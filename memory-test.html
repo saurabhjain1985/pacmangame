@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Memory Test</title>
+    <link rel="stylesheet" href="memory.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="back-button" onclick="goBack()">← Back to Games</div>
+        
+        <header>
+            <h1 id="game-title">🧠 Simple Memory Test</h1>
+        </header>
+
+        <!-- Difficulty Selection Screen -->
+        <div id="difficulty-screen" class="screen active">
+            <h2>Choose Your Challenge</h2>
+            <div class="difficulty-grid">
+                <div class="difficulty-card">
+                    <h3>Medium Test</h3>
+                    <button class="start-btn" onclick="startGame('medium')">Start Test</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div id="game-board"></div>
+            <div class="game-controls">
+                <button class="action-btn" onclick="goBack()">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="memory-simple.js"></script>
+</body>
+</html>

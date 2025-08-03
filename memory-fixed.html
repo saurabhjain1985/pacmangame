@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Match - Brain Training Game</title>
-    <meta name="description" content="Test your memory with this beautiful card matching game featuring 3 difficulty levels">
-    <meta name="keywords" content="memory, cards, game, brain, training, ios, apple">
+    <title>Memory Match - Fixed Version</title>
     <link rel="stylesheet" href="memory.css">
 </head>
 <body>
@@ -13,7 +11,7 @@
         <div id="back-button" onclick="goBack()">← Back to Games</div>
         
         <header>
-            <h1 id="game-title">🧠 Memory Match</h1>
+            <h1 id="game-title">🧠 Memory Match (Fixed)</h1>
             <div id="game-stats">
                 <div class="stat">
                     <span class="stat-label">Score</span>
@@ -39,7 +37,7 @@
                 <div class="difficulty-card" data-level="easy">
                     <div class="difficulty-icon">😊</div>
                     <h3>Easy</h3>
-                    <p>4x3 Grid • 6 Pairs</p>
+                    <p>3x4 Grid • 6 Pairs</p>
                     <p>Perfect for beginners</p>
                     <button class="start-btn" onclick="startGame('easy')">Start Easy</button>
                 </div>
@@ -48,15 +46,15 @@
                     <div class="difficulty-icon">🤔</div>
                     <h3>Medium</h3>
                     <p>4x4 Grid • 8 Pairs</p>
-                    <p>Good challenge level</p>
+                    <p>Good for practice</p>
                     <button class="start-btn" onclick="startGame('medium')">Start Medium</button>
                 </div>
                 
                 <div class="difficulty-card" data-level="hard">
-                    <div class="difficulty-icon">🤯</div>
+                    <div class="difficulty-icon">🔥</div>
                     <h3>Hard</h3>
-                    <p>6x4 Grid • 12 Pairs</p>
-                    <p>Ultimate memory test</p>
+                    <p>4x6 Grid • 12 Pairs</p>
+                    <p>Expert challenge</p>
                     <button class="start-btn" onclick="startGame('hard')">Start Hard</button>
                 </div>
             </div>
@@ -66,37 +64,33 @@
         <div id="game-screen" class="screen">
             <div id="game-board"></div>
             
-            <div id="game-controls">
-                <button id="pause-btn" onclick="pauseGame()">⏸️ Pause</button>
-                <button id="restart-btn" onclick="restartGame()">🔄 Restart</button>
-                <button id="new-game-btn" onclick="newGame()">🎮 New Game</button>
-                <button id="debug-btn" onclick="debugShowAll()" style="background: #ff6b6b;">🔍 Debug: Show All</button>
+            <div class="game-controls">
+                <button class="action-btn" onclick="pauseGame()">⏸️ Pause</button>
+                <button class="action-btn" onclick="restartGame()">🔄 Restart</button>
+                <button class="action-btn" onclick="newGame()">🎮 New Game</button>
+                <button class="action-btn" onclick="debugShowAll()" style="opacity: 0.5; font-size: 12px;">Debug</button>
             </div>
         </div>
 
-        <!-- Game Over Screen -->
-        <div id="game-over-screen" class="screen">
-            <h2 id="game-over-title">🎉 Congratulations!</h2>
-            <div id="final-stats">
-                <div class="final-stat">
-                    <span class="final-label">Final Score</span>
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="screen">
+            <h2>🎉 Congratulations!</h2>
+            <p>You completed the memory challenge!</p>
+            
+            <div class="victory-stats">
+                <div class="victory-stat">
+                    <span class="victory-label">Final Score</span>
                     <span id="final-score">0</span>
                 </div>
-                <div class="final-stat">
-                    <span class="final-label">Total Moves</span>
-                    <span id="final-moves">0</span>
-                </div>
-                <div class="final-stat">
-                    <span class="final-label">Time Taken</span>
+                <div class="victory-stat">
+                    <span class="victory-label">Time</span>
                     <span id="final-time">00:00</span>
                 </div>
-                <div class="final-stat">
-                    <span class="final-label">Accuracy</span>
-                    <span id="accuracy">0%</span>
+                <div class="victory-stat">
+                    <span class="victory-label">Moves</span>
+                    <span id="final-moves">0</span>
                 </div>
             </div>
-            
-            <div id="performance-message"></div>
             
             <div class="game-over-buttons">
                 <button class="action-btn" onclick="playAgain()">🔄 Play Again</button>
@@ -117,11 +111,23 @@
         </div>
     </div>
 
-    <script src="memory.js"></script>
+    <script src="memory-fixed.js"></script>
     <script>
         function goBack() {
             window.location.href = 'index.html';
         }
+        
+        // Additional debugging
+        console.log('Memory HTML loaded');
+        
+        // Check initialization after a delay
+        setTimeout(() => {
+            if (window.memoryGameInstance) {
+                console.log('✅ Game instance confirmed loaded');
+            } else {
+                console.error('❌ Game instance not found after 1 second');
+            }
+        }, 1000);
     </script>
 </body>
 </html>

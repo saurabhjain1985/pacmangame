@@ -1,0 +1,610 @@
+/* Puzzle Games Styles - iOS Design */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #ffffff;
+    overflow-x: hidden;
+    padding: 20px;
+}
+
+#game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+#back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+header {
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+}
+
+#game-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 4s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+#game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 1rem;
+    min-width: 100px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat span:last-child {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Puzzle Selection Grid */
+.puzzle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.puzzle-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.puzzle-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.puzzle-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.puzzle-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.puzzle-card p {
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
+.start-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    filter: brightness(1.1);
+}
+
+/* Difficulty Selector */
+.difficulty-selector {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.difficulty-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.difficulty-btn.active,
+.difficulty-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* Sliding Puzzle */
+.sliding-board {
+    display: grid;
+    gap: 2px;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 15px;
+    margin: 0 auto 2rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.sliding-tile {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.sliding-tile:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.sliding-tile.empty {
+    background: transparent;
+    box-shadow: none;
+    cursor: default;
+}
+
+.sliding-tile.empty:hover {
+    transform: none;
+}
+
+/* Word Search */
+.word-list {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.word-list h4 {
+    margin-bottom: 1rem;
+    color: #4ecdc4;
+}
+
+#words-to-find {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.word-item {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.word-item.found {
+    background: rgba(76, 175, 80, 0.6);
+    text-decoration: line-through;
+}
+
+.word-grid {
+    display: grid;
+    gap: 2px;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    max-width: 500px;
+}
+
+.word-cell {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.word-cell:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.word-cell.selected {
+    background: rgba(255, 193, 7, 0.6);
+}
+
+.word-cell.found {
+    background: rgba(76, 175, 80, 0.6);
+}
+
+/* Number Puzzle */
+#number-puzzle-area {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+#number-question {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+#number-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.number-option {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    color: white;
+    padding: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.number-option:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.number-option.correct {
+    background: rgba(76, 175, 80, 0.6);
+    border-color: #4CAF50;
+}
+
+.number-option.incorrect {
+    background: rgba(244, 67, 54, 0.6);
+    border-color: #f44336;
+}
+
+/* Pattern Match */
+#pattern-display {
+    max-width: 700px;
+    margin: 0 auto 2rem;
+}
+
+#pattern-sequence {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.pattern-item {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.pattern-item.missing {
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+}
+
+#pattern-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.pattern-option {
+    width: 80px;
+    height: 80px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.pattern-option:hover {
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.pattern-option.correct {
+    border-color: #4CAF50;
+    animation: correctPulse 0.6s ease-in-out;
+}
+
+@keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* Game Controls */
+.game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Victory Stats */
+.victory-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+.victory-stat {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.victory-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.victory-stat span:last-child {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #4ecdc4;
+}
+
+.victory-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    #game-title {
+        font-size: 2rem;
+    }
+    
+    .puzzle-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+    
+    .puzzle-card {
+        padding: 1.5rem;
+    }
+    
+    .sliding-tile {
+        font-size: 1.2rem;
+    }
+    
+    .word-grid {
+        max-width: 300px;
+    }
+    
+    #pattern-sequence {
+        padding: 1rem;
+    }
+    
+    .pattern-item {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+    
+    .pattern-option {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+    
+    .victory-stats {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    
+    .victory-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-btn {
+        width: 200px;
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .difficulty-selector {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .word-cell {
+        font-size: 0.8rem;
+    }
+    
+    #number-options {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    #pattern-options {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Loading and transition effects */
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.screen.active {
+    animation: slideInFromBottom 0.6s ease-out;
+}

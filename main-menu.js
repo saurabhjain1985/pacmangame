@@ -94,8 +94,18 @@ class GameMenu {
                 case 'snake':
                     window.location.href = 'snake.html';
                     break;
+                case 'tetris':
+                    window.location.href = 'tetris.html';
+                    break;
+                case 'breakout':
+                    window.location.href = 'breakout.html';
+                    break;
+                case 'puzzle':
+                    window.location.href = 'puzzle.html';
+                    break;
                 default:
                     console.log(`Game ${gameType} not implemented yet`);
+                    alert('This game is coming soon!');
             }
         }, 800);
     }

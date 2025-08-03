@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .test-button {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            display: inline-block;
+        }
+        
+        .test-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .debug-output {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .status.success {
+            background: rgba(0,255,0,0.2);
+            border: 1px solid #00ff00;
+        }
+        
+        .status.error {
+            background: rgba(255,0,0,0.2);
+            border: 1px solid #ff0000;
+        }
+        
+        .status.info {
+            background: rgba(0,0,255,0.2);
+            border: 1px solid #0066ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧠 Memory Game Diagnostic Test</h1>
+        
+        <div class="status info" id="status">
+            Loading...
+        </div>
+        
+        <div class="test-buttons">
+            <button class="test-button" onclick="testBasicFunctions()">Test Basic Functions</button>
+            <button class="test-button" onclick="testGameInitialization()">Test Game Init</button>
+            <button class="test-button" onclick="testStartEasy()">Test Start Easy Game</button>
+            <button class="test-button" onclick="clearLog()">Clear Log</button>
+            <button class="test-button" onclick="window.location.href='memory.html'">Go to Full Game</button>
+        </div>
+        
+        <div class="debug-output" id="debugOutput">
+            <div><strong>Debug Log:</strong></div>
+        </div>
+    </div>
+    
+    <script>
+        // Override console.log to show in our debug output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const debugOutput = document.getElementById('debugOutput');
+        
+        function addToLog(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? '#ff6666' : '#ffffff';
+            div.style.marginBottom = '2px';
+            div.textContent = `[${timestamp}] ${message}`;
+            debugOutput.appendChild(div);
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToLog(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToLog('ERROR: ' + args.join(' '), 'error');
+        };
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        function clearLog() {
+            debugOutput.innerHTML = '<div><strong>Debug Log (cleared):</strong></div>';
+        }
+        
+        function testBasicFunctions() {
+            console.log('=== Testing Basic Functions ===');
+            
+            // Test if memory.js loaded
+            const memoryScriptTags = document.querySelectorAll('script[src*="memory"]');
+            console.log('Memory script tags found:', memoryScriptTags.length);
+            
+            // Test global variables
+            console.log('window.memoryGame exists:', !!window.memoryGame);
+            console.log('memoryGame variable exists:', typeof memoryGame !== 'undefined');
+            
+            // Test global functions
+            console.log('startGame function exists:', typeof startGame === 'function');
+            console.log('goBack function exists:', typeof goBack === 'function');
+            
+            if (typeof startGame === 'function') {
+                updateStatus('Basic functions test: PASSED', 'success');
+            } else {
+                updateStatus('Basic functions test: FAILED', 'error');
+            }
+        }
+        
+        function testGameInitialization() {
+            console.log('=== Testing Game Initialization ===');
+            
+            if (window.memoryGame) {
+                console.log('Memory game instance found:', window.memoryGame.constructor.name);
+                console.log('Game state:', window.memoryGame.gameState);
+                console.log('Game methods available:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.memoryGame)));
+                updateStatus('Game initialization test: PASSED', 'success');
+            } else {
+                console.log('No memory game instance found');
+                updateStatus('Game initialization test: FAILED', 'error');
+            }
+        }
+        
+        function testStartEasy() {
+            console.log('=== Testing Start Easy Game ===');
+            try {
+                if (typeof startGame === 'function') {
+                    console.log('Calling startGame("easy")...');
+                    startGame('easy');
+                    setTimeout(() => {
+                        const gameScreen = document.getElementById('game-screen');
+                        if (gameScreen && gameScreen.classList.contains('active')) {
+                            console.log('Game screen is now active');
+                            updateStatus('Start game test: PASSED', 'success');
+                        } else {
+                            console.log('Game screen not activated');
+                            updateStatus('Start game test: FAILED', 'error');
+                        }
+                    }, 1000);
+                } else {
+                    throw new Error('startGame function not available');
+                }
+            } catch (error) {
+                console.error('Error testing start game:', error);
+                updateStatus('Start game test: ERROR', 'error');
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Test page loaded');
+            updateStatus('Test page ready', 'info');
+            
+            // Check if memory.js is already loaded
+            setTimeout(() => {
+                if (window.memoryGame) {
+                    updateStatus('Memory game detected and ready', 'success');
+                } else {
+                    updateStatus('Memory game not detected - check console', 'error');
+                }
+            }, 500);
+        });
+    </script>
+    
+    <!-- Load the memory game script -->
+    <script src="memory.js"></script>
+</body>
+</html>

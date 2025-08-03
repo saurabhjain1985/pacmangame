@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakout - iOS Style Brick Breaker</title>
+    <meta name="description" content="Classic Breakout game with modern iOS design and power-ups">
+    <link rel="stylesheet" href="breakout.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="back-button" onclick="goBack()">← Back to Games</div>
+        
+        <header>
+            <h1 id="game-title">🏓 Breakout</h1>
+            <div id="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Lives</span>
+                    <span id="lives">3</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Level</span>
+                    <span id="level">1</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Game Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h2>🏓 Classic Breakout</h2>
+            <p>Break all the bricks with your ball!</p>
+            
+            <div class="difficulty-grid">
+                <div class="difficulty-card">
+                    <div class="difficulty-icon">😊</div>
+                    <h3>Easy</h3>
+                    <p>Slow ball speed</p>
+                    <p>Large paddle</p>
+                    <button class="start-btn" onclick="startGame('easy')">Start Easy</button>
+                </div>
+                
+                <div class="difficulty-card">
+                    <div class="difficulty-icon">🤔</div>
+                    <h3>Medium</h3>
+                    <p>Normal ball speed</p>
+                    <p>Standard paddle</p>
+                    <button class="start-btn" onclick="startGame('medium')">Start Medium</button>
+                </div>
+                
+                <div class="difficulty-card">
+                    <div class="difficulty-icon">🔥</div>
+                    <h3>Hard</h3>
+                    <p>Fast ball speed</p>
+                    <p>Small paddle</p>
+                    <button class="start-btn" onclick="startGame('hard')">Start Hard</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div id="game-area">
+                <canvas id="breakout-canvas" width="800" height="600"></canvas>
+            </div>
+            
+            <div class="mobile-controls">
+                <div class="control-row">
+                    <button class="control-btn" id="left-btn">← Move Left</button>
+                    <button class="control-btn" id="right-btn">Move Right →</button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" id="launch-btn">🚀 Launch Ball</button>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="action-btn" onclick="pauseGame()">⏸️ Pause</button>
+                <button class="action-btn" onclick="restartGame()">🔄 Restart</button>
+                <button class="action-btn" onclick="newGame()">🎮 New Game</button>
+            </div>
+        </div>
+
+        <!-- Level Complete Screen -->
+        <div id="level-complete-screen" class="screen">
+            <h2>🎉 Level Complete!</h2>
+            <p>Amazing! You cleared all the bricks!</p>
+            
+            <div class="level-stats">
+                <div class="level-stat">
+                    <span class="level-label">Level Score</span>
+                    <span id="level-score">0</span>
+                </div>
+                <div class="level-stat">
+                    <span class="level-label">Bonus Points</span>
+                    <span id="bonus-points">0</span>
+                </div>
+                <div class="level-stat">
+                    <span class="level-label">Total Score</span>
+                    <span id="total-score">0</span>
+                </div>
+            </div>
+            
+            <div class="level-complete-buttons">
+                <button class="action-btn" onclick="nextLevel()">➡️ Next Level</button>
+                <button class="action-btn" onclick="restartGame()">🔄 Restart</button>
+                <button class="action-btn" onclick="newGame()">🎮 New Game</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen">
+            <h2>💥 Game Over!</h2>
+            <p>Don't give up! Try again!</p>
+            
+            <div class="final-stats">
+                <div class="final-stat">
+                    <span class="final-label">Final Score</span>
+                    <span id="final-score">0</span>
+                </div>
+                <div class="final-stat">
+                    <span class="final-label">Levels Completed</span>
+                    <span id="levels-completed">0</span>
+                </div>
+                <div class="final-stat">
+                    <span class="final-label">Bricks Destroyed</span>
+                    <span id="bricks-destroyed">0</span>
+                </div>
+            </div>
+            
+            <div class="game-over-buttons">
+                <button class="action-btn" onclick="playAgain()">🔄 Play Again</button>
+                <button class="action-btn" onclick="newGame()">🎮 New Difficulty</button>
+                <button class="action-btn" onclick="goBack()">← Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pause-screen" class="screen">
+            <h2>⏸️ Game Paused</h2>
+            <p>Take a break, the game will wait for you</p>
+            <div class="pause-buttons">
+                <button class="action-btn" onclick="resumeGame()">▶️ Resume</button>
+                <button class="action-btn" onclick="restartGame()">🔄 Restart</button>
+                <button class="action-btn" onclick="newGame()">🎮 New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="breakout.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Games - Brain Training Collection</title>
+    <link rel="stylesheet" href="puzzle.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="back-button" onclick="goBack()">← Back to Games</div>
+        
+        <header>
+            <h1 id="game-title">🎲 Puzzle Games</h1>
+            <div id="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Time</span>
+                    <span id="timer">00:00</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Moves</span>
+                    <span id="moves">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Puzzle Selection Screen -->
+        <div id="puzzle-selection-screen" class="screen active">
+            <h2>Choose Your Brain Challenge</h2>
+            <p>Train your mind with these engaging puzzles!</p>
+            
+            <div class="puzzle-grid">
+                <div class="puzzle-card" data-puzzle="sliding">
+                    <div class="puzzle-icon">🧩</div>
+                    <h3>Sliding Puzzle</h3>
+                    <p>Classic 15-puzzle game</p>
+                    <p>Arrange numbers in order</p>
+                    <button class="start-btn" onclick="startPuzzle('sliding')">Play Now</button>
+                </div>
+                
+                <div class="puzzle-card" data-puzzle="word">
+                    <div class="puzzle-icon">📝</div>
+                    <h3>Word Search</h3>
+                    <p>Find hidden words</p>
+                    <p>Multiple difficulty levels</p>
+                    <button class="start-btn" onclick="startPuzzle('word')">Play Now</button>
+                </div>
+                
+                <div class="puzzle-card" data-puzzle="number">
+                    <div class="puzzle-icon">🔢</div>
+                    <h3>Number Puzzle</h3>
+                    <p>Mathematical challenges</p>
+                    <p>Logic and arithmetic</p>
+                    <button class="start-btn" onclick="startPuzzle('number')">Play Now</button>
+                </div>
+                
+                <div class="puzzle-card" data-puzzle="pattern">
+                    <div class="puzzle-icon">🎨</div>
+                    <h3>Pattern Match</h3>
+                    <p>Visual pattern recognition</p>
+                    <p>Color and shape puzzles</p>
+                    <button class="start-btn" onclick="startPuzzle('pattern')">Play Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sliding Puzzle Game -->
+        <div id="sliding-game-screen" class="screen">
+            <h2>🧩 Sliding Puzzle</h2>
+            <p>Arrange the numbers from 1 to 15 in order</p>
+            
+            <div class="difficulty-selector">
+                <button class="difficulty-btn active" onclick="setSlidingDifficulty(3)">3x3 Easy</button>
+                <button class="difficulty-btn" onclick="setSlidingDifficulty(4)">4x4 Classic</button>
+                <button class="difficulty-btn" onclick="setSlidingDifficulty(5)">5x5 Hard</button>
+            </div>
+            
+            <div id="sliding-board" class="sliding-board"></div>
+            
+            <div class="game-controls">
+                <button class="action-btn" onclick="shuffleSliding()">🔀 Shuffle</button>
+                <button class="action-btn" onclick="resetPuzzle()">🔄 Reset</button>
+                <button class="action-btn" onclick="backToSelection()">← Back</button>
+            </div>
+        </div>
+
+        <!-- Word Search Game -->
+        <div id="word-game-screen" class="screen">
+            <h2>📝 Word Search</h2>
+            <p>Find all the hidden words in the grid</p>
+            
+            <div class="word-list">
+                <h4>Find these words:</h4>
+                <div id="words-to-find"></div>
+            </div>
+            
+            <div id="word-grid" class="word-grid"></div>
+            
+            <div class="game-controls">
+                <button class="action-btn" onclick="newWordPuzzle()">🆕 New Puzzle</button>
+                <button class="action-btn" onclick="showWordHint()">💡 Hint</button>
+                <button class="action-btn" onclick="backToSelection()">← Back</button>
+            </div>
+        </div>
+
+        <!-- Number Puzzle Game -->
+        <div id="number-game-screen" class="screen">
+            <h2>🔢 Number Puzzle</h2>
+            <p>Solve mathematical challenges</p>
+            
+            <div id="number-puzzle-area">
+                <div id="number-question"></div>
+                <div id="number-options"></div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="action-btn" onclick="nextNumberPuzzle()">➡️ Next</button>
+                <button class="action-btn" onclick="resetNumberPuzzle()">🔄 Reset</button>
+                <button class="action-btn" onclick="backToSelection()">← Back</button>
+            </div>
+        </div>
+
+        <!-- Pattern Match Game -->
+        <div id="pattern-game-screen" class="screen">
+            <h2>🎨 Pattern Match</h2>
+            <p>Complete the pattern sequence</p>
+            
+            <div id="pattern-display">
+                <div id="pattern-sequence"></div>
+                <div id="pattern-options"></div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="action-btn" onclick="nextPattern()">➡️ Next</button>
+                <button class="action-btn" onclick="resetPattern()">🔄 Reset</button>
+                <button class="action-btn" onclick="backToSelection()">← Back</button>
+            </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="screen">
+            <h2>🎉 Puzzle Complete!</h2>
+            <p>Congratulations! You solved it!</p>
+            
+            <div class="victory-stats">
+                <div class="victory-stat">
+                    <span class="victory-label">Final Score</span>
+                    <span id="final-score">0</span>
+                </div>
+                <div class="victory-stat">
+                    <span class="victory-label">Time</span>
+                    <span id="final-time">00:00</span>
+                </div>
+                <div class="victory-stat">
+                    <span class="victory-label">Moves</span>
+                    <span id="final-moves">0</span>
+                </div>
+            </div>
+            
+            <div class="victory-buttons">
+                <button class="action-btn" onclick="playAgain()">🔄 Play Again</button>
+                <button class="action-btn" onclick="backToSelection()">🎲 Try Another</button>
+                <button class="action-btn" onclick="goBack()">← Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.difficulty-card');
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.style.animation = 'bounce 0.5s ease-in-out';
+                    setTimeout(() => {
+                        card.style.animation = '';
+                    }, 500);
+                });
+            });
+        });
+    </script>
+    
+    <style>
+        .coming-soon-info {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            text-align: left;
+        }
+        
+        .coming-soon-info h3 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #4ecdc4;
+        }
+        
+        .coming-soon-info ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .coming-soon-info li {
+            padding: 0.5rem 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .start-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+    </style>
+</body>
+</html>

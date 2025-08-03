@@ -1,7 +1,10 @@
-// Memory Match Game - Advanced JavaScript Implementation
+// Memory Match Game - Working Version
+console.log('🧠 Loading Memory Game...');
+
 class MemoryGame {
     constructor() {
-        this.gameState = 'menu'; // menu, playing, paused, finished
+        console.log('Creating MemoryGame instance');
+        this.gameState = 'menu';
         this.difficulty = null;
         this.cards = [];
         this.flippedCards = [];
@@ -10,584 +13,464 @@ class MemoryGame {
         this.score = 0;
         this.timer = 0;
         this.timerInterval = null;
-        this.gameStartTime = null;
         
-        // Difficulty configurations
         this.difficulties = {
-            easy: { rows: 3, cols: 4, pairs: 6, timeBonus: 10, scoreMultiplier: 1 },
-            medium: { rows: 4, cols: 4, pairs: 8, timeBonus: 15, scoreMultiplier: 1.5 },
-            hard: { rows: 4, cols: 6, pairs: 12, timeBonus: 20, scoreMultiplier: 2 }
+            easy: { rows: 3, cols: 4, pairs: 6 },
+            medium: { rows: 4, cols: 4, pairs: 8 },
+            hard: { rows: 4, cols: 6, pairs: 12 }
         };
         
-        // Card symbols - using emojis for visual appeal
-        this.cardSymbols = [
-            '🎮', '🕹️', '🎯', '🎲', '🎪', '🎨', '🎭', '🎪',
+        this.symbols = [
+            '🎮', '🕹️', '🎯', '🎲', '🎪', '🎨', '🎭', '🎺',
             '🌟', '⭐', '💎', '💫', '🔥', '⚡', '🌈', '🎊',
             '🎁', '🎈', '🎉', '🎀', '🏆', '🥇', '🎖️', '🏅'
         ];
         
         this.init();
     }
-
+    
     init() {
-        this.bindEvents();
+        console.log('Initializing memory game');
         this.showScreen('difficulty-screen');
-        console.log('Memory game initialized');
     }
-
-    bindEvents() {
-        // Add keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            try {
-                switch(e.key) {
-                    case 'Escape':
-                        if (this.gameState === 'playing') {
-                            this.pauseGame();
-                        } else if (this.gameState === 'paused') {
-                            this.resumeGame();
-                        }
-                        break;
-                    case 'r':
-                    case 'R':
-                        if (this.gameState === 'playing' || this.gameState === 'paused') {
-                            this.restartGame();
-                        }
-                        break;
-                    case 'n':
-                    case 'N':
-                        this.newGame();
-                        break;
-                }
-            } catch (error) {
-                console.error('Keyboard event error:', error);
-            }
-        });
-
-        // Add click sound effect simulation
-        document.addEventListener('click', (e) => {
-            try {
-                if (e.target.classList.contains('game-card') || 
-                    e.target.classList.contains('start-btn') || 
-                    e.target.classList.contains('action-btn')) {
-                    this.playClickSound();
-                }
-            } catch (error) {
-                console.error('Click sound error:', error);
-            }
-        });
-    }
-
-    playClickSound() {
-        // Create audio feedback using Web Audio API
-        if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
-            const audioContext = new (AudioContext || webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.1);
-        }
-    }
-
+    
     showScreen(screenId) {
+        console.log('Showing screen:', screenId);
         document.querySelectorAll('.screen').forEach(screen => {
             screen.classList.remove('active');
         });
-        document.getElementById(screenId).classList.add('active');
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+            console.log('Screen activated:', screenId);
+        } else {
+            console.error('Screen not found:', screenId);
+        }
     }
-
+    
     startGame(difficulty) {
-        console.log('Starting memory game with difficulty:', difficulty);
+        console.log('🎮 Starting game with difficulty:', difficulty);
         this.difficulty = difficulty;
         this.gameState = 'playing';
-        this.resetGameState();
+        this.resetGame();
         this.createCards();
         this.shuffleCards();
-        this.renderGameBoard();
+        this.renderBoard();
         this.startTimer();
         this.showScreen('game-screen');
-        
-        // Add entrance animation
-        setTimeout(() => {
-            this.animateCardsEntrance();
-        }, 100);
-        
-        console.log('Game started, cards created:', this.cards.length);
     }
-
-    resetGameState() {
+    
+    resetGame() {
+        console.log('Resetting game state');
         this.cards = [];
         this.flippedCards = [];
         this.matchedPairs = 0;
         this.moves = 0;
         this.score = 0;
         this.timer = 0;
-        this.gameStartTime = Date.now();
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
         this.updateDisplay();
     }
-
+    
     createCards() {
         const config = this.difficulties[this.difficulty];
-        const selectedSymbols = this.cardSymbols.slice(0, config.pairs);
+        const numPairs = config.pairs;
+        const selectedSymbols = this.symbols.slice(0, numPairs);
         
-        // Create pairs of cards
-        const cardData = [];
+        console.log('Creating', numPairs, 'pairs of cards with symbols:', selectedSymbols);
+        
+        this.cards = [];
         selectedSymbols.forEach((symbol, index) => {
-            cardData.push({ id: index * 2, symbol, matched: false });
-            cardData.push({ id: index * 2 + 1, symbol, matched: false });
+            this.cards.push({
+                id: `card-${index}-1`,
+                symbol: symbol,
+                matched: false,
+                flipped: false
+            });
+            this.cards.push({
+                id: `card-${index}-2`, 
+                symbol: symbol,
+                matched: false,
+                flipped: false
+            });
         });
         
-        this.cards = cardData;
+        console.log('Created cards array with length:', this.cards.length);
     }
-
+    
     shuffleCards() {
-        // Fisher-Yates shuffle algorithm
+        console.log('Shuffling cards');
         for (let i = this.cards.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
         }
     }
-
-    renderGameBoard() {
+    
+    renderBoard() {
+        console.log('Rendering game board');
         const gameBoard = document.getElementById('game-board');
-        const config = this.difficulties[this.difficulty];
+        if (!gameBoard) {
+            console.error('Game board element not found!');
+            return;
+        }
         
-        console.log('Rendering game board for difficulty:', this.difficulty, 'with', this.cards.length, 'cards');
-        
-        // Set grid layout
-        gameBoard.className = `difficulty-${this.difficulty}`;
         gameBoard.innerHTML = '';
+        gameBoard.className = `difficulty-${this.difficulty}`;
         
         this.cards.forEach((card, index) => {
             const cardElement = this.createCardElement(card, index);
             gameBoard.appendChild(cardElement);
         });
         
-        console.log('Game board rendered with', gameBoard.children.length, 'card elements');
+        console.log('Board rendered with', gameBoard.children.length, 'cards');
     }
-
+    
     createCardElement(card, index) {
         const cardElement = document.createElement('div');
-        cardElement.classList.add('game-card');
+        cardElement.className = 'game-card';
         cardElement.dataset.cardId = card.id;
         cardElement.dataset.index = index;
         
-        cardElement.innerHTML = `
-            <div class="card-face card-back"></div>
-            <div class="card-face card-front">${card.symbol}</div>
-        `;
+        const cardBack = document.createElement('div');
+        cardBack.className = 'card-face card-back';
         
-        // Add click event listener
-        cardElement.addEventListener('click', (e) => {
+        const cardFront = document.createElement('div');
+        cardFront.className = 'card-face card-front';
+        cardFront.textContent = card.symbol;
+        cardFront.style.fontSize = '2rem';
+        cardFront.style.lineHeight = '1';
+        
+        cardElement.appendChild(cardBack);
+        cardElement.appendChild(cardFront);
+        
+        const clickHandler = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Card element clicked, index:', index);
+            console.log('🖱️ Card clicked! Index:', index, 'Symbol:', card.symbol);
             this.handleCardClick(index);
-        });
+        };
         
-        // Add touch event for mobile
-        cardElement.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Card element touched, index:', index);
-            this.handleCardClick(index);
-        });
+        cardElement.addEventListener('click', clickHandler);
+        cardElement.addEventListener('touchend', clickHandler);
         
-        console.log('Created card element for index:', index, 'symbol:', card.symbol);
+        cardElement.style.cursor = 'pointer';
+        cardElement.style.userSelect = 'none';
+        
+        console.log('✅ Created card element', index, 'with symbol', card.symbol);
         
         return cardElement;
     }
-
-    animateCardsEntrance() {
-        const cards = document.querySelectorAll('.game-card');
-        cards.forEach((card, index) => {
-            setTimeout(() => {
-                card.style.animation = 'fadeIn 0.5s ease-out';
-                card.style.transform = 'scale(1)';
-            }, index * 50);
-        });
-    }
-
+    
     handleCardClick(index) {
-        console.log('Card clicked:', index, 'Game state:', this.gameState);
+        console.log('🎯 Handling card click for index:', index);
         
         if (this.gameState !== 'playing') {
-            console.log('Game not in playing state, ignoring click');
+            console.log('❌ Game not in playing state:', this.gameState);
             return;
         }
+        
         if (this.flippedCards.length >= 2) {
-            console.log('Already 2 cards flipped, ignoring click');
+            console.log('❌ Already have 2 flipped cards');
             return;
         }
-        if (this.cards[index].matched) {
-            console.log('Card already matched, ignoring click');
+        
+        const card = this.cards[index];
+        if (!card) {
+            console.error('❌ Card not found at index:', index);
+            return;
+        }
+        
+        if (card.matched || card.flipped) {
+            console.log('❌ Card already matched or flipped');
             return;
         }
         
         const cardElement = document.querySelector(`[data-index="${index}"]`);
         if (!cardElement) {
-            console.log('Card element not found for index:', index);
+            console.error('❌ Card element not found');
             return;
         }
+        
         if (cardElement.classList.contains('flipped')) {
-            console.log('Card already flipped, ignoring click');
+            console.log('❌ Card already visually flipped');
             return;
         }
         
-        // Flip the card
+        console.log('✅ FLIPPING CARD:', index, card.symbol);
         this.flipCard(cardElement, index);
-        this.flippedCards.push({ element: cardElement, index: index });
         
-        console.log('Card flipped, total flipped cards:', this.flippedCards.length);
+        card.flipped = true;
+        this.flippedCards.push({ element: cardElement, index: index, card: card });
+        
+        console.log('📊 Total flipped cards:', this.flippedCards.length);
         
         if (this.flippedCards.length === 2) {
             this.moves++;
             this.updateDisplay();
-            setTimeout(() => this.checkMatch(), 800);
+            setTimeout(() => this.checkMatch(), 1000);
         }
     }
-
+    
     flipCard(cardElement, index) {
+        console.log('🔄 Visually flipping card:', index);
         cardElement.classList.add('flipped');
-        this.playFlipSound();
+        cardElement.offsetHeight;
+        this.playSound('flip');
     }
-
-    playFlipSound() {
-        // Enhanced flip sound
-        if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
-            const audioContext = new (AudioContext || webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.15);
-        }
-    }
-
+    
     checkMatch() {
-        const [card1, card2] = this.flippedCards;
-        const symbol1 = this.cards[card1.index].symbol;
-        const symbol2 = this.cards[card2.index].symbol;
+        console.log('🔍 Checking for match...');
         
-        if (symbol1 === symbol2) {
-            // Match found!
-            this.handleMatch(card1, card2);
+        if (this.flippedCards.length !== 2) {
+            console.error('❌ Expected 2 flipped cards, got:', this.flippedCards.length);
+            return;
+        }
+        
+        const [first, second] = this.flippedCards;
+        const isMatch = first.card.symbol === second.card.symbol;
+        
+        console.log('Match check:', first.card.symbol, 'vs', second.card.symbol, '=', isMatch);
+        
+        if (isMatch) {
+            console.log('✅ MATCH FOUND!');
+            first.card.matched = true;
+            second.card.matched = true;
+            first.element.classList.add('matched');
+            second.element.classList.add('matched');
+            
+            this.matchedPairs++;
+            this.score += 100;
+            this.playSound('match');
+            
+            if (this.matchedPairs === this.difficulties[this.difficulty].pairs) {
+                setTimeout(() => this.gameComplete(), 500);
+            }
         } else {
-            // No match
-            this.handleNoMatch(card1, card2);
+            console.log('❌ No match - flipping back');
+            first.element.classList.remove('flipped');
+            second.element.classList.remove('flipped');
+            first.card.flipped = false;
+            second.card.flipped = false;
+            this.playSound('noMatch');
         }
         
         this.flippedCards = [];
-    }
-
-    handleMatch(card1, card2) {
-        // Mark cards as matched
-        this.cards[card1.index].matched = true;
-        this.cards[card2.index].matched = true;
-        
-        // Add match animation
-        card1.element.classList.add('matched');
-        card2.element.classList.add('matched');
-        
-        this.matchedPairs++;
-        this.calculateScore(true);
-        this.updateDisplay();
-        this.playMatchSound();
-        
-        // Check if game is complete
-        const config = this.difficulties[this.difficulty];
-        if (this.matchedPairs === config.pairs) {
-            setTimeout(() => this.gameComplete(), 1000);
-        }
-    }
-
-    handleNoMatch(card1, card2) {
-        // Flip cards back
-        setTimeout(() => {
-            card1.element.classList.remove('flipped');
-            card2.element.classList.remove('flipped');
-        }, 500);
-        
-        this.calculateScore(false);
         this.updateDisplay();
     }
-
-    playMatchSound() {
-        // Success sound
-        if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
-            const audioContext = new (AudioContext || webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(523, audioContext.currentTime); // C5
-            oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.1); // E5
-            oscillator.frequency.setValueAtTime(784, audioContext.currentTime + 0.2); // G5
-            
-            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.4);
-        }
-    }
-
-    calculateScore(isMatch) {
-        const config = this.difficulties[this.difficulty];
-        const baseScore = 100;
-        const timeBonus = Math.max(0, config.timeBonus - Math.floor(this.timer / 10));
+    
+    gameComplete() {
+        console.log('🎉 GAME COMPLETE!');
+        this.gameState = 'finished';
+        this.stopTimer();
+        this.playSound('victory');
         
-        if (isMatch) {
-            const matchScore = (baseScore + timeBonus) * config.scoreMultiplier;
-            this.score += Math.round(matchScore);
-        } else {
-            // Small penalty for wrong moves
-            this.score = Math.max(0, this.score - 10);
-        }
+        const timeBonus = Math.max(0, 300 - this.timer);
+        const movesPenalty = Math.max(0, this.moves - this.difficulties[this.difficulty].pairs) * 5;
+        this.score = this.score + timeBonus - movesPenalty;
+        
+        this.updateDisplay();
+        this.showScreen('victory-screen');
+        
+        const finalScore = document.getElementById('final-score');
+        const finalTime = document.getElementById('final-time');
+        const finalMoves = document.getElementById('final-moves');
+        
+        if (finalScore) finalScore.textContent = this.score;
+        if (finalTime) finalTime.textContent = this.formatTime(this.timer);
+        if (finalMoves) finalMoves.textContent = this.moves;
     }
-
+    
     startTimer() {
+        console.log('⏰ Starting timer');
         this.timerInterval = setInterval(() => {
-            if (this.gameState === 'playing') {
-                this.timer++;
-                this.updateDisplay();
-            }
+            this.timer++;
+            this.updateDisplay();
         }, 1000);
     }
-
-    pauseGame() {
-        if (this.gameState === 'playing') {
-            this.gameState = 'paused';
-            this.showScreen('pause-screen');
-        }
-    }
-
-    resumeGame() {
-        if (this.gameState === 'paused') {
-            this.gameState = 'playing';
-            this.showScreen('game-screen');
-        }
-    }
-
-    restartGame() {
-        this.stopTimer();
-        this.startGame(this.difficulty);
-    }
-
-    newGame() {
-        this.stopTimer();
-        this.gameState = 'menu';
-        this.showScreen('difficulty-screen');
-    }
-
+    
     stopTimer() {
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
         }
     }
-
-    gameComplete() {
-        this.gameState = 'finished';
-        this.stopTimer();
-        this.calculateFinalStats();
-        this.showGameOverScreen();
+    
+    updateDisplay() {
+        const scoreElement = document.getElementById('score');
+        const movesElement = document.getElementById('moves');
+        const timerElement = document.getElementById('timer');
+        
+        if (scoreElement) scoreElement.textContent = this.score;
+        if (movesElement) movesElement.textContent = this.moves;
+        if (timerElement) timerElement.textContent = this.formatTime(this.timer);
     }
-
-    calculateFinalStats() {
-        const accuracy = this.moves > 0 ? Math.round((this.matchedPairs * 2 / this.moves) * 100) : 100;
-        const timeInSeconds = this.timer;
-        
-        // Performance message based on stats
-        let performanceMessage = '';
-        if (accuracy >= 90 && timeInSeconds <= 60) {
-            performanceMessage = '🏆 Perfect! You have an amazing memory!';
-        } else if (accuracy >= 75 && timeInSeconds <= 120) {
-            performanceMessage = '⭐ Great job! Excellent memory skills!';
-        } else if (accuracy >= 60) {
-            performanceMessage = '👍 Good work! Keep practicing!';
-        } else {
-            performanceMessage = '💪 Nice try! Practice makes perfect!';
-        }
-        
-        document.getElementById('performance-message').textContent = performanceMessage;
+    
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
-
-    showGameOverScreen() {
-        document.getElementById('final-score').textContent = this.score;
-        document.getElementById('final-moves').textContent = this.moves;
-        document.getElementById('final-time').textContent = this.formatTime(this.timer);
-        
-        const accuracy = this.moves > 0 ? Math.round((this.matchedPairs * 2 / this.moves) * 100) : 100;
-        document.getElementById('accuracy').textContent = accuracy + '%';
-        
-        this.showScreen('game-over-screen');
-        
-        // Add celebration animation
-        this.celebrateCompletion();
-    }
-
-    celebrateCompletion() {
-        // Create confetti effect
-        const colors = ['#667eea', '#764ba2', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24'];
-        
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                this.createConfetti(colors[Math.floor(Math.random() * colors.length)]);
-            }, i * 50);
-        }
-    }
-
-    createConfetti(color) {
-        const confetti = document.createElement('div');
-        confetti.style.cssText = `
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: ${color};
-            left: ${Math.random() * 100}vw;
-            top: -10px;
-            z-index: 10000;
-            pointer-events: none;
-            animation: confettiFall 3s linear forwards;
-        `;
-        
-        // Add confetti animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes confettiFall {
-                to {
-                    transform: translateY(100vh) rotate(720deg);
-                    opacity: 0;
-                }
+    
+    playSound(type) {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'flip':
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    break;
+                case 'match':
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                    break;
+                case 'noMatch':
+                    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                    break;
+                case 'victory':
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    break;
             }
-        `;
-        document.head.appendChild(style);
-        
-        document.body.appendChild(confetti);
-        
-        setTimeout(() => {
-            document.body.removeChild(confetti);
-        }, 3000);
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        } catch (error) {
+            // Silent fail for audio
+        }
     }
-
-    playAgain() {
+    
+    pauseGame() {
+        if (this.gameState === 'playing') {
+            this.gameState = 'paused';
+            this.stopTimer();
+            this.showScreen('pause-screen');
+        }
+    }
+    
+    resumeGame() {
+        if (this.gameState === 'paused') {
+            this.gameState = 'playing';
+            this.startTimer();
+            this.showScreen('game-screen');
+        }
+    }
+    
+    restartGame() {
+        console.log('🔄 Restarting game');
         this.startGame(this.difficulty);
     }
-
-    updateDisplay() {
-        document.getElementById('score').textContent = this.score;
-        document.getElementById('moves').textContent = this.moves;
-        document.getElementById('timer').textContent = this.formatTime(this.timer);
+    
+    newGame() {
+        console.log('🆕 Starting new game');
+        this.gameState = 'menu';
+        this.stopTimer();
+        this.showScreen('difficulty-screen');
     }
-
-    formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    
+    playAgain() {
+        this.restartGame();
     }
 }
 
 // Global functions for HTML onclick events
 function startGame(difficulty) {
-    console.log('Global startGame called with:', difficulty);
-    if (window.memoryGame || memoryGame) {
-        (window.memoryGame || memoryGame).startGame(difficulty);
+    console.log('🚀 Global startGame called with:', difficulty);
+    
+    if (window.memoryGameInstance && typeof window.memoryGameInstance.startGame === 'function') {
+        window.memoryGameInstance.startGame(difficulty);
     } else {
-        console.error('Memory game not initialized yet');
+        console.error('❌ Memory game not properly initialized');
+        // Try to initialize and then start
+        if (initializeMemoryGame()) {
+            setTimeout(() => {
+                if (window.memoryGameInstance) {
+                    window.memoryGameInstance.startGame(difficulty);
+                } else {
+                    alert('Game failed to load. Please refresh the page.');
+                }
+            }, 100);
+        }
     }
 }
 
 function pauseGame() {
-    if (window.memoryGame || memoryGame) {
-        (window.memoryGame || memoryGame).pauseGame();
+    if (window.memoryGameInstance) {
+        window.memoryGameInstance.pauseGame();
     }
 }
 
 function resumeGame() {
-    if (window.memoryGame || memoryGame) {
-        (window.memoryGame || memoryGame).resumeGame();
+    if (window.memoryGameInstance) {
+        window.memoryGameInstance.resumeGame();
     }
 }
 
 function restartGame() {
-    if (window.memoryGame || memoryGame) {
-        (window.memoryGame || memoryGame).restartGame();
+    if (window.memoryGameInstance) {
+        window.memoryGameInstance.restartGame();
     }
 }
 
 function newGame() {
-    if (window.memoryGame || memoryGame) {
-        (window.memoryGame || memoryGame).newGame();
+    if (window.memoryGameInstance) {
+        window.memoryGameInstance.newGame();
     }
 }
 
 function playAgain() {
-    if (window.memoryGame || memoryGame) {
-        (window.memoryGame || memoryGame).playAgain();
+    if (window.memoryGameInstance) {
+        window.memoryGameInstance.playAgain();
     }
 }
 
-// Global card click handler as backup
-function handleCardClick(index) {
-    console.log('Global handleCardClick called with index:', index);
-    if (window.memoryGame || memoryGame) {
-        (window.memoryGame || memoryGame).handleCardClick(index);
-    }
-}
-
-// Initialize the game when DOM is loaded
-let memoryGame;
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing memory game');
-    memoryGame = new MemoryGame();
-    window.memoryGame = memoryGame; // Make it globally accessible
-});
-
-// Fallback if DOMContentLoaded already fired
-if (document.readyState === 'loading') {
-    // Do nothing, DOMContentLoaded will fire
-} else {
-    // DOM is already loaded
-    console.log('DOM already loaded, initializing memory game immediately');
-    memoryGame = new MemoryGame();
-    window.memoryGame = memoryGame;
-}
-
-// Add global click event listener as backup
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.game-card')) {
-        const cardElement = e.target.closest('.game-card');
-        const index = parseInt(cardElement.dataset.index);
-        if (!isNaN(index)) {
-            console.log('Global click handler triggered for card index:', index);
-            memoryGame.handleCardClick(index);
-        }
-    }
-});
-
-// Add performance monitoring
-if ('performance' in window) {
-    window.addEventListener('load', () => {
-        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-        console.log(`🧠 Memory game loaded in ${loadTime}ms`);
+function debugShowAll() {
+    console.log('🐛 DEBUG: Showing all cards');
+    document.querySelectorAll('.game-card').forEach(card => {
+        card.classList.add('flipped');
     });
 }
+
+// Initialization function
+function initializeMemoryGame() {
+    console.log('🎮 Initializing Memory Game...');
+    try {
+        window.memoryGameInstance = new MemoryGame();
+        console.log('✅ Memory Game initialized successfully!');
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to initialize Memory Game:', error);
+        return false;
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing memory game');
+    initializeMemoryGame();
+});
+
+// Fallback initialization
+if (document.readyState === 'loading') {
+    console.log('Document still loading, waiting for DOMContentLoaded');
+} else {
+    console.log('Document already loaded, initializing immediately');
+    initializeMemoryGame();
+}
+
+// Additional fallback with delay
+setTimeout(() => {
+    if (!window.memoryGameInstance) {
+        console.log('🔄 Backup initialization after delay...');
+        initializeMemoryGame();
+    }
+}, 500);
+
+console.log('🧠 Memory Game script loaded successfully!');

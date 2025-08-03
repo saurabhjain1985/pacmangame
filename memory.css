@@ -241,6 +241,16 @@ header {
     transform: rotateY(180deg);
 }
 
+.game-card.flipped .card-front {
+    opacity: 1;
+    visibility: visible;
+}
+
+.game-card.flipped .card-back {
+    opacity: 0;
+    visibility: hidden;
+}
+
 .game-card.matched {
     animation: matchSuccess 0.6s ease-out;
     pointer-events: none;
@@ -264,12 +274,17 @@ header {
     backface-visibility: hidden;
     border: 2px solid rgba(255, 255, 255, 0.2);
     pointer-events: none;
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Emoji', sans-serif;
+    line-height: 1;
 }
 
 .card-front {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     transform: rotateY(180deg);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
 }
 
 .card-back {

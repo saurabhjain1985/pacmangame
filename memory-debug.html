@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        .debug-card {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .debug-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px;
+        }
+        button {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Memory Game Debug Test</h1>
+    <button onclick="createTestCards()">Create Test Cards</button>
+    <button onclick="clearCards()">Clear Cards</button>
+    <div id="test-area"></div>
+    
+    <script>
+        function createTestCards() {
+            console.log('Creating test cards...');
+            const testArea = document.getElementById('test-area');
+            testArea.innerHTML = '<div class="debug-grid"></div>';
+            const grid = testArea.querySelector('.debug-grid');
+            
+            const symbols = ['🎮', '🎯', '🎪', '🎨', '🎮', '🎯', '🎪', '🎨'];
+            
+            symbols.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.className = 'debug-card';
+                card.textContent = symbol;
+                card.onclick = () => handleCardClick(index, symbol);
+                grid.appendChild(card);
+                console.log('Created card:', index, symbol);
+            });
+        }
+        
+        function handleCardClick(index, symbol) {
+            console.log('Card clicked!', index, symbol);
+            alert(`Card ${index} clicked: ${symbol}`);
+        }
+        
+        function clearCards() {
+            document.getElementById('test-area').innerHTML = '';
+        }
+        
+        console.log('Debug page loaded');
+    </script>
+</body>
+</html>
