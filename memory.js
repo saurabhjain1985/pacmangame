@@ -314,6 +314,33 @@ class MemoryGame {
     }
     
     playSound(type) {
+        // Use the comprehensive game audio system with haptic feedback
+        if (window.gameAudio) {
+            switch(type) {
+                case 'flip':
+                    gameAudio.playSound('blip', 400); // Card flip sound
+                    gameAudio.hapticFeedback('light');
+                    break;
+                case 'match':
+                    gameAudio.playSound('success', 600); // Match success sound
+                    gameAudio.hapticFeedback('success');
+                    break;
+                case 'noMatch':
+                    gameAudio.playSound('error', 200); // No match sound
+                    gameAudio.hapticFeedback('error');
+                    break;
+                case 'victory':
+                    gameAudio.playSound('levelUp'); // Victory celebration
+                    gameAudio.hapticFeedback('success');
+                    break;
+            }
+        } else {
+            // Fallback to basic audio
+            this.playBasicSound(type);
+        }
+    }
+    
+    playBasicSound(type) {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();

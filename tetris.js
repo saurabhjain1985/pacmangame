@@ -518,6 +518,41 @@ class TetrisGame {
     }
     
     playSound(type) {
+        // Use the comprehensive game audio system with haptic feedback
+        if (window.gameAudio) {
+            switch(type) {
+                case 'move':
+                    gameAudio.playSound('blip', 200, 0.1); // Soft blip for movement
+                    gameAudio.hapticFeedback('light');
+                    break;
+                case 'rotate':
+                    gameAudio.playSound('blip', 300, 0.1); // Higher pitched for rotation
+                    gameAudio.hapticFeedback('light');
+                    break;
+                case 'drop':
+                    gameAudio.playSound('blip', 150, 0.2); // Lower pitched for drop
+                    gameAudio.hapticFeedback('medium');
+                    break;
+                case 'place':
+                    gameAudio.playSound('success', 400); // Success sound for piece placement
+                    gameAudio.hapticFeedback('medium');
+                    break;
+                case 'line':
+                    gameAudio.playSound('levelUp'); // Celebration sound for line clear
+                    gameAudio.hapticFeedback('success');
+                    break;
+                case 'gameOver':
+                    gameAudio.playSound('error'); // Game over sound
+                    gameAudio.hapticFeedback('gameOver');
+                    break;
+            }
+        } else {
+            // Fallback to basic audio
+            this.playBasicSound(type);
+        }
+    }
+    
+    playBasicSound(type) {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();

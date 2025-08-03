@@ -136,7 +136,13 @@
         <!-- Pattern Match Game -->
         <div id="pattern-screen" class="screen">
             <h2>🎨 Pattern Match</h2>
-            <p>Complete the pattern sequence</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
+                <p><strong>🎯 How to Play:</strong></p>
+                <p>• Look for the <strong>logical pattern</strong> in the sequence</p>
+                <p>• Find which color should replace the <strong>?</strong></p>
+                <p>• Patterns can be: alternating, repeating, sequential, or mirrored</p>
+                <p>• Each puzzle has a <strong>hint</strong> to help you understand the pattern type</p>
+            </div>
             
             <div class="difficulty-selector">
                 <button class="difficulty-btn" data-difficulty="easy">Easy (4 items)</button>
@@ -183,8 +189,6 @@
         </div>
     </div>
 
-    <script src="puzzle.js"></script>
-    
     <style>
         .coming-soon-info {
             background: rgba(255, 255, 255, 0.15);
@@ -226,5 +230,7 @@
             80% { transform: translateY(-5px); }
         }
     </style>
+    <script src="game-audio.js"></script>
+    <script src="puzzle.js"></script>
 </body>
 </html>

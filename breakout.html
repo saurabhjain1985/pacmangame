@@ -67,13 +67,30 @@
                 <canvas id="breakout-canvas" width="800" height="600"></canvas>
             </div>
             
+            <!-- Improved Mobile Controls -->
             <div class="mobile-controls">
-                <div class="control-row">
-                    <button class="control-btn" id="left-btn">← Move Left</button>
-                    <button class="control-btn" id="right-btn">Move Right →</button>
+                <!-- Left side control -->
+                <div class="control-side control-left">
+                    <button class="control-btn mobile-btn-left" id="left-btn">
+                        <span class="btn-icon">◀</span>
+                        <span class="btn-label">LEFT</span>
+                    </button>
                 </div>
-                <div class="control-row">
-                    <button class="control-btn" id="launch-btn">🚀 Launch Ball</button>
+                
+                <!-- Center launch button -->
+                <div class="control-center">
+                    <button class="control-btn launch-btn-mobile" id="launch-btn">
+                        <span class="btn-icon">🚀</span>
+                        <span class="btn-label">LAUNCH</span>
+                    </button>
+                </div>
+                
+                <!-- Right side control -->
+                <div class="control-side control-right">
+                    <button class="control-btn mobile-btn-right" id="right-btn">
+                        <span class="btn-icon">▶</span>
+                        <span class="btn-label">RIGHT</span>
+                    </button>
                 </div>
             </div>
             
@@ -150,6 +167,11 @@
         </div>
     </div>
 
+    <!-- Feedback Widget -->
+    <link rel="stylesheet" href="feedback-widget.css">
+    <script src="feedback-widget-new.js"></script>
+    
+    <script src="game-audio.js"></script>
     <script src="breakout.js"></script>
     <script>
         function goBack() {

@@ -3,6 +3,13 @@ const CELL_SIZE = 20;
 const MAZE_WIDTH = 28;
 const MAZE_HEIGHT = 21;
 
+// Original Pacman speed mechanics
+const PACMAN_NORMAL_SPEED = 12; // Frames between moves (slower = higher number)
+const PACMAN_POWER_SPEED = 8;   // Faster when powered up
+const GHOST_NORMAL_SPEED = 16;  // Normal ghost speed
+const GHOST_VULNERABLE_SPEED = 24; // Much slower when vulnerable
+const GHOST_FRIGHTENED_SPEED = 20; // Slightly slower when fleeing
+
 // Game elements
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -17,6 +24,8 @@ let gameRunning = true;
 let animationFrame = 0;
 let powerMode = false;
 let powerModeTimer = 0;
+let powerBlinkTimer = 0; // For blinking effect when power mode is ending
+let ghostsEatenInPowerMode = 0; // Track consecutive ghost eating for authentic scoring
 
 // Maze layout (1 = wall, 0 = dot, 2 = empty space, 3 = pacman start, 4 = ghost start, 5 = power pellet)
 const maze = [
@@ -275,11 +284,15 @@ function movePacman() {
                 score += 10;
                 scoreElement.textContent = `Score: ${score}`;
                 
+                // Play dot collection sound
+                if (gameAudio) gameAudio.pacmanSounds.eatDot();
+                
                 // Check win condition
                 if (dots.length === 0 && powerPellets.length === 0) {
                     gameRunning = false;
                     messageElement.textContent = "YOU WIN!";
                     messageElement.className = "winner";
+                    if (gameAudio) gameAudio.pacmanSounds.levelUp();
                 }
                 break;
             }
@@ -289,18 +302,33 @@ function movePacman() {
         for (let i = powerPellets.length - 1; i >= 0; i--) {
             if (powerPellets[i].x === pacman.x && powerPellets[i].y === pacman.y) {
                 powerPellets.splice(i, 1);
-                score += 50;
+                score += 50; // Authentic power pellet points
                 scoreElement.textContent = `Score: ${score}`;
                 
-                // Activate power mode
-                powerMode = true;
-                powerModeTimer = 300; // 5 seconds at 60fps
+                // Play power pellet sound
+                if (gameAudio) gameAudio.pacmanSounds.eatPowerPellet();
                 
-                // Make ghosts vulnerable
+                // Activate power mode with authentic effects
+                powerMode = true;
+                powerModeTimer = 480; // 8 seconds at 60fps (more authentic timing)
+                powerBlinkTimer = 0;
+                ghostsEatenInPowerMode = 0; // Reset ghost eating counter
+                
+                // Make ghosts vulnerable and slower
                 ghosts.forEach(ghost => {
                     ghost.vulnerable = true;
+                    // Reverse ghost direction when power pellet is eaten (authentic behavior)
+                    ghost.direction = (ghost.direction + 2) % 4;
                     ghost.fleeDirection = Math.floor(Math.random() * 4);
                 });
+                
+                // Visual feedback - brief screen flash
+                setTimeout(() => {
+                    canvas.style.filter = 'brightness(1.5)';
+                    setTimeout(() => {
+                        canvas.style.filter = '';
+                    }, 100);
+                }, 50);
                 
                 // Check win condition
                 if (dots.length === 0 && powerPellets.length === 0) {
@@ -313,93 +341,123 @@ function movePacman() {
         }
     }
     
-    // Update power mode
+    // Update power mode with authentic timing and blinking
     if (powerMode) {
         powerModeTimer--;
+        powerBlinkTimer++;
+        
+        // Start blinking when power mode is about to end (last 3 seconds)
+        if (powerModeTimer <= 180) { // Last 3 seconds
+            // Make ghosts blink between blue and normal color
+            const blinkRate = powerModeTimer <= 60 ? 8 : 16; // Faster blinking near end
+            const shouldBlink = Math.floor(powerBlinkTimer / blinkRate) % 2 === 0;
+            
+            ghosts.forEach(ghost => {
+                ghost.blinking = shouldBlink;
+            });
+        }
+        
         if (powerModeTimer <= 0) {
             powerMode = false;
+            powerBlinkTimer = 0;
             ghosts.forEach(ghost => {
                 ghost.vulnerable = false;
+                ghost.blinking = false;
             });
         }
     }
 }
 
-// Simple AI for ghosts with different behaviors
+// Enhanced ghost AI with authentic Pacman behaviors
 function moveGhosts() {
     ghosts.forEach((ghost, index) => {
         let bestDirection = ghost.direction;
         let validDirections = [];
         
-        // Find all valid directions
+        // Find all valid directions (avoid going backwards unless cornered)
         for (let i = 0; i < 4; i++) {
             const dir = directions[i];
             const newX = ghost.x + dir.x;
             const newY = ghost.y + dir.y;
             
             if (isValidPosition(newX, newY)) {
-                validDirections.push({direction: i, x: newX, y: newY});
+                // Prefer not to reverse direction unless it's the only option
+                const isReverse = (ghost.direction + 2) % 4 === i;
+                validDirections.push({
+                    direction: i, 
+                    x: newX, 
+                    y: newY, 
+                    isReverse: isReverse
+                });
             }
         }
         
         if (validDirections.length === 0) return;
         
-        // If ghost is vulnerable (power mode), flee from Pac-Man
-        if (ghost.vulnerable) {
+        // Filter out reverse direction if there are other options
+        const nonReverseDirections = validDirections.filter(d => !d.isReverse);
+        const directionsToConsider = nonReverseDirections.length > 0 ? nonReverseDirections : validDirections;
+        
+        // If ghost is vulnerable (power mode), flee from Pac-Man intelligently
+        if (ghost.vulnerable && powerMode) {
             let maxDistance = -1;
-            validDirections.forEach(option => {
+            let bestOptions = [];
+            
+            directionsToConsider.forEach(option => {
                 const distance = Math.abs(option.x - pacman.x) + Math.abs(option.y - pacman.y);
                 if (distance > maxDistance) {
                     maxDistance = distance;
-                    bestDirection = option.direction;
+                    bestOptions = [option];
+                } else if (distance === maxDistance) {
+                    bestOptions.push(option);
                 }
             });
+            
+            // Choose randomly among equally good fleeing options
+            const chosen = bestOptions[Math.floor(Math.random() * bestOptions.length)];
+            bestDirection = chosen.direction;
+            
         } else {
-            // Normal behavior when not vulnerable
+            // Enhanced AI behavior when not vulnerable
             if (ghost.behavior === 'chase') {
-                // Red ghost: Direct chase - improved AI
-                let minDistance = Infinity;
-                validDirections.forEach(option => {
-                    const distance = Math.abs(option.x - pacman.x) + Math.abs(option.y - pacman.y);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        bestDirection = option.direction;
-                    }
-                });
-            } else if (ghost.behavior === 'ambush') {
-                // Teal ghost: Try to get in front of Pac-Man - improved targeting
-                const targetX = pacman.x + directions[pacman.direction].x * 3;
-                const targetY = pacman.y + directions[pacman.direction].y * 3;
+                // Red ghost: Aggressive direct chase with pathfinding
+                bestDirection = findBestPath(ghost, pacman.x, pacman.y, directionsToConsider);
                 
-                let minDistance = Infinity;
-                validDirections.forEach(option => {
-                    const distance = Math.abs(option.x - targetX) + Math.abs(option.y - targetY);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        bestDirection = option.direction;
-                    }
-                });
+            } else if (ghost.behavior === 'ambush') {
+                // Teal ghost: Ambush by targeting ahead of Pac-Man
+                let targetX = pacman.x + directions[pacman.direction].x * 4;
+                let targetY = pacman.y + directions[pacman.direction].y * 4;
+                
+                // Ensure target is within bounds
+                targetX = Math.max(0, Math.min(MAZE_WIDTH - 1, targetX));
+                targetY = Math.max(0, Math.min(MAZE_HEIGHT - 1, targetY));
+                
+                bestDirection = findBestPath(ghost, targetX, targetY, directionsToConsider);
+                
             } else if (ghost.behavior === 'random') {
-                // Yellow ghost: More aggressive random movement
-                if (Math.random() < 0.6) {
-                    // 60% chance to move toward Pac-Man
-                    let minDistance = Infinity;
-                    validDirections.forEach(option => {
-                        const distance = Math.abs(option.x - pacman.x) + Math.abs(option.y - pacman.y);
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            bestDirection = option.direction;
-                        }
-                    });
-                } else {
-                    // 40% chance to move randomly
-                    const randomOption = validDirections[Math.floor(Math.random() * validDirections.length)];
+                // Yellow ghost: Smart random - mix of hunting and unpredictability
+                const distanceToPacman = Math.abs(ghost.x - pacman.x) + Math.abs(ghost.y - pacman.y);
+                
+                if (distanceToPacman < 8 && Math.random() < 0.7) {
+                    // When close, 70% chance to hunt Pac-Man
+                    bestDirection = findBestPath(ghost, pacman.x, pacman.y, directionsToConsider);
+                } else if (Math.random() < 0.3) {
+                    // 30% chance for truly random movement
+                    const randomOption = directionsToConsider[Math.floor(Math.random() * directionsToConsider.length)];
                     bestDirection = randomOption.direction;
+                } else {
+                    // Otherwise, patrol corners or move toward general area
+                    const patrolTargets = [
+                        {x: 2, y: 2}, {x: MAZE_WIDTH-3, y: 2}, 
+                        {x: 2, y: MAZE_HEIGHT-3}, {x: MAZE_WIDTH-3, y: MAZE_HEIGHT-3}
+                    ];
+                    const target = patrolTargets[Math.floor(Date.now() / 5000) % patrolTargets.length];
+                    bestDirection = findBestPath(ghost, target.x, target.y, directionsToConsider);
                 }
             }
         }
         
-        // Move ghost
+        // Move ghost with collision detection
         const dir = directions[bestDirection];
         const newX = ghost.x + dir.x;
         const newY = ghost.y + dir.y;
@@ -413,15 +471,61 @@ function moveGhosts() {
     });
 }
 
+// Enhanced pathfinding for ghosts
+function findBestPath(ghost, targetX, targetY, validDirections) {
+    let bestDirection = ghost.direction;
+    let minDistance = Infinity;
+    let bestOptions = [];
+    
+    validDirections.forEach(option => {
+        // Calculate Manhattan distance to target
+        const distance = Math.abs(option.x - targetX) + Math.abs(option.y - targetY);
+        
+        // Add small penalty for changing direction to reduce jittery movement
+        const directionChangePenalty = (option.direction !== ghost.direction) ? 0.1 : 0;
+        const totalScore = distance + directionChangePenalty;
+        
+        if (totalScore < minDistance) {
+            minDistance = totalScore;
+            bestOptions = [option];
+        } else if (Math.abs(totalScore - minDistance) < 0.2) {
+            // Include options that are very close in score
+            bestOptions.push(option);
+        }
+    });
+    
+    // If multiple equally good options, choose one that doesn't reverse direction
+    if (bestOptions.length > 1) {
+        const nonReverseOptions = bestOptions.filter(opt => !opt.isReverse);
+        if (nonReverseOptions.length > 0) {
+            bestOptions = nonReverseOptions;
+        }
+    }
+    
+    // Choose randomly among best options to add unpredictability
+    const chosen = bestOptions[Math.floor(Math.random() * bestOptions.length)];
+    return chosen ? chosen.direction : ghost.direction;
+}
+
 // Check collision between Pac-Man and ghosts
 function checkCollision() {
     for (let i = 0; i < ghosts.length; i++) {
         let ghost = ghosts[i];
         if (pacman.x === ghost.x && pacman.y === ghost.y) {
             if (ghost.vulnerable && powerMode) {
-                // Pac-Man eats the ghost
-                score += 200;
+                // Pac-Man eats the ghost - authentic scoring: 200, 400, 800, 1600
+                const ghostPoints = 200 * Math.pow(2, ghostsEatenInPowerMode);
+                score += ghostPoints;
                 scoreElement.textContent = `Score: ${score}`;
+                ghostsEatenInPowerMode++;
+                
+                // Show points floating animation (authentic Pacman feature)
+                showFloatingPoints(ghost.x * CELL_SIZE, ghost.y * CELL_SIZE, ghostPoints);
+                
+                // Play ghost eaten sound
+                if (window.gameAudio) {
+                    gameAudio.pacmanSounds.ghostEaten();
+                }
                 
                 // Reset ghost to starting position
                 if (i === 0) { ghost.x = 11; ghost.y = 9; }
@@ -433,6 +537,11 @@ function checkCollision() {
                 // Ghost catches Pac-Man
                 lives--;
                 livesElement.textContent = `Lives: ${lives}`;
+                
+                // Play death sound
+                if (window.gameAudio) {
+                    gameAudio.pacmanSounds.death();
+                }
                 
                 if (lives <= 0) {
                     gameRunning = false;
@@ -503,27 +612,31 @@ function drawDots() {
         ctx.fill();
     }
     
-    // Draw power pellets
-    const powerGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 8);
-    powerGradient.addColorStop(0, '#FFFFFF');
-    powerGradient.addColorStop(0.5, '#FFD700');
-    powerGradient.addColorStop(1, '#FF6B6B');
-    
+    // Draw power pellets with authentic Pacman blinking
     for (let pellet of powerPellets) {
-        const centerX = pellet.x * CELL_SIZE + CELL_SIZE / 2;
-        const centerY = pellet.y * CELL_SIZE + CELL_SIZE / 2;
-        
-        // Pulsing effect
-        const pulseSize = 6 + Math.sin(animationFrame * 0.3) * 2;
-        
-        // Add stronger glow effect
-        ctx.shadowColor = '#FFFFFF';
-        ctx.shadowBlur = 15;
-        
-        ctx.fillStyle = powerGradient;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, pulseSize, 0, Math.PI * 2);
-        ctx.fill();
+        // Authentic blinking effect - blink every 15 frames like original Pacman
+        if (Math.floor(animationFrame / 15) % 2 === 0) {
+            const centerX = pellet.x * CELL_SIZE + CELL_SIZE / 2;
+            const centerY = pellet.y * CELL_SIZE + CELL_SIZE / 2;
+            
+            // Create authentic power pellet gradient
+            const powerGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 8);
+            powerGradient.addColorStop(0, '#FFFFFF');
+            powerGradient.addColorStop(0.5, '#FFD700');
+            powerGradient.addColorStop(1, '#FFA500');
+            
+            // Add glow effect like original game
+            ctx.shadowColor = '#FFFF00';
+            ctx.shadowBlur = 10;
+            
+            ctx.fillStyle = powerGradient;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 7, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Reset shadow
+            ctx.shadowBlur = 0;
+        }
     }
     
     // Reset shadow
@@ -570,33 +683,51 @@ function drawPacman() {
 }
 
 function drawGhosts() {
-    ghosts.forEach(ghost => {
+    ghosts.forEach((ghost, index) => {
         const centerX = ghost.x * CELL_SIZE + CELL_SIZE / 2;
         const centerY = ghost.y * CELL_SIZE + CELL_SIZE / 2;
         const radius = CELL_SIZE / 2 - 2;
+        
+        // Authentic Pacman ghost colors
+        const ghostColors = [
+            { primary: '#FF0000', secondary: '#CC0000', name: 'Blinky' },  // Red
+            { primary: '#FFB8FF', secondary: '#FF69B4', name: 'Pinky' },  // Pink
+            { primary: '#00FFFF', secondary: '#00CCCC', name: 'Inky' },   // Cyan
+            { primary: '#FFB852', secondary: '#FF8C00', name: 'Sue' }     // Orange
+        ];
+        
+        const ghostColor = ghostColors[index] || ghostColors[0];
         
         // Create gradient for ghost based on its color and vulnerability
         const ghostGradient = ctx.createRadialGradient(centerX - 3, centerY - 5, 0, centerX, centerY, radius);
         
         if (ghost.vulnerable && powerMode) {
-            // Vulnerable ghost - blue and flashing
-            const flashIntensity = Math.sin(animationFrame * 0.5) * 0.3 + 0.7;
-            ghostGradient.addColorStop(0, `rgba(0, 0, 255, ${flashIntensity})`);
-            ghostGradient.addColorStop(1, `rgba(0, 0, 139, ${flashIntensity})`);
-            ctx.shadowColor = '#0000FF';
-        } else {
-            // Normal ghost colors
-            if (ghost.color === '#FF6B6B') {
-                ghostGradient.addColorStop(0, '#FF6B6B');
-                ghostGradient.addColorStop(1, '#E74C3C');
-            } else if (ghost.color === '#4ECDC4') {
-                ghostGradient.addColorStop(0, '#4ECDC4');
-                ghostGradient.addColorStop(1, '#26D0CE');
-            } else if (ghost.color === '#FFD93D') {
-                ghostGradient.addColorStop(0, '#FFD93D');
-                ghostGradient.addColorStop(1, '#F39C12');
+            // Vulnerable ghost - blue color with authentic blinking when power mode ending
+            if (ghost.blinking) {
+                // Blink between blue and white/normal color
+                const blinkPhase = Math.floor(animationFrame / 8) % 2;
+                if (blinkPhase === 0) {
+                    // Blue vulnerable state
+                    ghostGradient.addColorStop(0, '#4169E1');
+                    ghostGradient.addColorStop(1, '#0000FF');
+                    ctx.shadowColor = '#0000FF';
+                } else {
+                    // White blinking state (authentic Pacman behavior)
+                    ghostGradient.addColorStop(0, '#FFFFFF');
+                    ghostGradient.addColorStop(1, '#E0E0E0');
+                    ctx.shadowColor = '#FFFFFF';
+                }
+            } else {
+                // Solid blue vulnerable state
+                ghostGradient.addColorStop(0, '#4169E1');
+                ghostGradient.addColorStop(1, '#0000FF');
+                ctx.shadowColor = '#0000FF';
             }
-            ctx.shadowColor = ghost.color;
+        } else {
+            // Authentic ghost colors with enhanced gradients
+            ghostGradient.addColorStop(0, ghostColor.primary);
+            ghostGradient.addColorStop(1, ghostColor.secondary);
+            ctx.shadowColor = ghostColor.primary;
         }
         
         // Add glow effect
@@ -663,11 +794,17 @@ function draw() {
 
 function gameLoop() {
     if (gameRunning) {
-        // Move game objects every few frames for better control - SLOWED DOWN
-        if (animationFrame % 12 === 0) { // Changed from 8 to 12 - slower Pac-Man
+        // Dynamic speed based on power mode - authentic Pacman mechanics
+        const pacmanSpeed = powerMode ? PACMAN_POWER_SPEED : PACMAN_NORMAL_SPEED;
+        const ghostSpeed = powerMode ? GHOST_VULNERABLE_SPEED : GHOST_NORMAL_SPEED;
+        
+        // Move Pacman at variable speed
+        if (animationFrame % pacmanSpeed === 0) {
             movePacman();
         }
-        if (animationFrame % 16 === 0) { // Changed from 12 to 16 - slower ghosts
+        
+        // Move ghosts at variable speed (slower when vulnerable)
+        if (animationFrame % ghostSpeed === 0) {
             moveGhosts();
         }
         
@@ -685,6 +822,46 @@ function initGame() {
     scoreElement.textContent = `Score: ${score}`;
     livesElement.textContent = `Lives: ${lives}`;
     gameLoop();
+}
+
+// Show floating points animation (authentic Pacman feature)
+function showFloatingPoints(x, y, points) {
+    const pointsElement = document.createElement('div');
+    pointsElement.textContent = points.toString();
+    pointsElement.style.cssText = `
+        position: absolute;
+        left: ${x}px;
+        top: ${y}px;
+        color: #FFD700;
+        font-weight: bold;
+        font-size: 14px;
+        pointer-events: none;
+        z-index: 1000;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        animation: floatUp 2s ease-out forwards;
+    `;
+    
+    // Add CSS animation if not already added
+    if (!document.getElementById('floatUpAnimation')) {
+        const style = document.createElement('style');
+        style.id = 'floatUpAnimation';
+        style.textContent = `
+            @keyframes floatUp {
+                0% { transform: translateY(0); opacity: 1; }
+                100% { transform: translateY(-30px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(pointsElement);
+    
+    // Remove element after animation
+    setTimeout(() => {
+        if (pointsElement.parentNode) {
+            pointsElement.parentNode.removeChild(pointsElement);
+        }
+    }, 2000);
 }
 
 // Start the game when page loads

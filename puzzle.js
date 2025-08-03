@@ -618,13 +618,96 @@ class PuzzleGameManager {
         const lengths = { easy: 4, medium: 6, hard: 8 };
         const length = lengths[difficulty] || 6;
         
+        // Generate different types of logical patterns
+        const patternTypes = [
+            'alternating',      // A, B, A, B, A, ?
+            'repeating',        // A, B, C, A, B, ?
+            'sequence',         // Follows color order
+            'skip_pattern',     // A, _, B, _, C, ?
+            'mirror'           // A, B, C, C, B, ?
+        ];
+        
+        const patternType = patternTypes[Math.floor(Math.random() * patternTypes.length)];
         this.currentPattern = [];
-        for (let i = 0; i < length; i++) {
-            this.currentPattern.push(symbols[Math.floor(Math.random() * symbols.length)]);
+        
+        switch(patternType) {
+            case 'alternating':
+                // Simple A, B, A, B pattern
+                const alt1 = symbols[Math.floor(Math.random() * symbols.length)];
+                const alt2 = symbols.filter(s => s !== alt1)[Math.floor(Math.random() * (symbols.length - 1))];
+                for (let i = 0; i < length; i++) {
+                    this.currentPattern.push(i % 2 === 0 ? alt1 : alt2);
+                }
+                break;
+                
+            case 'repeating':
+                // A, B, C, A, B, C pattern
+                const repeatLength = Math.min(3, Math.floor(length / 2));
+                const repeatBase = [];
+                for (let i = 0; i < repeatLength; i++) {
+                    let symbol;
+                    do {
+                        symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    } while (repeatBase.includes(symbol));
+                    repeatBase.push(symbol);
+                }
+                for (let i = 0; i < length; i++) {
+                    this.currentPattern.push(repeatBase[i % repeatLength]);
+                }
+                break;
+                
+            case 'sequence':
+                // Follow color order in symbols array
+                const startIndex = Math.floor(Math.random() * (symbols.length - length));
+                for (let i = 0; i < length; i++) {
+                    this.currentPattern.push(symbols[startIndex + i]);
+                }
+                break;
+                
+            case 'skip_pattern':
+                // A, _, B, _, C, _ pattern (every other position)
+                const skipBase = symbols[Math.floor(Math.random() * symbols.length)];
+                const skipFill = symbols.filter(s => s !== skipBase)[Math.floor(Math.random() * (symbols.length - 1))];
+                for (let i = 0; i < length; i++) {
+                    this.currentPattern.push(i % 2 === 0 ? skipBase : skipFill);
+                }
+                break;
+                
+            case 'mirror':
+                // A, B, C, C, B, A pattern
+                const half = Math.floor(length / 2);
+                const mirrorBase = [];
+                for (let i = 0; i < half; i++) {
+                    let symbol;
+                    do {
+                        symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    } while (mirrorBase.includes(symbol));
+                    mirrorBase.push(symbol);
+                }
+                // Build mirror pattern
+                this.currentPattern = [...mirrorBase];
+                for (let i = mirrorBase.length - 1; i >= 0 && this.currentPattern.length < length; i--) {
+                    this.currentPattern.push(mirrorBase[i]);
+                }
+                // If odd length, add middle element
+                if (length % 2 === 1 && this.currentPattern.length < length) {
+                    this.currentPattern.splice(half, 0, mirrorBase[half - 1]);
+                }
+                break;
         }
         
-        // Remove one element to create the missing piece
-        this.missingIndex = Math.floor(Math.random() * length);
+        // Ensure pattern is exactly the right length
+        this.currentPattern = this.currentPattern.slice(0, length);
+        
+        // Store pattern type for instruction display
+        this.currentPatternType = patternType;
+        
+        // Remove one element to create the missing piece (avoid first and last for clarity)
+        const validIndices = [];
+        for (let i = 1; i < length - 1; i++) {
+            validIndices.push(i);
+        }
+        this.missingIndex = validIndices[Math.floor(Math.random() * validIndices.length)] || Math.floor(length / 2);
         this.correctAnswer = this.currentPattern[this.missingIndex];
         
         this.renderPattern();
@@ -634,6 +717,40 @@ class PuzzleGameManager {
         const sequenceElement = document.getElementById('pattern-sequence');
         sequenceElement.innerHTML = '';
         
+        // Add pattern hint based on type
+        const hintElement = document.createElement('div');
+        hintElement.className = 'pattern-hint';
+        hintElement.style.cssText = `
+            font-size: 14px; 
+            color: #666; 
+            margin-bottom: 15px; 
+            padding: 8px 12px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 20px; 
+            text-align: center;
+        `;
+        
+        const hints = {
+            'alternating': '🔄 Alternating Pattern: Two colors take turns',
+            'repeating': '🔁 Repeating Sequence: Same order repeats',
+            'sequence': '📊 Color Sequence: Colors follow their natural order',
+            'skip_pattern': '⏭️ Skip Pattern: Every other position follows a rule',
+            'mirror': '🪞 Mirror Pattern: Pattern reflects like a mirror'
+        };
+        
+        hintElement.textContent = hints[this.currentPatternType] || '🎯 Find the missing piece that completes the pattern';
+        sequenceElement.appendChild(hintElement);
+        
+        // Create pattern display container
+        const patternContainer = document.createElement('div');
+        patternContainer.style.cssText = `
+            display: flex; 
+            gap: 10px; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            margin: 20px 0;
+        `;
+        
         this.currentPattern.forEach((symbol, index) => {
             const item = document.createElement('div');
             item.className = 'pattern-item';
@@ -641,13 +758,35 @@ class PuzzleGameManager {
             if (index === this.missingIndex) {
                 item.classList.add('missing');
                 item.textContent = '?';
+                item.style.cssText += `
+                    background: linear-gradient(135deg, #444, #666) !important;
+                    border: 3px dashed #fff;
+                    font-size: 24px;
+                    color: #fff;
+                    animation: pulse 2s infinite;
+                `;
             } else {
                 item.textContent = symbol;
                 item.style.background = this.getSymbolColor(symbol);
             }
             
-            sequenceElement.appendChild(item);
+            patternContainer.appendChild(item);
         });
+        
+        sequenceElement.appendChild(patternContainer);
+        
+        // Add pulsing animation for missing item
+        if (!document.getElementById('pulse-animation')) {
+            const style = document.createElement('style');
+            style.id = 'pulse-animation';
+            style.textContent = `
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); opacity: 0.8; }
+                    50% { transform: scale(1.1); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
         
         // Generate options
         const options = [this.correctAnswer];
@@ -701,15 +840,34 @@ class PuzzleGameManager {
             this.gameStats.score += 15;
             this.patternLevel++;
             
+            // Play success sound and haptic feedback
+            if (window.gameAudio) {
+                gameAudio.playSound('success');
+                gameAudio.hapticFeedback('light');
+            }
+            
             setTimeout(() => {
                 if (this.patternLevel > 8) {
                     this.gameStats.score += Math.max(300 - this.gameStats.time, 100);
+                    
+                    // Play victory sound
+                    if (window.gameAudio) {
+                        gameAudio.playSound('levelUp');
+                        gameAudio.hapticFeedback('success');
+                    }
+                    
                     this.showVictory();
                 } else {
                     this.generatePattern();
                 }
             }, 1000);
         } else {
+            // Play error sound and haptic feedback
+            if (window.gameAudio) {
+                gameAudio.playSound('error');
+                gameAudio.hapticFeedback('error');
+            }
+            
             // Show correct answer
             const correctButton = Array.from(document.querySelectorAll('.pattern-option'))
                 .find(btn => btn.textContent === this.correctAnswer);

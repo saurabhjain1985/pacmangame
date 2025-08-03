@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedtime Story Generator</title>
+    <link rel="stylesheet" href="bedtime-stories.css">
+</head>
+<body>
+    <div class="story-container">
+        <header class="story-header">
+            <h1>🌙 Bedtime Story Generator</h1>
+            <p>Create magical bedtime stories with your favorite characters</p>
+        </header>
+
+        <div class="story-form-container">
+            <div class="form-section">
+                <h2>📝 Story Settings</h2>
+                
+                <div class="input-group">
+                    <label for="characters">Main Characters (separate with commas)</label>
+                    <input type="text" id="characters" placeholder="e.g., Luna the fairy, Max the brave knight, Sparkle the unicorn">
+                    <div class="input-hint">Add up to 5 characters for your story</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="theme">Story Theme</label>
+                    <select id="theme">
+                        <option value="adventure">🗺️ Adventure & Exploration</option>
+                        <option value="friendship">👫 Friendship & Kindness</option>
+                        <option value="magic">✨ Magic & Fantasy</option>
+                        <option value="animals">🐾 Animal Friends</option>
+                        <option value="space">🚀 Space Adventure</option>
+                        <option value="ocean">🌊 Ocean Adventure</option>
+                        <option value="forest">🌲 Forest Mystery</option>
+                        <option value="dreams">💭 Dreams & Imagination</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="storyLength">Story Length</label>
+                    <select id="storyLength">
+                        <option value="short">📖 Short (2-3 minutes)</option>
+                        <option value="medium">📚 Medium (5-7 minutes)</option>
+                        <option value="long">📓 Long (10-12 minutes)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="mood">Story Mood</label>
+                    <select id="mood">
+                        <option value="peaceful">😌 Peaceful & Calming</option>
+                        <option value="exciting">🎉 Exciting & Fun</option>
+                        <option value="heartwarming">❤️ Heartwarming</option>
+                        <option value="mysterious">🔍 Mysterious</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="setting">Story Setting (Optional)</label>
+                    <input type="text" id="setting" placeholder="e.g., enchanted castle, magical garden, cozy village">
+                    <div class="input-hint">Leave blank for automatic setting based on theme</div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn-generate" onclick="generateStory()">
+                        ✨ Generate My Story
+                    </button>
+                    <button class="btn-surprise" onclick="generateSurpriseStory()">
+                        🎲 Surprise Me!
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="story-output-container" id="storyOutput" style="display: none;">
+            <div class="story-header-output">
+                <h2 id="storyTitle">Your Magical Story</h2>
+                <div class="story-meta">
+                    <span id="readingTime">📖 5 minutes</span>
+                    <span id="storyTheme">✨ Magic</span>
+                </div>
+            </div>
+
+            <div class="story-content">
+                <div class="story-text" id="storyText">
+                    <!-- Generated story will appear here -->
+                </div>
+            </div>
+
+            <div class="story-actions">
+                <div class="voice-controls">
+                    <label for="voiceSelect">🎙️ Choose Voice:</label>
+                    <select id="voiceSelect" class="voice-selector">
+                        <option value="">Loading voices...</option>
+                    </select>
+                    <div class="voice-settings">
+                        <label for="voiceSpeed">Speed: <span id="speedValue">0.8x</span></label>
+                        <input type="range" id="voiceSpeed" min="0.5" max="1.5" step="0.1" value="0.8">
+                        <label for="voicePitch">Pitch: <span id="pitchValue">1.1</span></label>
+                        <input type="range" id="voicePitch" min="0.8" max="1.5" step="0.1" value="1.1">
+                    </div>
+                </div>
+                
+                <button class="btn-read" onclick="readStoryAloud()">
+                    🔊 Read Aloud
+                </button>
+                <button class="btn-save" onclick="saveStory()">
+                    💾 Save Story
+                </button>
+                <button class="btn-share" onclick="shareStory()">
+                    📤 Share
+                </button>
+                <button class="btn-new" onclick="showStoryForm()">
+                    📝 New Story
+                </button>
+            </div>
+        </div>
+
+        <div class="saved-stories-container">
+            <h3>📚 Your Saved Stories</h3>
+            <div class="saved-stories-list" id="savedStoriesList">
+                <!-- Saved stories will appear here -->
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="btn-back">🏠 Back to Games</a>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Creating your magical story...</p>
+            <div class="loading-tips" id="loadingTips">
+                ✨ Gathering magical ingredients...
+            </div>
+        </div>
+    </div>
+
+    <script src="bedtime-stories.js"></script>
+</body>
+</html>

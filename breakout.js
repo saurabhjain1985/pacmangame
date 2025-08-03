@@ -451,6 +451,45 @@ class BreakoutGame {
     }
     
     playSound(type) {
+        // Use the comprehensive game audio system with haptic feedback
+        if (window.gameAudio) {
+            switch(type) {
+                case 'paddle':
+                    gameAudio.playSound('blip', 220); // Low frequency for paddle hit
+                    gameAudio.hapticFeedback('light');
+                    break;
+                case 'wall':
+                    gameAudio.playSound('blip', 330); // Medium frequency for wall bounce
+                    gameAudio.hapticFeedback('light');
+                    break;
+                case 'brick':
+                    gameAudio.playSound('success', 440); // Success sound for brick break
+                    gameAudio.hapticFeedback('medium');
+                    break;
+                case 'launch':
+                    gameAudio.playSound('levelUp'); // Launch ball sound
+                    gameAudio.hapticFeedback('light');
+                    break;
+                case 'loseLife':
+                    gameAudio.playSound('error'); // Error sound for losing life
+                    gameAudio.hapticFeedback('error');
+                    break;
+                case 'levelComplete':
+                    gameAudio.playSound('levelUp'); // Level complete celebration
+                    gameAudio.hapticFeedback('success');
+                    break;
+                case 'gameOver':
+                    gameAudio.playSound('error', 150, 1.0); // Game over sound
+                    gameAudio.hapticFeedback('gameOver');
+                    break;
+            }
+        } else {
+            // Fallback to basic audio if game audio system not available
+            this.playBasicSound(type);
+        }
+    }
+    
+    playBasicSound(type) {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();

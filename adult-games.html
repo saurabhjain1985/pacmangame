@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adult & Teen Games - Challenge Zone</title>
+    <link rel="stylesheet" href="adult-games.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 Challenge Zone</h1>
+            <p>Advanced Games for Adults & Teens</p>
+        </header>
+
+        <nav class="game-menu">
+            <div class="game-card" onclick="showGame('sudoku')">
+                <div class="game-icon">🔢</div>
+                <h3>Sudoku Master</h3>
+                <p>Classic number puzzle with multiple difficulty levels</p>
+            </div>
+            
+            <div class="game-card" onclick="showGame('reaction')">
+                <div class="game-icon">⚡</div>
+                <h3>Reaction Trainer</h3>
+                <p>Test your lightning-fast reflexes</p>
+            </div>
+            
+            <div class="game-card" onclick="showGame('memory')">
+                <div class="game-icon">🧩</div>
+                <h3>Memory Blitz</h3>
+                <p>Intense memory challenges with patterns & colors</p>
+            </div>
+            
+            <div class="game-card" onclick="showGame('money')">
+                <div class="game-icon">💰</div>
+                <h3>Money Academy</h3>
+                <p>Learn financial concepts through interactive lessons</p>
+            </div>
+            
+            <div class="game-card" onclick="showGame('puzzle')">
+                <div class="game-icon">🖼️</div>
+                <h3>Image Puzzle Builder</h3>
+                <p>Create & solve custom jigsaw puzzles</p>
+            </div>
+        </nav>
+
+        <!-- Sudoku Game -->
+        <div id="sudoku-game" class="game-container hidden">
+            <div class="game-header">
+                <h2>🔢 Sudoku Master</h2>
+                <button class="back-btn" onclick="showMenu()">← Back to Menu</button>
+            </div>
+            
+            <div class="sudoku-controls">
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" data-level="easy">Easy</button>
+                    <button class="difficulty-btn" data-level="medium">Medium</button>
+                    <button class="difficulty-btn" data-level="hard">Hard</button>
+                </div>
+                
+                <div class="game-stats">
+                    <div class="timer">⏱️ <span id="sudoku-timer">00:00</span></div>
+                    <button class="hint-btn" onclick="getHint()">💡 Hint</button>
+                    <button class="new-game-btn" onclick="newSudokuGame()">🔄 New Game</button>
+                </div>
+            </div>
+            
+            <div class="sudoku-board" id="sudoku-board"></div>
+            
+            <div class="number-pad">
+                <button class="number-btn" data-number="1">1</button>
+                <button class="number-btn" data-number="2">2</button>
+                <button class="number-btn" data-number="3">3</button>
+                <button class="number-btn" data-number="4">4</button>
+                <button class="number-btn" data-number="5">5</button>
+                <button class="number-btn" data-number="6">6</button>
+                <button class="number-btn" data-number="7">7</button>
+                <button class="number-btn" data-number="8">8</button>
+                <button class="number-btn" data-number="9">9</button>
+                <button class="number-btn erase" data-number="0">✖️</button>
+            </div>
+        </div>
+
+        <!-- Reaction Trainer Game -->
+        <div id="reaction-game" class="game-container hidden">
+            <div class="game-header">
+                <h2>⚡ Reaction Trainer</h2>
+                <button class="back-btn" onclick="showMenu()">← Back to Menu</button>
+            </div>
+            
+            <div class="reaction-area">
+                <div class="reaction-display" id="reaction-display">
+                    <h3>Get Ready...</h3>
+                    <p>Tap the screen as fast as possible when you see the signal!</p>
+                    <button class="start-reaction-btn" onclick="startReaction()">Start Test</button>
+                </div>
+                
+                <div class="reaction-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Best Time:</span>
+                        <span class="stat-value" id="best-reaction">---</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Average:</span>
+                        <span class="stat-value" id="avg-reaction">---</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Tests:</span>
+                        <span class="stat-value" id="reaction-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memory Blitz Game -->
+        <div id="memory-game" class="game-container hidden">
+            <div class="game-header">
+                <h2>🧩 Memory Blitz</h2>
+                <button class="back-btn" onclick="showMenu()">← Back to Menu</button>
+            </div>
+            
+            <div class="memory-controls">
+                <div class="memory-stats">
+                    <div class="stat">Level: <span id="memory-level">1</span></div>
+                    <div class="stat">Score: <span id="memory-score">0</span></div>
+                    <div class="stat">Time: <span id="memory-timer">30</span>s</div>
+                </div>
+                <button class="start-memory-btn" onclick="startMemoryBlitz()">Start Challenge</button>
+            </div>
+            
+            <div class="memory-board" id="memory-board"></div>
+            
+            <div class="memory-instructions">
+                <p>Watch the pattern, then recreate it!</p>
+                <p>Patterns get more complex as you advance.</p>
+            </div>
+        </div>
+
+        <!-- Money Academy -->
+        <div id="money-game" class="game-container hidden">
+            <div class="game-header">
+                <h2>💰 Money Academy</h2>
+                <button class="back-btn" onclick="showMenu()">← Back to Menu</button>
+            </div>
+            
+            <div class="money-dashboard">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="money-progress"></div>
+                    <span class="progress-text" id="money-progress-text">Chapter 1 of 8</span>
+                </div>
+                
+                <div class="chapter-selector">
+                    <div class="chapter-card active" data-chapter="1">
+                        <h4>💳 What is Money?</h4>
+                        <p>Basic concepts and history</p>
+                    </div>
+                    <div class="chapter-card" data-chapter="2">
+                        <h4>🏦 Banking Basics</h4>
+                        <p>Savings, checking, and interest</p>
+                    </div>
+                    <div class="chapter-card" data-chapter="3">
+                        <h4>📊 Budgeting</h4>
+                        <p>Managing income and expenses</p>
+                    </div>
+                    <div class="chapter-card" data-chapter="4">
+                        <h4>💡 Smart Spending</h4>
+                        <p>Needs vs wants, comparison shopping</p>
+                    </div>
+                    <div class="chapter-card" data-chapter="5">
+                        <h4>🎯 Saving Goals</h4>
+                        <p>Setting and achieving financial goals</p>
+                    </div>
+                    <div class="chapter-card" data-chapter="6">
+                        <h4>📈 Investment Basics</h4>
+                        <p>Growing money over time</p>
+                    </div>
+                    <div class="chapter-card" data-chapter="7">
+                        <h4>🛡️ Financial Safety</h4>
+                        <p>Avoiding scams and debt traps</p>
+                    </div>
+                    <div class="chapter-card" data-chapter="8">
+                        <h4>🏆 Money Master</h4>
+                        <p>Final quiz and certification</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chapter-content" id="chapter-content">
+                <!-- Chapter content will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Image Puzzle Builder -->
+        <div id="puzzle-game" class="game-container hidden">
+            <div class="game-header">
+                <h2>🖼️ Image Puzzle Builder</h2>
+                <button class="back-btn" onclick="showMenu()">← Back to Menu</button>
+            </div>
+            
+            <div class="puzzle-setup">
+                <div class="image-selector">
+                    <h3>Choose an Image:</h3>
+                    <div class="preset-images">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzRBOTBFMiIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjMwIiBmaWxsPSIjRkZENzAwIi8+PC9zdmc+" class="preset-img" alt="Simple Circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJFQ0Q3MSIvPjxwb2x5Z29uIHBvaW50cz0iNTAsMTAgODAsMzAgODAsNzAgNTAsOTAgMjAsNzAgMjAsMzAiIGZpbGw9IiNGRkZGRkYiLz48L3N2Zz4=" class="preset-img" alt="Hexagon">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRjY5QjQiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM0QzFEOTUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0idXJsKCNnKSIvPjxzdGFyIGN4PSI1MCIgY3k9IjUwIiByPSIyNSIgZmlsbD0iI0ZGRkZGRiIvPjwvc3ZnPg==" class="preset-img" alt="Star Gradient">
+                    </div>
+                    
+                    <div class="custom-upload">
+                        <input type="file" id="custom-image" accept="image/*" onchange="loadCustomImage(this)">
+                        <label for="custom-image" class="upload-btn">📁 Upload Custom Image</label>
+                    </div>
+                </div>
+                
+                <div class="puzzle-controls">
+                    <button class="create-puzzle-btn" onclick="createPuzzle()">🧩 Create 8-Piece Puzzle</button>
+                    <button class="shuffle-btn" onclick="shufflePuzzle()" disabled>🔀 Shuffle</button>
+                    <div class="puzzle-timer">Time: <span id="puzzle-timer">00:00</span></div>
+                </div>
+            </div>
+            
+            <div class="puzzle-area">
+                <div class="puzzle-preview" id="puzzle-preview"></div>
+                <div class="puzzle-board" id="puzzle-board"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="sudoku.js"></script>
+    <script src="reaction-trainer.js"></script>
+    <script src="memory-blitz.js"></script>
+    <script src="money-academy.js"></script>
+    <script src="puzzle-builder.js"></script>
+    <script src="adult-games.js"></script>
+</body>
+</html>

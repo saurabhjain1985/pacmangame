@@ -106,6 +106,9 @@ class GameMenu {
                 case 'math-tables':
                     window.location.href = 'math-tables.html';
                     break;
+                case 'bedtime-stories':
+                    window.location.href = 'bedtime-stories.html';
+                    break;
                 default:
                     console.log(`Game ${gameType} not implemented yet`);
                     alert('This game is coming soon!');

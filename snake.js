@@ -251,7 +251,13 @@ class SnakeGame {
         this.score += 10;
         this.generateFood();
         this.updateDisplay();
-        this.playEatSound();
+        // Play eat sound with haptic feedback
+        if (window.gameAudio) {
+            gameAudio.playSound('success', 800);
+            gameAudio.hapticFeedback('light');
+        } else {
+            this.playEatSound();
+        }
         
         // Increase speed slightly as snake grows
         if (this.snake.length % 5 === 0) {
@@ -393,7 +399,13 @@ class SnakeGame {
         }
         
         this.showGameOverScreen();
-        this.playGameOverSound();
+        // Play game over sound with haptic feedback
+        if (window.gameAudio) {
+            gameAudio.playSound('error');
+            gameAudio.hapticFeedback('gameOver');
+        } else {
+            this.playGameOverSound();
+        }
     }
 
     showGameOverScreen() {
