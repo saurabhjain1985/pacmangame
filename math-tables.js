@@ -28,10 +28,26 @@ class MathTablesGame {
 
     init() {
         console.log('Math Tables Master initialized');
-        this.setupEventListeners();
-        this.showScreen('grade-selection');
-        this.updateStats();
-        this.loadUserProgress();
+        try {
+            this.setupEventListeners();
+            this.showScreen('grade-selection');
+            this.updateStats();
+            this.loadUserProgress();
+            
+            // Initialize with safe defaults
+            this.currentTable = null;
+            this.currentGrade = null;
+            this.currentQuestions = [];
+            
+            console.log('Math Tables Master initialization complete');
+        } catch (error) {
+            console.error('Error during initialization:', error);
+            // Fallback initialization
+            this.currentTable = null;
+            this.currentGrade = null;
+            this.currentQuestions = [];
+            this.showScreen('grade-selection');
+        }
     }
 
     setupEventListeners() {
@@ -116,8 +132,10 @@ class MathTablesGame {
     }
 
     selectGrade(grade) {
+        console.log('Selecting grade:', grade);
         this.currentGrade = grade;
         this.gameStats.level = 1;
+        this.resetGameStats(); // Reset only stats, keep grade/table info
         this.startLearningMode();
     }
 
@@ -126,14 +144,31 @@ class MathTablesGame {
     }
 
     startPracticeMode(table) {
+        console.log('Starting practice mode for table:', table);
         this.currentTable = table;
         this.currentGrade = 'practice';
+        this.resetGameStats(); // Reset only stats, keep grade/table info
         this.showLearningScreen();
     }
 
     startLearningMode() {
         const config = this.gradeConfigs[this.currentGrade];
-        this.currentTable = config.tables[this.gameStats.level - 1];
+        if (!config) {
+            console.error('Invalid grade configuration:', this.currentGrade);
+            this.showScreen('grade-selection');
+            return;
+        }
+        
+        const tableIndex = this.gameStats.level - 1;
+        if (tableIndex < 0 || tableIndex >= config.tables.length) {
+            console.error('Invalid level for grade:', this.gameStats.level, this.currentGrade);
+            this.gameStats.level = 1;
+            this.currentTable = config.tables[0];
+        } else {
+            this.currentTable = config.tables[tableIndex];
+        }
+        
+        console.log(`Starting learning mode: Grade ${this.currentGrade}, Level ${this.gameStats.level}, Table ${this.currentTable}`);
         this.showLearningScreen();
     }
 
@@ -147,10 +182,10 @@ class MathTablesGame {
         const title = document.getElementById('table-title');
         const subtitle = document.getElementById('learning-subtitle');
         
-        if (title) {
+        if (title && this.currentTable) {
             title.textContent = `Learning ${this.currentTable} Times Table`;
         }
-        if (subtitle) {
+        if (subtitle && this.currentTable) {
             subtitle.textContent = `Let's learn the ${this.currentTable} times table step by step!`;
         }
     }
@@ -158,6 +193,12 @@ class MathTablesGame {
     displayTableChart() {
         const chartContainer = document.getElementById('table-chart');
         if (!chartContainer) return;
+
+        if (!this.currentTable) {
+            console.error('Cannot display table chart: No table selected');
+            chartContainer.innerHTML = '<p>Please select a table first!</p>';
+            return;
+        }
 
         chartContainer.innerHTML = '';
         
@@ -179,17 +220,18 @@ class MathTablesGame {
             
             chartContainer.appendChild(row);
             
-            // Animate each row
-            setTimeout(() => {
-                row.style.opacity = '0';
-                row.style.transform = 'translateX(-50px)';
-                row.style.transition = 'all 0.5s ease';
-                
+            // Simple animation without nested timeouts
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-50px)';
+            row.style.transition = 'all 0.5s ease';
+            
+            // Use requestAnimationFrame for better performance
+            requestAnimationFrame(() => {
                 setTimeout(() => {
                     row.style.opacity = '1';
                     row.style.transform = 'translateX(0)';
-                }, i * 100);
-            }, 10);
+                }, i * 50); // Reduced delay
+            });
         }
     }
 
@@ -204,9 +246,19 @@ class MathTablesGame {
         });
     }
 
-    startQuiz() {
+    async startQuiz() {
+        // Validate that we have a current table set
+        if (!this.currentTable) {
+            console.error('No table selected for quiz');
+            this.showFeedback('Please select a table first!', 'error');
+            return;
+        }
+
         this.showScreen('quiz');
-        this.generateQuestions();
+        
+        // Generate questions asynchronously to prevent blocking
+        await this.generateQuestions();
+        
         this.gameStats.questionsAnswered = 0;
         this.gameStats.correctAnswers = 0;
         this.gameStats.currentQuestionIndex = 0;
@@ -218,41 +270,70 @@ class MathTablesGame {
         const title = document.getElementById('quiz-title');
         const subtitle = document.getElementById('quiz-subtitle');
         
-        if (title) {
+        if (title && this.currentTable) {
             title.textContent = `${this.currentTable} Times Table Quiz`;
         }
-        if (subtitle) {
+        if (subtitle && this.currentQuestions.length > 0) {
             const remaining = this.currentQuestions.length - this.gameStats.currentQuestionIndex;
             subtitle.textContent = `${remaining} questions remaining`;
         }
     }
 
     generateQuestions() {
-        this.currentQuestions = [];
-        const maxNumber = this.currentGrade === 'practice' ? 15 : 
-                         this.gradeConfigs[this.currentGrade].maxNumber;
-        const questionCount = this.currentGrade === 'practice' ? 15 : 
-                             this.gradeConfigs[this.currentGrade].questionsPerLevel;
-
-        // Generate unique questions
-        const usedQuestions = new Set();
-        
-        while (this.currentQuestions.length < questionCount) {
-            const multiplier = Math.floor(Math.random() * maxNumber) + 1;
-            const questionKey = `${this.currentTable}x${multiplier}`;
+        return new Promise((resolve) => {
+            this.currentQuestions = [];
             
-            if (!usedQuestions.has(questionKey)) {
-                usedQuestions.add(questionKey);
-                this.currentQuestions.push({
-                    table: this.currentTable,
-                    multiplier: multiplier,
-                    answer: this.currentTable * multiplier
-                });
+            // Validate current table
+            if (!this.currentTable) {
+                console.error('Cannot generate questions: No table selected');
+                resolve();
+                return;
             }
-        }
 
-        // Shuffle questions
-        this.currentQuestions = this.shuffleArray(this.currentQuestions);
+            const maxNumber = this.currentGrade === 'practice' ? 15 : 
+                             this.gradeConfigs[this.currentGrade].maxNumber;
+            const questionCount = this.currentGrade === 'practice' ? 15 : 
+                                 this.gradeConfigs[this.currentGrade].questionsPerLevel;
+
+            // Generate unique questions
+            const usedQuestions = new Set();
+            let attempts = 0;
+            const maxAttempts = questionCount * 3; // Safety limit
+            
+            while (this.currentQuestions.length < questionCount && attempts < maxAttempts) {
+                attempts++;
+                const multiplier = Math.floor(Math.random() * maxNumber) + 1;
+                const questionKey = `${this.currentTable}x${multiplier}`;
+                
+                if (!usedQuestions.has(questionKey)) {
+                    usedQuestions.add(questionKey);
+                    this.currentQuestions.push({
+                        table: this.currentTable,
+                        multiplier: multiplier,
+                        answer: this.currentTable * multiplier
+                    });
+                }
+            }
+
+            // If we couldn't generate enough unique questions, fill with any remaining
+            if (this.currentQuestions.length < questionCount) {
+                for (let i = 1; i <= maxNumber && this.currentQuestions.length < questionCount; i++) {
+                    const questionKey = `${this.currentTable}x${i}`;
+                    if (!usedQuestions.has(questionKey)) {
+                        this.currentQuestions.push({
+                            table: this.currentTable,
+                            multiplier: i,
+                            answer: this.currentTable * i
+                        });
+                    }
+                }
+            }
+
+            // Shuffle questions
+            this.currentQuestions = this.shuffleArray(this.currentQuestions);
+            console.log(`Generated ${this.currentQuestions.length} questions for table ${this.currentTable}`);
+            resolve();
+        });
     }
 
     showNextQuestion() {
@@ -262,6 +343,12 @@ class MathTablesGame {
         }
 
         const question = this.currentQuestions[this.gameStats.currentQuestionIndex];
+        if (!question) {
+            console.error('No question available at index', this.gameStats.currentQuestionIndex);
+            this.completeLevel();
+            return;
+        }
+
         this.displayQuestion(question);
         this.generateAnswerOptions(question.answer);
         this.clearFeedback();
@@ -285,7 +372,11 @@ class MathTablesGame {
         const options = [correctAnswer];
         
         // Generate wrong answers
-        while (options.length < 4) {
+        let attempts = 0;
+        const maxAttempts = 20; // Safety limit to prevent infinite loop
+        
+        while (options.length < 4 && attempts < maxAttempts) {
+            attempts++;
             let wrongAnswer;
             const randomType = Math.random();
             
@@ -304,6 +395,16 @@ class MathTablesGame {
             
             if (wrongAnswer > 0 && !options.includes(wrongAnswer)) {
                 options.push(wrongAnswer);
+            }
+        }
+
+        // If we still don't have enough options, add simple variations
+        while (options.length < 4) {
+            const variation = correctAnswer + options.length;
+            if (!options.includes(variation)) {
+                options.push(variation);
+            } else {
+                options.push(correctAnswer + options.length + 10);
             }
         }
 
@@ -363,7 +464,10 @@ class MathTablesGame {
 
     showFeedback(message, type) {
         const feedbackArea = document.getElementById('feedback-area');
-        if (!feedbackArea) return;
+        if (!feedbackArea) {
+            console.error('Feedback area not found');
+            return;
+        }
 
         feedbackArea.innerHTML = '';
         const feedbackElement = document.createElement('div');
@@ -611,6 +715,19 @@ class MathTablesGame {
         }
     }
 
+    resetGameStats() {
+        this.gameStats = {
+            score: 0,
+            streak: 0,
+            level: this.gameStats.level, // Keep current level
+            questionsAnswered: 0,
+            correctAnswers: 0,
+            currentQuestionIndex: 0
+        };
+        this.currentQuestions = [];
+        this.updateStats();
+    }
+
     resetGame() {
         this.gameStats = {
             score: 0,
@@ -621,6 +738,8 @@ class MathTablesGame {
             currentQuestionIndex: 0
         };
         this.currentQuestions = [];
+        this.currentTable = null;
+        this.currentGrade = null;
         this.updateStats();
     }
 

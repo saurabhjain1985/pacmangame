@@ -73,13 +73,28 @@
             </div>
             
             <div class="mobile-controls">
-                <div class="control-row">
-                    <button class="control-btn" id="rotate-btn">↻ Rotate</button>
-                    <button class="control-btn" id="drop-btn">↓ Drop</button>
+                <!-- Top row: Left and Right buttons on sides -->
+                <div class="control-row side-controls">
+                    <button class="control-btn side-btn left-btn" id="left-btn">
+                        <span class="btn-icon">←</span>
+                        <span class="btn-label">Left</span>
+                    </button>
+                    <div class="center-space"></div>
+                    <button class="control-btn side-btn right-btn" id="right-btn">
+                        <span class="btn-icon">→</span>
+                        <span class="btn-label">Right</span>
+                    </button>
                 </div>
-                <div class="control-row">
-                    <button class="control-btn" id="left-btn">← Left</button>
-                    <button class="control-btn" id="right-btn">Right →</button>
+                <!-- Bottom row: Down and Rotate in center -->
+                <div class="control-row center-controls">
+                    <button class="control-btn center-btn" id="drop-btn">
+                        <span class="btn-icon">↓</span>
+                        <span class="btn-label">Drop</span>
+                    </button>
+                    <button class="control-btn center-btn" id="rotate-btn">
+                        <span class="btn-icon">↻</span>
+                        <span class="btn-label">Rotate</span>
+                    </button>
                 </div>
             </div>
             

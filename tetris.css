@@ -220,39 +220,125 @@ header {
     background: rgba(0, 0, 0, 0.2);
 }
 
-/* Mobile Controls */
+/* Mobile Controls - Ergonomic Layout */
 .mobile-controls {
-    display: grid;
-    gap: 1rem;
-    max-width: 400px;
-    margin: 0 auto 2rem;
-}
-
-.control-row {
     display: flex;
-    gap: 1rem;
-    justify-content: center;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 100%;
+    margin: 0 auto 2rem;
+    padding: 0 20px;
 }
 
-.control-btn {
+/* Side controls row - Left and Right buttons */
+.side-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.center-space {
+    flex: 1;
+    min-width: 100px;
+}
+
+.side-btn {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     color: white;
-    padding: 15px 20px;
-    border-radius: 15px;
-    font-size: 1rem;
-    font-weight: 500;
+    padding: 20px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     user-select: none;
-    flex: 1;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.left-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+.right-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+/* Center controls row - Drop and Rotate buttons */
+.center-controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    width: 100%;
+}
+
+.center-btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 18px 30px;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
     min-width: 120px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+#drop-btn {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    border-color: rgba(78, 205, 196, 0.5);
+}
+
+#rotate-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    border-color: rgba(255, 107, 107, 0.5);
+}
+
+.btn-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.btn-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .control-btn:hover, .control-btn:active {
-    background: rgba(255, 255, 255, 0.3);
     transform: scale(0.95);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.side-btn:hover, .side-btn:active {
+    filter: brightness(1.1);
+}
+
+.center-btn:hover, .center-btn:active {
+    filter: brightness(1.1);
 }
 
 /* Game Controls */
@@ -343,6 +429,37 @@ header {
         padding: 1rem 0;
     }
     
+    /* Enhanced mobile controls for smaller screens */
+    .mobile-controls {
+        gap: 1rem;
+        padding: 0 10px;
+    }
+    
+    .side-btn {
+        width: 70px;
+        height: 70px;
+        padding: 15px;
+    }
+    
+    .center-btn {
+        min-width: 100px;
+        height: 60px;
+        padding: 15px 25px;
+    }
+    
+    .center-controls {
+        gap: 1.5rem;
+    }
+    
+    .btn-icon {
+        font-size: 1.3rem;
+    }
+    
+    .btn-label {
+        font-size: 0.7rem;
+    }
+}
+    
     .difficulty-card {
         padding: 1.5rem;
     }
@@ -385,12 +502,33 @@ header {
         height: 480px;
     }
     
-    .control-row {
-        flex-direction: column;
+    /* Ultra-compact mobile controls for very small screens */
+    .side-btn {
+        width: 60px;
+        height: 60px;
+        padding: 12px;
     }
     
-    .control-btn {
-        min-width: auto;
+    .center-btn {
+        min-width: 90px;
+        height: 55px;
+        padding: 12px 20px;
+    }
+    
+    .center-controls {
+        gap: 1rem;
+    }
+    
+    .btn-icon {
+        font-size: 1.2rem;
+    }
+    
+    .btn-label {
+        font-size: 0.6rem;
+    }
+    
+    .mobile-controls {
+        gap: 0.8rem;
     }
 }
 
