@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man iOS - Modern Pac-Man Game</title>
+    <meta name="description" content="A modern, Apple-inspired Pac-Man game with 3 smart ghosts and beautiful iOS design">
+    <meta name="keywords" content="pacman, game, html5, javascript, ios, apple, retro">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1 id="game-title">Pac-Man iOS</h1>
+        <div id="hud">
+            <span id="score">Score: 0</span>
+            <span id="lives">Lives: 3</span>
+        </div>
+        <canvas id="game-canvas" width="560" height="420"></canvas>
+        <div id="message"></div>
+        <div id="controls">
+            <p>Use arrow keys to move Pac-Man</p>
+            <p>Eat all dots to win! Avoid the 3 ghosts!</p>
+            <div id="share-info">
+                <p>🎮 Built with HTML5, CSS3 & JavaScript</p>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>

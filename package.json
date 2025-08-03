@@ -1,0 +1,13 @@
+{
+  "name": "pacman-ios",
+  "version": "1.0.0",
+  "description": "A modern Apple-inspired Pac-Man game",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve . --live"
+  },
+  "keywords": ["pacman", "game", "html5", "javascript", "ios"],
+  "author": "Your Name",
+  "license": "MIT"
+}
