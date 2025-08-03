@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match - Brain Training Game</title>
+    <meta name="description" content="Test your memory with this beautiful card matching game featuring 3 difficulty levels">
+    <meta name="keywords" content="memory, cards, game, brain, training, ios, apple">
+    <link rel="stylesheet" href="memory.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="back-button" onclick="goBack()">← Back to Games</div>
+        
+        <header>
+            <h1 id="game-title">🧠 Memory Match</h1>
+            <div id="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Moves</span>
+                    <span id="moves">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Time</span>
+                    <span id="timer">00:00</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Difficulty Selection Screen -->
+        <div id="difficulty-screen" class="screen active">
+            <h2>Choose Your Challenge</h2>
+            <p>Test your memory skills with different difficulty levels</p>
+            
+            <div class="difficulty-grid">
+                <div class="difficulty-card" data-level="easy">
+                    <div class="difficulty-icon">😊</div>
+                    <h3>Easy</h3>
+                    <p>4x3 Grid • 6 Pairs</p>
+                    <p>Perfect for beginners</p>
+                    <button class="start-btn" onclick="startGame('easy')">Start Easy</button>
+                </div>
+                
+                <div class="difficulty-card" data-level="medium">
+                    <div class="difficulty-icon">🤔</div>
+                    <h3>Medium</h3>
+                    <p>4x4 Grid • 8 Pairs</p>
+                    <p>Good challenge level</p>
+                    <button class="start-btn" onclick="startGame('medium')">Start Medium</button>
+                </div>
+                
+                <div class="difficulty-card" data-level="hard">
+                    <div class="difficulty-icon">🤯</div>
+                    <h3>Hard</h3>
+                    <p>6x4 Grid • 12 Pairs</p>
+                    <p>Ultimate memory test</p>
+                    <button class="start-btn" onclick="startGame('hard')">Start Hard</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div id="game-board"></div>
+            
+            <div id="game-controls">
+                <button id="pause-btn" onclick="pauseGame()">⏸️ Pause</button>
+                <button id="restart-btn" onclick="restartGame()">🔄 Restart</button>
+                <button id="new-game-btn" onclick="newGame()">🎮 New Game</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen">
+            <h2 id="game-over-title">🎉 Congratulations!</h2>
+            <div id="final-stats">
+                <div class="final-stat">
+                    <span class="final-label">Final Score</span>
+                    <span id="final-score">0</span>
+                </div>
+                <div class="final-stat">
+                    <span class="final-label">Total Moves</span>
+                    <span id="final-moves">0</span>
+                </div>
+                <div class="final-stat">
+                    <span class="final-label">Time Taken</span>
+                    <span id="final-time">00:00</span>
+                </div>
+                <div class="final-stat">
+                    <span class="final-label">Accuracy</span>
+                    <span id="accuracy">0%</span>
+                </div>
+            </div>
+            
+            <div id="performance-message"></div>
+            
+            <div class="game-over-buttons">
+                <button class="action-btn" onclick="playAgain()">🔄 Play Again</button>
+                <button class="action-btn" onclick="newGame()">🎮 New Difficulty</button>
+                <button class="action-btn" onclick="goBack()">← Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pause-screen" class="screen">
+            <h2>⏸️ Game Paused</h2>
+            <p>Take your time, the timer is stopped</p>
+            <div class="pause-buttons">
+                <button class="action-btn" onclick="resumeGame()">▶️ Resume</button>
+                <button class="action-btn" onclick="restartGame()">🔄 Restart</button>
+                <button class="action-btn" onclick="newGame()">🎮 New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="memory.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

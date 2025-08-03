@@ -3,41 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pac-Man iOS - Modern Pac-Man Game</title>
-    <meta name="description" content="A modern, Apple-inspired Pac-Man game with 3 smart ghosts and beautiful iOS design">
-    <meta name="keywords" content="pacman, game, html5, javascript, ios, apple, retro">
-    <link rel="stylesheet" href="style.css">
+    <title>iOS Games Collection - Choose Your Adventure</title>
+    <meta name="description" content="A collection of modern iOS-style games including Pac-Man and Memory games">
+    <meta name="keywords" content="games, html5, javascript, ios, apple, pacman, memory, puzzle">
+    <link rel="stylesheet" href="main-menu.css">
 </head>
 <body>
-    <div id="game-container">
-        <h1 id="game-title">Pac-Man iOS</h1>
-        <div id="hud">
-            <span id="score">Score: 0</span>
-            <span id="lives">Lives: 3</span>
-        </div>
-        <canvas id="game-canvas" width="560" height="420"></canvas>
-        <div id="message"></div>
+    <div id="main-container">
+        <header>
+            <h1 id="main-title">🎮 iOS Games Collection</h1>
+            <p id="subtitle">Choose your favorite game to play</p>
+        </header>
         
-        <!-- Mobile Controls -->
-        <div id="mobile-controls">
-            <div class="control-pad">
-                <div class="control-btn" data-direction="up" title="Move Up">▲</div>
-                <div class="control-btn" data-direction="left" title="Move Left">◀</div>
-                <div class="control-btn" data-direction="right" title="Move Right">▶</div>
-                <div class="control-btn" data-direction="down" title="Move Down">▼</div>
+        <div id="games-grid">
+            <!-- Pac-Man Game Card -->
+            <div class="game-card" data-game="pacman">
+                <div class="game-icon">🟡</div>
+                <h3 class="game-title">Pac-Man iOS</h3>
+                <p class="game-description">Classic arcade action with 3 smart ghosts and power-ups</p>
+                <div class="game-features">
+                    <span class="feature">🕹️ Mobile Controls</span>
+                    <span class="feature">👻 3 Ghost Types</span>
+                    <span class="feature">💊 Power-ups</span>
+                </div>
+                <button class="play-btn" onclick="playGame('pacman')">Play Now</button>
+            </div>
+            
+            <!-- Memory Game Card -->
+            <div class="game-card" data-game="memory">
+                <div class="game-icon">🧠</div>
+                <h3 class="game-title">Memory Match</h3>
+                <p class="game-description">Test your memory with beautiful cards and multiple difficulty levels</p>
+                <div class="game-features">
+                    <span class="feature">🎯 3 Difficulty Levels</span>
+                    <span class="feature">⏱️ Timer Challenge</span>
+                    <span class="feature">🏆 Score System</span>
+                </div>
+                <button class="play-btn" onclick="playGame('memory')">Play Now</button>
+            </div>
+            
+            <!-- Snake Game Card -->
+            <div class="game-card" data-game="snake">
+                <div class="game-icon">🐍</div>
+                <h3 class="game-title">Snake iOS</h3>
+                <p class="game-description">Classic snake game with modern design and mobile controls</p>
+                <div class="game-features">
+                    <span class="feature">🕹️ Touch Controls</span>
+                    <span class="feature">⚡ 3 Speed Levels</span>
+                    <span class="feature">🏆 High Score</span>
+                </div>
+                <button class="play-btn" onclick="playGame('snake')">Play Now</button>
+            </div>
+            
+            <!-- Coming Soon Card -->
+            <div class="game-card coming-soon">
+                <div class="game-icon">🚀</div>
+                <h3 class="game-title">More Games</h3>
+                <p class="game-description">Tetris, Breakout, and more exciting games coming soon!</p>
+                <div class="game-features">
+                    <span class="feature">🧩 Tetris</span>
+                    <span class="feature">🏓 Breakout</span>
+                    <span class="feature">🎲 Puzzle Games</span>
+                </div>
+                <button class="play-btn disabled" disabled>Coming Soon</button>
             </div>
         </div>
         
-        <div id="controls">
-            <p>🖥️ Desktop: Use arrow keys to move Pac-Man</p>
-            <p>📱 Mobile: Tap the D-pad buttons to move</p>
-            <p>🎯 Eat all dots to win! Avoid the 3 ghosts!</p>
-            <p>💊 Eat power pellets (big dots) to chase ghosts!</p>
-            <div id="share-info">
-                <p>🎮 Built with HTML5, CSS3 & JavaScript</p>
-            </div>
-        </div>
+        <footer>
+            <p>🎮 Built with HTML5, CSS3 & JavaScript</p>
+            <p>Optimized for mobile and desktop</p>
+        </footer>
     </div>
-    <script src="game.js"></script>
+    
+    <script src="main-menu.js"></script>
 </body>
 </html>
