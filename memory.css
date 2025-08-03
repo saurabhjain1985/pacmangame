@@ -214,6 +214,7 @@ header {
     justify-content: center;
     margin-bottom: 2rem;
     perspective: 1000px;
+    pointer-events: auto;
 }
 
 .game-card {
@@ -223,6 +224,17 @@ header {
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    user-select: none;
+}
+
+.game-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+}
+
+.game-card:active {
+    transform: scale(0.95);
 }
 
 .game-card.flipped {
@@ -251,6 +263,7 @@ header {
     font-size: 2rem;
     backface-visibility: hidden;
     border: 2px solid rgba(255, 255, 255, 0.2);
+    pointer-events: none;
 }
 
 .card-front {

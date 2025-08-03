@@ -104,6 +104,7 @@ class MemoryGame {
     }
 
     startGame(difficulty) {
+        console.log('Starting memory game with difficulty:', difficulty);
         this.difficulty = difficulty;
         this.gameState = 'playing';
         this.resetGameState();
@@ -117,6 +118,8 @@ class MemoryGame {
         setTimeout(() => {
             this.animateCardsEntrance();
         }, 100);
+        
+        console.log('Game started, cards created:', this.cards.length);
     }
 
     resetGameState() {
@@ -156,6 +159,8 @@ class MemoryGame {
         const gameBoard = document.getElementById('game-board');
         const config = this.difficulties[this.difficulty];
         
+        console.log('Rendering game board for difficulty:', this.difficulty, 'with', this.cards.length, 'cards');
+        
         // Set grid layout
         gameBoard.className = `difficulty-${this.difficulty}`;
         gameBoard.innerHTML = '';
@@ -164,6 +169,8 @@ class MemoryGame {
             const cardElement = this.createCardElement(card, index);
             gameBoard.appendChild(cardElement);
         });
+        
+        console.log('Game board rendered with', gameBoard.children.length, 'card elements');
     }
 
     createCardElement(card, index) {
@@ -177,7 +184,23 @@ class MemoryGame {
             <div class="card-face card-front">${card.symbol}</div>
         `;
         
-        cardElement.addEventListener('click', () => this.handleCardClick(index));
+        // Add click event listener
+        cardElement.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Card element clicked, index:', index);
+            this.handleCardClick(index);
+        });
+        
+        // Add touch event for mobile
+        cardElement.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Card element touched, index:', index);
+            this.handleCardClick(index);
+        });
+        
+        console.log('Created card element for index:', index, 'symbol:', card.symbol);
         
         return cardElement;
     }
@@ -193,16 +216,36 @@ class MemoryGame {
     }
 
     handleCardClick(index) {
-        if (this.gameState !== 'playing') return;
-        if (this.flippedCards.length >= 2) return;
-        if (this.cards[index].matched) return;
+        console.log('Card clicked:', index, 'Game state:', this.gameState);
+        
+        if (this.gameState !== 'playing') {
+            console.log('Game not in playing state, ignoring click');
+            return;
+        }
+        if (this.flippedCards.length >= 2) {
+            console.log('Already 2 cards flipped, ignoring click');
+            return;
+        }
+        if (this.cards[index].matched) {
+            console.log('Card already matched, ignoring click');
+            return;
+        }
         
         const cardElement = document.querySelector(`[data-index="${index}"]`);
-        if (cardElement.classList.contains('flipped')) return;
+        if (!cardElement) {
+            console.log('Card element not found for index:', index);
+            return;
+        }
+        if (cardElement.classList.contains('flipped')) {
+            console.log('Card already flipped, ignoring click');
+            return;
+        }
         
         // Flip the card
         this.flipCard(cardElement, index);
         this.flippedCards.push({ element: cardElement, index: index });
+        
+        console.log('Card flipped, total flipped cards:', this.flippedCards.length);
         
         if (this.flippedCards.length === 2) {
             this.moves++;
@@ -464,31 +507,82 @@ class MemoryGame {
 
 // Global functions for HTML onclick events
 function startGame(difficulty) {
-    memoryGame.startGame(difficulty);
+    console.log('Global startGame called with:', difficulty);
+    if (window.memoryGame || memoryGame) {
+        (window.memoryGame || memoryGame).startGame(difficulty);
+    } else {
+        console.error('Memory game not initialized yet');
+    }
 }
 
 function pauseGame() {
-    memoryGame.pauseGame();
+    if (window.memoryGame || memoryGame) {
+        (window.memoryGame || memoryGame).pauseGame();
+    }
 }
 
 function resumeGame() {
-    memoryGame.resumeGame();
+    if (window.memoryGame || memoryGame) {
+        (window.memoryGame || memoryGame).resumeGame();
+    }
 }
 
 function restartGame() {
-    memoryGame.restartGame();
+    if (window.memoryGame || memoryGame) {
+        (window.memoryGame || memoryGame).restartGame();
+    }
 }
 
 function newGame() {
-    memoryGame.newGame();
+    if (window.memoryGame || memoryGame) {
+        (window.memoryGame || memoryGame).newGame();
+    }
 }
 
 function playAgain() {
-    memoryGame.playAgain();
+    if (window.memoryGame || memoryGame) {
+        (window.memoryGame || memoryGame).playAgain();
+    }
+}
+
+// Global card click handler as backup
+function handleCardClick(index) {
+    console.log('Global handleCardClick called with index:', index);
+    if (window.memoryGame || memoryGame) {
+        (window.memoryGame || memoryGame).handleCardClick(index);
+    }
 }
 
 // Initialize the game when DOM is loaded
-const memoryGame = new MemoryGame();
+let memoryGame;
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing memory game');
+    memoryGame = new MemoryGame();
+    window.memoryGame = memoryGame; // Make it globally accessible
+});
+
+// Fallback if DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+    // Do nothing, DOMContentLoaded will fire
+} else {
+    // DOM is already loaded
+    console.log('DOM already loaded, initializing memory game immediately');
+    memoryGame = new MemoryGame();
+    window.memoryGame = memoryGame;
+}
+
+// Add global click event listener as backup
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.game-card')) {
+        const cardElement = e.target.closest('.game-card');
+        const index = parseInt(cardElement.dataset.index);
+        if (!isNaN(index)) {
+            console.log('Global click handler triggered for card index:', index);
+            memoryGame.handleCardClick(index);
+        }
+    }
+});
 
 // Add performance monitoring
 if ('performance' in window) {
