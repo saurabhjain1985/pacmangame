@@ -19,7 +19,7 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Time</span>
-                    <span id="timer">00:00</span>
+                    <span id="time">00:00</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Moves</span>
@@ -29,69 +29,74 @@
         </header>
 
         <!-- Puzzle Selection Screen -->
-        <div id="puzzle-selection-screen" class="screen active">
+        <div id="selection-screen" class="screen active">
             <h2>Choose Your Brain Challenge</h2>
             <p>Train your mind with these engaging puzzles!</p>
             
             <div class="puzzle-grid">
-                <div class="puzzle-card" data-puzzle="sliding">
+                <div class="puzzle-card" data-game="sliding">
                     <div class="puzzle-icon">🧩</div>
                     <h3>Sliding Puzzle</h3>
                     <p>Classic 15-puzzle game</p>
                     <p>Arrange numbers in order</p>
-                    <button class="start-btn" onclick="startPuzzle('sliding')">Play Now</button>
+                    <button class="start-btn">Play Now</button>
                 </div>
                 
-                <div class="puzzle-card" data-puzzle="word">
+                <div class="puzzle-card" data-game="wordsearch">
                     <div class="puzzle-icon">📝</div>
                     <h3>Word Search</h3>
                     <p>Find hidden words</p>
                     <p>Multiple difficulty levels</p>
-                    <button class="start-btn" onclick="startPuzzle('word')">Play Now</button>
+                    <button class="start-btn">Play Now</button>
                 </div>
                 
-                <div class="puzzle-card" data-puzzle="number">
+                <div class="puzzle-card" data-game="number">
                     <div class="puzzle-icon">🔢</div>
                     <h3>Number Puzzle</h3>
                     <p>Mathematical challenges</p>
                     <p>Logic and arithmetic</p>
-                    <button class="start-btn" onclick="startPuzzle('number')">Play Now</button>
+                    <button class="start-btn">Play Now</button>
                 </div>
                 
-                <div class="puzzle-card" data-puzzle="pattern">
+                <div class="puzzle-card" data-game="pattern">
                     <div class="puzzle-icon">🎨</div>
                     <h3>Pattern Match</h3>
                     <p>Visual pattern recognition</p>
                     <p>Color and shape puzzles</p>
-                    <button class="start-btn" onclick="startPuzzle('pattern')">Play Now</button>
+                    <button class="start-btn">Play Now</button>
                 </div>
             </div>
         </div>
 
         <!-- Sliding Puzzle Game -->
-        <div id="sliding-game-screen" class="screen">
+        <div id="sliding-screen" class="screen">
             <h2>🧩 Sliding Puzzle</h2>
             <p>Arrange the numbers from 1 to 15 in order</p>
             
             <div class="difficulty-selector">
-                <button class="difficulty-btn active" onclick="setSlidingDifficulty(3)">3x3 Easy</button>
-                <button class="difficulty-btn" onclick="setSlidingDifficulty(4)">4x4 Classic</button>
-                <button class="difficulty-btn" onclick="setSlidingDifficulty(5)">5x5 Hard</button>
+                <button class="difficulty-btn active" data-difficulty="easy">3x3 Easy</button>
+                <button class="difficulty-btn" data-difficulty="medium">4x4 Classic</button>
+                <button class="difficulty-btn" data-difficulty="hard">5x5 Hard</button>
             </div>
             
             <div id="sliding-board" class="sliding-board"></div>
             
             <div class="game-controls">
-                <button class="action-btn" onclick="shuffleSliding()">🔀 Shuffle</button>
-                <button class="action-btn" onclick="resetPuzzle()">🔄 Reset</button>
-                <button class="action-btn" onclick="backToSelection()">← Back</button>
+                <button class="action-btn new-game-btn">� New Game</button>
+                <button class="action-btn back-to-menu-btn">← Back</button>
             </div>
         </div>
 
         <!-- Word Search Game -->
-        <div id="word-game-screen" class="screen">
+        <div id="wordsearch-screen" class="screen">
             <h2>📝 Word Search</h2>
             <p>Find all the hidden words in the grid</p>
+            
+            <div class="difficulty-selector">
+                <button class="difficulty-btn" data-difficulty="easy">Easy (8x8)</button>
+                <button class="difficulty-btn active" data-difficulty="medium">Medium (10x10)</button>
+                <button class="difficulty-btn" data-difficulty="hard">Hard (12x12)</button>
+            </div>
             
             <div class="word-list">
                 <h4>Find these words:</h4>
@@ -101,16 +106,21 @@
             <div id="word-grid" class="word-grid"></div>
             
             <div class="game-controls">
-                <button class="action-btn" onclick="newWordPuzzle()">🆕 New Puzzle</button>
-                <button class="action-btn" onclick="showWordHint()">💡 Hint</button>
-                <button class="action-btn" onclick="backToSelection()">← Back</button>
+                <button class="action-btn new-game-btn">🆕 New Puzzle</button>
+                <button class="action-btn back-to-menu-btn">← Back</button>
             </div>
         </div>
 
         <!-- Number Puzzle Game -->
-        <div id="number-game-screen" class="screen">
+        <div id="number-screen" class="screen">
             <h2>🔢 Number Puzzle</h2>
             <p>Solve mathematical challenges</p>
+            
+            <div class="difficulty-selector">
+                <button class="difficulty-btn" data-difficulty="easy">Easy (+/-)</button>
+                <button class="difficulty-btn active" data-difficulty="medium">Medium (×)</button>
+                <button class="difficulty-btn" data-difficulty="hard">Hard (÷)</button>
+            </div>
             
             <div id="number-puzzle-area">
                 <div id="number-question"></div>
@@ -118,16 +128,21 @@
             </div>
             
             <div class="game-controls">
-                <button class="action-btn" onclick="nextNumberPuzzle()">➡️ Next</button>
-                <button class="action-btn" onclick="resetNumberPuzzle()">🔄 Reset</button>
-                <button class="action-btn" onclick="backToSelection()">← Back</button>
+                <button class="action-btn new-game-btn">🔄 New Game</button>
+                <button class="action-btn back-to-menu-btn">← Back</button>
             </div>
         </div>
 
         <!-- Pattern Match Game -->
-        <div id="pattern-game-screen" class="screen">
+        <div id="pattern-screen" class="screen">
             <h2>🎨 Pattern Match</h2>
             <p>Complete the pattern sequence</p>
+            
+            <div class="difficulty-selector">
+                <button class="difficulty-btn" data-difficulty="easy">Easy (4 items)</button>
+                <button class="difficulty-btn active" data-difficulty="medium">Medium (6 items)</button>
+                <button class="difficulty-btn" data-difficulty="hard">Hard (8 items)</button>
+            </div>
             
             <div id="pattern-display">
                 <div id="pattern-sequence"></div>
@@ -135,9 +150,8 @@
             </div>
             
             <div class="game-controls">
-                <button class="action-btn" onclick="nextPattern()">➡️ Next</button>
-                <button class="action-btn" onclick="resetPattern()">🔄 Reset</button>
-                <button class="action-btn" onclick="backToSelection()">← Back</button>
+                <button class="action-btn new-game-btn">🔄 New Pattern</button>
+                <button class="action-btn back-to-menu-btn">← Back</button>
             </div>
         </div>
 
@@ -162,31 +176,14 @@
             </div>
             
             <div class="victory-buttons">
-                <button class="action-btn" onclick="playAgain()">🔄 Play Again</button>
-                <button class="action-btn" onclick="backToSelection()">🎲 Try Another</button>
-                <button class="action-btn" onclick="goBack()">← Main Menu</button>
+                <button class="action-btn new-game-btn">🔄 Play Again</button>
+                <button class="action-btn back-to-menu-btn">🎲 Try Another</button>
+                <button class="action-btn" onclick="window.location.href='index.html'">← Main Menu</button>
             </div>
         </div>
     </div>
 
-    <script>
-        function goBack() {
-            window.location.href = 'index.html';
-        }
-        
-        // Add some interactive effects
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.difficulty-card');
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    card.style.animation = 'bounce 0.5s ease-in-out';
-                    setTimeout(() => {
-                        card.style.animation = '';
-                    }, 500);
-                });
-            });
-        });
-    </script>
+    <script src="puzzle.js"></script>
     
     <style>
         .coming-soon-info {
