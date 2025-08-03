@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    padding: 20px;
+    padding: 10px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #ffffff;
@@ -8,6 +8,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    overflow-x: auto;
 }
 
 #game-container {
@@ -15,10 +16,12 @@ body {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 30px;
+    padding: 20px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 25px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    max-width: 100vw;
+    box-sizing: border-box;
 }
 
 #game-title {
@@ -61,6 +64,101 @@ body {
     margin: 0 auto;
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    max-width: 100%;
+    height: auto;
+}
+
+/* Mobile Controls */
+#mobile-controls {
+    display: none;
+    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(3, 60px);
+    gap: 5px;
+}
+
+.control-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+}
+
+.control-btn:active {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0.9);
+}
+
+.control-btn:nth-child(2) { /* Up */
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.control-btn:nth-child(3) { /* Left */
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.control-btn:nth-child(4) { /* Right */
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.control-btn:nth-child(5) { /* Down */
+    grid-column: 2;
+    grid-row: 3;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+    }
+    
+    #game-container {
+        padding: 15px;
+        margin: 0;
+        border-radius: 15px;
+    }
+    
+    #game-title {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+    
+    #hud {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    
+    #mobile-controls {
+        display: flex;
+    }
+    
+    #controls p {
+        font-size: 12px;
+        margin: 5px 0;
+    }
+    
+    #share-info {
+        font-size: 10px;
+    }
 }
 
 #message {
