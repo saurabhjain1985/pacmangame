@@ -148,48 +148,85 @@ document.addEventListener('keydown', (e) => {
 // Mobile touch controls
 document.addEventListener('DOMContentLoaded', () => {
     const controlBtns = document.querySelectorAll('.control-btn');
+    
     controlBtns.forEach(btn => {
+        // Prevent scrolling and zooming
         btn.addEventListener('touchstart', (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            
             if (!gameRunning) return;
             
-            const direction = btn.getAttribute('data-direction');
-            switch(direction) {
-                case 'right':
-                    pacman.nextDirection = 0;
-                    break;
-                case 'down':
-                    pacman.nextDirection = 1;
-                    break;
-                case 'left':
-                    pacman.nextDirection = 2;
-                    break;
-                case 'up':
-                    pacman.nextDirection = 3;
-                    break;
+            // Haptic feedback if available
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
             }
-        });
+            
+            const direction = btn.getAttribute('data-direction');
+            setDirection(direction);
+        }, { passive: false });
         
+        btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, { passive: false });
+        
+        btn.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, { passive: false });
+        
+        // Also handle regular clicks for desktop testing
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            
             if (!gameRunning) return;
             
             const direction = btn.getAttribute('data-direction');
-            switch(direction) {
-                case 'right':
-                    pacman.nextDirection = 0;
-                    break;
-                case 'down':
-                    pacman.nextDirection = 1;
-                    break;
-                case 'left':
-                    pacman.nextDirection = 2;
-                    break;
-                case 'up':
-                    pacman.nextDirection = 3;
-                    break;
-            }
+            setDirection(direction);
         });
+    });
+    
+    // Helper function to set direction
+    function setDirection(direction) {
+        switch(direction) {
+            case 'right':
+                pacman.nextDirection = 0;
+                break;
+            case 'down':
+                pacman.nextDirection = 1;
+                break;
+            case 'left':
+                pacman.nextDirection = 2;
+                break;
+            case 'up':
+                pacman.nextDirection = 3;
+                break;
+        }
+    }
+    
+    // Prevent zooming on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+    
+    // Prevent pinch zoom
+    document.addEventListener('gesturestart', function (e) {
+        e.preventDefault();
+    });
+    
+    document.addEventListener('gesturechange', function (e) {
+        e.preventDefault();
+    });
+    
+    document.addEventListener('gestureend', function (e) {
+        e.preventDefault();
     });
 });
 

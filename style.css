@@ -74,22 +74,28 @@ body {
     margin-top: 20px;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
+    padding: 20px;
 }
 
 .control-pad {
     display: grid;
-    grid-template-columns: repeat(3, 60px);
-    grid-template-rows: repeat(3, 60px);
-    gap: 5px;
+    grid-template-columns: 80px 80px 80px;
+    grid-template-rows: 80px 80px 80px;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 25px;
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .control-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
     color: white;
-    font-size: 20px;
+    font-size: 28px;
     font-weight: bold;
     cursor: pointer;
     user-select: none;
@@ -97,32 +103,62 @@ body {
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(10px);
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .control-btn:active {
-    background: rgba(255, 255, 255, 0.4);
-    transform: scale(0.9);
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(0.92);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-.control-btn:nth-child(2) { /* Up */
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* D-Pad Layout */
+.control-btn[data-direction="up"] {
     grid-column: 2;
     grid-row: 1;
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(80, 170, 255, 0.3));
 }
 
-.control-btn:nth-child(3) { /* Left */
+.control-btn[data-direction="left"] {
     grid-column: 1;
     grid-row: 2;
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 154, 158, 0.3));
 }
 
-.control-btn:nth-child(4) { /* Right */
+.control-btn[data-direction="right"] {
     grid-column: 3;
     grid-row: 2;
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.3), rgba(107, 229, 219, 0.3));
 }
 
-.control-btn:nth-child(5) { /* Down */
+.control-btn[data-direction="down"] {
     grid-column: 2;
     grid-row: 3;
+    background: linear-gradient(135deg, rgba(255, 217, 61, 0.3), rgba(255, 206, 84, 0.3));
+}
+
+/* Center circle decoration */
+.control-pad::after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-15px, -15px);
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    justify-self: center;
+    pointer-events: none;
 }
 
 /* Mobile Responsive */
@@ -135,6 +171,7 @@ body {
         padding: 15px;
         margin: 0;
         border-radius: 15px;
+        max-width: 100%;
     }
     
     #game-title {
@@ -147,8 +184,29 @@ body {
         margin-bottom: 15px;
     }
     
+    #game-canvas {
+        max-width: 100%;
+        height: auto;
+    }
+    
     #mobile-controls {
         display: flex;
+    }
+    
+    .control-pad {
+        grid-template-columns: 70px 70px 70px;
+        grid-template-rows: 70px 70px 70px;
+        gap: 6px;
+        padding: 15px;
+    }
+    
+    .control-btn {
+        font-size: 24px;
+        border-radius: 15px;
+    }
+    
+    #controls {
+        margin-top: 15px;
     }
     
     #controls p {
@@ -158,6 +216,33 @@ body {
     
     #share-info {
         font-size: 10px;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 480px) {
+    #game-container {
+        padding: 10px;
+    }
+    
+    #game-title {
+        font-size: 20px;
+    }
+    
+    #hud {
+        font-size: 14px;
+    }
+    
+    .control-pad {
+        grid-template-columns: 60px 60px 60px;
+        grid-template-rows: 60px 60px 60px;
+        gap: 4px;
+        padding: 12px;
+    }
+    
+    .control-btn {
+        font-size: 20px;
+        border-radius: 12px;
     }
 }
 
