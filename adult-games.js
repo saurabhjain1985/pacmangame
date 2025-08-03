@@ -1,6 +1,11 @@
 // Main Adult Games JavaScript
 let currentGame = '';
 
+function goBackToMainGames() {
+    // Navigate back to the main games menu (index.html)
+    window.location.href = 'index.html';
+}
+
 function showMenu() {
     // Hide all games
     document.querySelectorAll('.game-container').forEach(container => {
@@ -13,6 +18,12 @@ function showMenu() {
 }
 
 function showGame(gameType) {
+    // Handle puzzle builder differently - redirect to dedicated puzzle page
+    if (gameType === 'puzzle') {
+        window.location.href = 'puzzle.html';
+        return;
+    }
+    
     // Hide menu
     document.querySelector('.game-menu').style.display = 'none';
     
@@ -41,8 +52,6 @@ function showGame(gameType) {
             case 'money':
                 initMoneyAcademy();
                 break;
-            case 'puzzle':
-                initPuzzleBuilder();
                 break;
         }
     }

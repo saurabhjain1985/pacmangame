@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Tables Master - Learn Multiplication</title>
+    <link rel="stylesheet" href="math-tables-simple.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="back-button" onclick="goBack()">← Back to Games</div>
+        
+        <header>
+            <h1 id="game-title">🔢 Math Tables Master</h1>
+            <div id="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Correct</span>
+                    <span id="correct">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Total</span>
+                    <span id="total">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Table Selection Screen -->
+        <div id="table-selection-screen" class="screen active">
+            <h2>🎯 Choose Your Tables</h2>
+            <p>Select which multiplication tables you want to practice:</p>
+            
+            <div class="table-grid">
+                <div class="table-card" data-table="2">
+                    <div class="table-number">2</div>
+                    <div class="table-preview">2 × 1 = 2<br>2 × 2 = 4<br>2 × 3 = 6</div>
+                </div>
+                
+                <div class="table-card" data-table="3">
+                    <div class="table-number">3</div>
+                    <div class="table-preview">3 × 1 = 3<br>3 × 2 = 6<br>3 × 3 = 9</div>
+                </div>
+                
+                <div class="table-card" data-table="4">
+                    <div class="table-number">4</div>
+                    <div class="table-preview">4 × 1 = 4<br>4 × 2 = 8<br>4 × 3 = 12</div>
+                </div>
+                
+                <div class="table-card" data-table="5">
+                    <div class="table-number">5</div>
+                    <div class="table-preview">5 × 1 = 5<br>5 × 2 = 10<br>5 × 3 = 15</div>
+                </div>
+                
+                <div class="table-card" data-table="6">
+                    <div class="table-number">6</div>
+                    <div class="table-preview">6 × 1 = 6<br>6 × 2 = 12<br>6 × 3 = 18</div>
+                </div>
+                
+                <div class="table-card" data-table="7">
+                    <div class="table-number">7</div>
+                    <div class="table-preview">7 × 1 = 7<br>7 × 2 = 14<br>7 × 3 = 21</div>
+                </div>
+                
+                <div class="table-card" data-table="8">
+                    <div class="table-number">8</div>
+                    <div class="table-preview">8 × 1 = 8<br>8 × 2 = 16<br>8 × 3 = 24</div>
+                </div>
+                
+                <div class="table-card" data-table="9">
+                    <div class="table-number">9</div>
+                    <div class="table-preview">9 × 1 = 9<br>9 × 2 = 18<br>9 × 3 = 27</div>
+                </div>
+                
+                <div class="table-card" data-table="10">
+                    <div class="table-number">10</div>
+                    <div class="table-preview">10 × 1 = 10<br>10 × 2 = 20<br>10 × 3 = 30</div>
+                </div>
+                
+                <div class="table-card" data-table="11">
+                    <div class="table-number">11</div>
+                    <div class="table-preview">11 × 1 = 11<br>11 × 2 = 22<br>11 × 3 = 33</div>
+                </div>
+                
+                <div class="table-card" data-table="12">
+                    <div class="table-number">12</div>
+                    <div class="table-preview">12 × 1 = 12<br>12 × 2 = 24<br>12 × 3 = 36</div>
+                </div>
+            </div>
+            
+            <div class="selection-controls">
+                <div class="selected-tables">
+                    <h3>Selected Tables: <span id="selected-count">0</span></h3>
+                    <div id="selected-list"></div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button id="select-all-btn" class="control-btn">Select All</button>
+                    <button id="clear-all-btn" class="control-btn">Clear All</button>
+                    <button id="start-quiz-btn" class="start-btn" disabled>Start Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-progress">
+                <div class="progress-bar">
+                    <div id="progress-fill"></div>
+                </div>
+                <div class="question-counter">
+                    Question <span id="current-question">1</span> of <span id="total-questions">10</span>
+                </div>
+            </div>
+            
+            <div class="quiz-content">
+                <div class="question">
+                    <span id="question-number1" class="number">?</span>
+                    <span class="operator">×</span>
+                    <span id="question-number2" class="number">?</span>
+                    <span class="equals">=</span>
+                    <span class="answer-placeholder">?</span>
+                </div>
+                
+                <div class="answer-input">
+                    <input type="number" id="answer-field" placeholder="Your answer" autofocus>
+                    <button id="submit-answer" class="submit-btn">Submit</button>
+                </div>
+                
+                <div class="multiple-choice" id="multiple-choice" style="display: none;">
+                    <button class="choice-btn" data-choice="0">0</button>
+                    <button class="choice-btn" data-choice="1">1</button>
+                    <button class="choice-btn" data-choice="2">2</button>
+                    <button class="choice-btn" data-choice="3">3</button>
+                </div>
+            </div>
+            
+            <div class="quiz-controls">
+                <button id="toggle-mode-btn" class="control-btn">Switch to Multiple Choice</button>
+                <button id="skip-btn" class="control-btn">Skip</button>
+                <button id="quit-quiz-btn" class="control-btn danger">Quit Quiz</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen">
+            <h2>🎉 Quiz Complete!</h2>
+            
+            <div class="results-summary">
+                <div class="result-stat">
+                    <div class="result-number" id="final-score">0</div>
+                    <div class="result-label">Score</div>
+                </div>
+                
+                <div class="result-stat">
+                    <div class="result-number" id="final-correct">0</div>
+                    <div class="result-label">Correct</div>
+                </div>
+                
+                <div class="result-stat">
+                    <div class="result-number" id="final-percentage">0%</div>
+                    <div class="result-label">Accuracy</div>
+                </div>
+            </div>
+            
+            <div class="performance-message">
+                <div id="performance-emoji">🎉</div>
+                <div id="performance-text">Great job!</div>
+            </div>
+            
+            <div class="result-actions">
+                <button id="play-again-btn" class="start-btn">Play Again</button>
+                <button id="choose-tables-btn" class="control-btn">Choose Different Tables</button>
+                <button onclick="goBack()" class="control-btn">Back to Games</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="math-tables-simple.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -224,5 +224,22 @@
     </div>
 
     <script src="math-tables.js"></script>
+    
+    <!-- Feedback Widget -->
+    <link rel="stylesheet" href="feedback-widget.css">
+    <script src="feedback-widget.js"></script>
+    
+    <!-- Pizza Payment Widget -->
+    <link rel="stylesheet" href="pizza-payment.css">
+    <script src="pizza-payment.js"></script>
+    
+    <script>
+        // Initialize widgets
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initializeFeedbackWidget === 'function') {
+                initializeFeedbackWidget();
+            }
+        });
+    </script>
 </body>
 </html>

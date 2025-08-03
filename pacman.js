@@ -1,20 +1,46 @@
+// Pac-Man Collection - Multiple Game Modes
 // Game constants
 const CELL_SIZE = 20;
 const MAZE_WIDTH = 28;
 const MAZE_HEIGHT = 21;
 
-// Original Pacman speed mechanics
-const PACMAN_NORMAL_SPEED = 12; // Frames between moves (slower = higher number)
-const PACMAN_POWER_SPEED = 8;   // Faster when powered up
-const GHOST_NORMAL_SPEED = 16;  // Normal ghost speed
-const GHOST_VULNERABLE_SPEED = 24; // Much slower when vulnerable
-const GHOST_FRIGHTENED_SPEED = 20; // Slightly slower when fleeing
+// Game modes
+let currentGameMode = 'classic';
+let selectedAvatar = 'classic';
+
+// Multi-level system
+let currentLevel = 1;
+const MAX_LEVELS = 3;
+
+// Speed adjustment per level
+const getSpeedForLevel = (level) => {
+    const baseSpeed = {
+        pacman: 12,
+        pacmanPower: 8,
+        ghost: 16,
+        ghostVulnerable: 24,
+        ghostFrightened: 20
+    };
+    
+    const speedMultiplier = Math.max(0.7, 1 - (level - 1) * 0.15);
+    return {
+        pacman: Math.max(6, Math.floor(baseSpeed.pacman * speedMultiplier)),
+        pacmanPower: Math.max(4, Math.floor(baseSpeed.pacmanPower * speedMultiplier)),
+        ghost: Math.max(8, Math.floor(baseSpeed.ghost * speedMultiplier)),
+        ghostVulnerable: Math.max(12, Math.floor(baseSpeed.ghostVulnerable * speedMultiplier)),
+        ghostFrightened: Math.max(10, Math.floor(baseSpeed.ghostFrightened * speedMultiplier))
+    };
+};
+
+// Dynamic speed based on level
+let speeds = getSpeedForLevel(currentLevel);
 
 // Game elements
 const canvas = document.getElementById('game-canvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas ? canvas.getContext('2d') : null;
 const scoreElement = document.getElementById('score');
 const livesElement = document.getElementById('lives');
+const levelElement = document.getElementById('level');
 const messageElement = document.getElementById('message');
 
 // Game state
@@ -24,11 +50,32 @@ let gameRunning = true;
 let animationFrame = 0;
 let powerMode = false;
 let powerModeTimer = 0;
-let powerBlinkTimer = 0; // For blinking effect when power mode is ending
-let ghostsEatenInPowerMode = 0; // Track consecutive ghost eating for authentic scoring
+let powerBlinkTimer = 0;
+let ghostsEatenInPowerMode = 0;
+let gameWon = false;
+let dotsCollected = 0;
 
-// Maze layout (1 = wall, 0 = dot, 2 = empty space, 3 = pacman start, 4 = ghost start, 5 = power pellet)
-const maze = [
+// Shifting maze specific variables
+let shiftTimer = 0;
+let shiftInterval = 20000; // 20 seconds
+let lastShiftTime = 0;
+
+// Ghost control mode variables
+let selectedGhost = 0;
+let aiPacmanTarget = { x: 0, y: 0 };
+
+// Avatar definitions
+const avatars = {
+    classic: { emoji: '🟡', color: '#FFFF00', name: 'Classic Pac-Man' },
+    trump: { emoji: '🍊', color: '#FFA500', name: 'Donald Trump' },
+    shrek: { emoji: '🟢', color: '#228B22', name: 'Shrek' },
+    bezos: { emoji: '📦', color: '#FF9900', name: 'Jeff Bezos' },
+    musk: { emoji: '🚀', color: '#1DA1F2', name: 'Elon Musk' },
+    mario: { emoji: '🔴', color: '#FF0000', name: 'Mario' }
+};
+
+// Original maze layout
+const originalMaze = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,5,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,5,1],
@@ -52,6 +99,9 @@ const maze = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
+// Current maze (can be modified for shifting mode)
+let maze = JSON.parse(JSON.stringify(originalMaze));
+
 // Game objects
 const pacman = {
     x: 13,
@@ -67,30 +117,355 @@ const ghosts = [
         x: 11,
         y: 9,
         direction: 0,
+        nextDirection: 0,
         color: '#FF6B6B',
         behavior: 'chase',
         vulnerable: false,
-        fleeDirection: 0
+        fleeDirection: 0,
+        visionRadius: 5
     },
     {
         x: 13,
         y: 9,
-        direction: 2,
+        direction: 1,
+        nextDirection: 1,
         color: '#4ECDC4',
-        behavior: 'ambush',
+        behavior: 'patrol',
         vulnerable: false,
-        fleeDirection: 0
+        fleeDirection: 0,
+        visionRadius: 4
     },
     {
         x: 15,
         y: 9,
-        direction: 1,
-        color: '#FFD93D',
+        direction: 2,
+        nextDirection: 2,
+        color: '#FFE066',
         behavior: 'random',
         vulnerable: false,
-        fleeDirection: 0
+        fleeDirection: 0,
+        visionRadius: 3
     }
 ];
+
+// Screen Management Functions
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    document.getElementById(screenId).classList.add('active');
+}
+
+function showModeSelection() {
+    showScreen('mode-selection');
+    resetGame();
+}
+
+function selectMode(mode) {
+    currentGameMode = mode;
+    
+    if (mode === 'avatar-mode') {
+        showScreen('avatar-selection');
+    } else {
+        selectedAvatar = 'classic';
+        startGame();
+    }
+    
+    updateGameTitle();
+}
+
+function selectAvatar(avatar) {
+    selectedAvatar = avatar;
+    
+    // Update UI
+    document.querySelectorAll('.avatar-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    document.querySelector(`[data-avatar="${avatar}"]`).classList.add('active');
+}
+
+function startGameWithAvatar() {
+    startGame();
+}
+
+function startGame() {
+    showScreen('game-screen');
+    resetGame();
+    initializeGame();
+    updateGameTitle();
+    updateControls();
+    
+    if (canvas && ctx) {
+        gameLoop();
+    }
+}
+
+function updateGameTitle() {
+    const titles = {
+        'classic': 'Pac-Man Classic',
+        'ghost-control': 'Ghost Hunter Mode',
+        'shifting-maze': 'Shifting Maze Mode',
+        'avatar-mode': `Avatar Mode - ${avatars[selectedAvatar].name}`
+    };
+    
+    document.getElementById('game-title').textContent = titles[currentGameMode] || 'Pac-Man';
+}
+
+function updateControls() {
+    const controlText = document.getElementById('control-text');
+    const objectiveText = document.getElementById('objective-text');
+    const modeInfo = document.getElementById('mode-info');
+    
+    switch (currentGameMode) {
+        case 'classic':
+        case 'avatar-mode':
+        case 'shifting-maze':
+            controlText.textContent = '🖥️ Desktop: Use arrow keys to move Pac-Man';
+            objectiveText.textContent = '🎯 Eat all dots to win! Avoid the 3 ghosts!';
+            if (currentGameMode === 'shifting-maze') {
+                modeInfo.style.display = 'inline';
+                modeInfo.textContent = 'Maze shifts every 20s!';
+            } else {
+                modeInfo.style.display = 'none';
+            }
+            break;
+        case 'ghost-control':
+            controlText.textContent = '🖥️ Desktop: Use arrow keys to control selected ghost (SPACE to switch)';
+            objectiveText.textContent = '👻 Control ghosts to trap AI Pac-Man! Ghosts have limited vision.';
+            modeInfo.style.display = 'inline';
+            modeInfo.textContent = `Controlling Ghost ${selectedGhost + 1}`;
+            break;
+    }
+}
+
+// Game Initialization
+function initializeGame() {
+    // Reset maze to original state
+    maze = JSON.parse(JSON.stringify(originalMaze));
+    
+    // Reset positions
+    pacman.x = 13;
+    pacman.y = 15;
+    pacman.direction = 0;
+    pacman.nextDirection = 0;
+    
+    ghosts[0].x = 11;
+    ghosts[0].y = 9;
+    ghosts[1].x = 13;
+    ghosts[1].y = 9;
+    ghosts[2].x = 15;
+    ghosts[2].y = 9;
+    
+    // Reset game state
+    powerMode = false;
+    powerModeTimer = 0;
+    gameRunning = true;
+    gameWon = false;
+    dotsCollected = 0;
+    shiftTimer = 0;
+    lastShiftTime = Date.now();
+    
+    // Count total dots
+    let totalDots = 0;
+    for (let row of maze) {
+        for (let cell of row) {
+            if (cell === 0 || cell === 5) totalDots++;
+        }
+    }
+    
+    messageElement.textContent = '';
+}
+
+// Maze Shifting Logic (for shifting-maze mode)
+function shiftMaze() {
+    if (currentGameMode !== 'shifting-maze') return;
+    
+    const currentTime = Date.now();
+    if (currentTime - lastShiftTime < shiftInterval) return;
+    
+    lastShiftTime = currentTime;
+    
+    // Create a list of non-wall, non-special tiles that can be shifted
+    const shiftableTiles = [];
+    for (let y = 1; y < MAZE_HEIGHT - 1; y++) {
+        for (let x = 1; x < MAZE_WIDTH - 1; x++) {
+            if (maze[y][x] === 0 || maze[y][x] === 2) {
+                // Don't shift tiles too close to pacman or ghosts
+                const distToPacman = Math.abs(x - pacman.x) + Math.abs(y - pacman.y);
+                const tooCloseToGhost = ghosts.some(ghost => 
+                    Math.abs(x - ghost.x) + Math.abs(y - ghost.y) < 3
+                );
+                
+                if (distToPacman > 3 && !tooCloseToGhost) {
+                    shiftableTiles.push({ x, y });
+                }
+            }
+        }
+    }
+    
+    // Randomly swap some tiles
+    const swapCount = Math.min(10, Math.floor(shiftableTiles.length / 4));
+    for (let i = 0; i < swapCount; i++) {
+        const tile1 = shiftableTiles[Math.floor(Math.random() * shiftableTiles.length)];
+        const tile2 = shiftableTiles[Math.floor(Math.random() * shiftableTiles.length)];
+        
+        if (tile1 !== tile2) {
+            const temp = maze[tile1.y][tile1.x];
+            maze[tile1.y][tile1.x] = maze[tile2.y][tile2.x];
+            maze[tile2.y][tile2.x] = temp;
+        }
+    }
+    
+    // Show message
+    messageElement.textContent = '🌀 Maze shifted!';
+    setTimeout(() => {
+        if (messageElement.textContent === '🌀 Maze shifted!') {
+            messageElement.textContent = '';
+        }
+    }, 2000);
+}
+
+// AI Pac-Man Logic (for ghost-control mode)
+function updateAIPacman() {
+    if (currentGameMode !== 'ghost-control') return;
+    
+    // Simple AI: move towards nearest dot while avoiding ghosts
+    const nearestDot = findNearestDot();
+    if (nearestDot) {
+        aiPacmanTarget = nearestDot;
+    }
+    
+    // Check if any ghost is too close
+    const nearestGhost = findNearestVisibleGhost();
+    
+    if (nearestGhost && nearestGhost.distance < 4) {
+        // Run away from ghost
+        const escapeDirection = getEscapeDirection(nearestGhost);
+        if (escapeDirection !== -1) {
+            pacman.nextDirection = escapeDirection;
+        }
+    } else if (aiPacmanTarget) {
+        // Move towards target
+        const direction = getDirectionToTarget(aiPacmanTarget);
+        if (direction !== -1) {
+            pacman.nextDirection = direction;
+        }
+    }
+}
+
+function findNearestDot() {
+    let nearest = null;
+    let minDistance = Infinity;
+    
+    for (let y = 0; y < MAZE_HEIGHT; y++) {
+        for (let x = 0; x < MAZE_WIDTH; x++) {
+            if (maze[y][x] === 0 || maze[y][x] === 5) {
+                const distance = Math.abs(x - pacman.x) + Math.abs(y - pacman.y);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearest = { x, y };
+                }
+            }
+        }
+    }
+    
+    return nearest;
+}
+
+function findNearestVisibleGhost() {
+    let nearest = null;
+    let minDistance = Infinity;
+    
+    for (const ghost of ghosts) {
+        const distance = Math.abs(ghost.x - pacman.x) + Math.abs(ghost.y - pacman.y);
+        // Check if ghost can "see" pacman (within vision radius)
+        if (distance <= ghost.visionRadius && distance < minDistance) {
+            minDistance = distance;
+            nearest = { ghost, distance };
+        }
+    }
+    
+    return nearest;
+}
+
+function getEscapeDirection(nearestGhost) {
+    const directions = [
+        { dir: 0, dx: 1, dy: 0 },   // right
+        { dir: 1, dx: 0, dy: 1 },   // down
+        { dir: 2, dx: -1, dy: 0 },  // left
+        { dir: 3, dx: 0, dy: -1 }   // up
+    ];
+    
+    let bestDirection = -1;
+    let maxDistance = -1;
+    
+    for (const { dir, dx, dy } of directions) {
+        const newX = pacman.x + dx;
+        const newY = pacman.y + dy;
+        
+        if (isValidMove(newX, newY)) {
+            const distanceFromGhost = Math.abs(newX - nearestGhost.ghost.x) + Math.abs(newY - nearestGhost.ghost.y);
+            if (distanceFromGhost > maxDistance) {
+                maxDistance = distanceFromGhost;
+                bestDirection = dir;
+            }
+        }
+    }
+    
+    return bestDirection;
+}
+
+function getDirectionToTarget(target) {
+    const directions = [
+        { dir: 0, dx: 1, dy: 0 },   // right
+        { dir: 1, dx: 0, dy: 1 },   // down
+        { dir: 2, dx: -1, dy: 0 },  // left
+        { dir: 3, dx: 0, dy: -1 }   // up
+    ];
+    
+    let bestDirection = -1;
+    let minDistance = Infinity;
+    
+    for (const { dir, dx, dy } of directions) {
+        const newX = pacman.x + dx;
+        const newY = pacman.y + dy;
+        
+        if (isValidMove(newX, newY)) {
+            const distance = Math.abs(newX - target.x) + Math.abs(newY - target.y);
+            if (distance < minDistance) {
+                minDistance = distance;
+                bestDirection = dir;
+            }
+        }
+    }
+    
+    return bestDirection;
+}
+
+// Ghost Control Logic
+function handleGhostControl() {
+    if (currentGameMode !== 'ghost-control') return;
+    
+    // Update selected ghost indicator
+    document.getElementById('mode-info').textContent = `Controlling Ghost ${selectedGhost + 1}`;
+}
+
+function switchGhost() {
+    if (currentGameMode === 'ghost-control') {
+        selectedGhost = (selectedGhost + 1) % ghosts.length;
+        handleGhostControl();
+    }
+}
+
+// Continue with existing game logic...
+
+// Utility Functions
+function isValidMove(x, y) {
+    if (x < 0 || x >= MAZE_WIDTH || y < 0 || y >= MAZE_HEIGHT) {
+        return false;
+    }
+    return maze[y][x] !== 1;
+}
 
 // Initialize dots array
 let dots = [];
@@ -138,18 +513,44 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 document.addEventListener('keydown', (e) => {
     if (!gameRunning) return;
     
+    // Special keys for different modes
+    if (e.key === ' ' || e.key === 'Spacebar') {
+        if (currentGameMode === 'ghost-control') {
+            switchGhost();
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    // Arrow key handling depends on game mode
     switch(e.key) {
         case 'ArrowRight':
-            pacman.nextDirection = 0;
+            if (currentGameMode === 'ghost-control') {
+                ghosts[selectedGhost].nextDirection = 0;
+            } else {
+                pacman.nextDirection = 0;
+            }
             break;
         case 'ArrowDown':
-            pacman.nextDirection = 1;
+            if (currentGameMode === 'ghost-control') {
+                ghosts[selectedGhost].nextDirection = 1;
+            } else {
+                pacman.nextDirection = 1;
+            }
             break;
         case 'ArrowLeft':
-            pacman.nextDirection = 2;
+            if (currentGameMode === 'ghost-control') {
+                ghosts[selectedGhost].nextDirection = 2;
+            } else {
+                pacman.nextDirection = 2;
+            }
             break;
         case 'ArrowUp':
-            pacman.nextDirection = 3;
+            if (currentGameMode === 'ghost-control') {
+                ghosts[selectedGhost].nextDirection = 3;
+            } else {
+                pacman.nextDirection = 3;
+            }
             break;
     }
 });
@@ -290,8 +691,28 @@ function movePacman() {
                 // Check win condition
                 if (dots.length === 0 && powerPellets.length === 0) {
                     gameRunning = false;
-                    messageElement.textContent = "YOU WIN!";
-                    messageElement.className = "winner";
+                    gameWon = true;
+                    
+                    if (currentLevel < MAX_LEVELS) {
+                        messageElement.innerHTML = `
+                            <div class="level-complete">
+                                🎉 LEVEL ${currentLevel} COMPLETE! 🎉<br>
+                                <button id="nextLevelBtn" onclick="nextLevel()">➡️ Level ${currentLevel + 1}</button>
+                                <button id="restartBtn" onclick="restartGame()">🔄 Restart Game</button>
+                            </div>
+                        `;
+                        messageElement.className = "level-complete";
+                    } else {
+                        messageElement.innerHTML = `
+                            <div class="game-complete">
+                                🏆 GAME COMPLETE! ALL LEVELS BEATEN! 🏆<br>
+                                <div class="final-score">Final Score: ${score}</div>
+                                <button id="restartBtn" onclick="restartGame()">🔄 Play Again</button>
+                            </div>
+                        `;
+                        messageElement.className = "game-complete";
+                    }
+                    
                     if (gameAudio) gameAudio.pacmanSounds.levelUp();
                 }
                 break;
@@ -371,6 +792,36 @@ function movePacman() {
 // Enhanced ghost AI with authentic Pacman behaviors
 function moveGhosts() {
     ghosts.forEach((ghost, index) => {
+        // In ghost-control mode, handle player input for selected ghost
+        if (currentGameMode === 'ghost-control' && index === selectedGhost) {
+            // Check if player wants to change direction
+            if (ghost.nextDirection !== undefined && ghost.nextDirection !== ghost.direction) {
+                const nextDir = directions[ghost.nextDirection];
+                const nextX = ghost.x + nextDir.x;
+                const nextY = ghost.y + nextDir.y;
+                
+                if (isValidPosition(nextX, nextY)) {
+                    ghost.direction = ghost.nextDirection;
+                }
+            }
+            
+            // Move in current direction
+            const dir = directions[ghost.direction];
+            const newX = ghost.x + dir.x;
+            const newY = ghost.y + dir.y;
+            
+            if (isValidPosition(newX, newY)) {
+                ghost.x = newX;
+                ghost.y = newY;
+            } else {
+                // Hit a wall, stop moving
+                ghost.direction = (ghost.direction + 1) % 4; // Turn when hitting wall
+            }
+            
+            return; // Skip AI behavior for player-controlled ghost
+        }
+        
+        // Original AI behavior for non-controlled ghosts
         let bestDirection = ghost.direction;
         let validDirections = [];
         
@@ -397,6 +848,20 @@ function moveGhosts() {
         // Filter out reverse direction if there are other options
         const nonReverseDirections = validDirections.filter(d => !d.isReverse);
         const directionsToConsider = nonReverseDirections.length > 0 ? nonReverseDirections : validDirections;
+        
+        // In ghost-control mode, limit vision for AI ghosts
+        if (currentGameMode === 'ghost-control') {
+            const distanceToPacman = Math.abs(ghost.x - pacman.x) + Math.abs(ghost.y - pacman.y);
+            if (distanceToPacman > ghost.visionRadius) {
+                // Can't see Pacman, move randomly
+                const randomChoice = directionsToConsider[Math.floor(Math.random() * directionsToConsider.length)];
+                bestDirection = randomChoice.direction;
+                ghost.x = randomChoice.x;
+                ghost.y = randomChoice.y;
+                ghost.direction = bestDirection;
+                return;
+            }
+        }
         
         // If ghost is vulnerable (power mode), flee from Pac-Man intelligently
         if (ghost.vulnerable && powerMode) {
@@ -522,9 +987,13 @@ function checkCollision() {
                 // Show points floating animation (authentic Pacman feature)
                 showFloatingPoints(ghost.x * CELL_SIZE, ghost.y * CELL_SIZE, ghostPoints);
                 
-                // Play ghost eaten sound
+                // Play ghost eaten sound with enhanced feedback
                 if (window.gameAudio) {
                     gameAudio.pacmanSounds.ghostEaten();
+                    // Add extra celebration sound for multiple ghosts
+                    if (ghostsEatenInPowerMode > 1) {
+                        setTimeout(() => gameAudio.pacmanSounds.bonus(), 100);
+                    }
                 }
                 
                 // Reset ghost to starting position
@@ -545,7 +1014,14 @@ function checkCollision() {
                 
                 if (lives <= 0) {
                     gameRunning = false;
-                    messageElement.textContent = "GAME OVER!";
+                    messageElement.innerHTML = `
+                        <div class="game-over">
+                            💀 GAME OVER! 💀<br>
+                            <div class="final-score">Score: ${score} | Level: ${currentLevel}</div>
+                            <button id="restartBtn" onclick="restartGame()">🔄 Try Again</button>
+                            <button id="backBtn" onclick="goBack()">← Back to Games</button>
+                        </div>
+                    `;
                     messageElement.className = "game-over";
                 } else {
                     // Reset positions
@@ -648,38 +1124,68 @@ function drawPacman() {
     const centerY = pacman.y * CELL_SIZE + CELL_SIZE / 2;
     const radius = CELL_SIZE / 2 - 2;
     
-    // Create gradient for Pac-Man
-    const pacmanGradient = ctx.createRadialGradient(centerX - 3, centerY - 3, 0, centerX, centerY, radius);
-    pacmanGradient.addColorStop(0, '#FFE135');
-    pacmanGradient.addColorStop(1, '#F39C12');
+    // Check if using avatar mode or selected avatar
+    const currentAvatar = avatars[selectedAvatar];
     
-    // Add glow effect
-    ctx.shadowColor = '#FFE135';
-    ctx.shadowBlur = 15;
-    
-    ctx.fillStyle = pacmanGradient;
-    ctx.beginPath();
-    
-    if (pacman.mouthOpen) {
-        // Draw Pac-Man with mouth open
-        const mouthAngle = Math.PI / 3;
-        const startAngle = (pacman.direction * Math.PI / 2) - mouthAngle / 2;
-        const endAngle = (pacman.direction * Math.PI / 2) + mouthAngle / 2;
+    if (selectedAvatar === 'classic') {
+        // Original Pac-Man drawing
+        const pacmanGradient = ctx.createRadialGradient(centerX - 3, centerY - 3, 0, centerX, centerY, radius);
+        pacmanGradient.addColorStop(0, '#FFE135');
+        pacmanGradient.addColorStop(1, '#F39C12');
         
-        ctx.arc(centerX, centerY, radius, endAngle, startAngle);
-        ctx.lineTo(centerX, centerY);
+        // Add glow effect
+        ctx.shadowColor = '#FFE135';
+        ctx.shadowBlur = 15;
+        
+        ctx.fillStyle = pacmanGradient;
+        ctx.beginPath();
+        
+        if (pacman.mouthOpen) {
+            // Draw Pac-Man with mouth open
+            const mouthAngle = Math.PI / 3;
+            const startAngle = (pacman.direction * Math.PI / 2) - mouthAngle / 2;
+            const endAngle = (pacman.direction * Math.PI / 2) + mouthAngle / 2;
+            
+            ctx.arc(centerX, centerY, radius, endAngle, startAngle);
+            ctx.lineTo(centerX, centerY);
+        } else {
+            // Draw full circle
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        }
+        
+        ctx.fill();
+        ctx.shadowBlur = 0;
     } else {
-        // Draw full circle
+        // Draw avatar-based character
+        const avatarGradient = ctx.createRadialGradient(centerX - 3, centerY - 3, 0, centerX, centerY, radius);
+        avatarGradient.addColorStop(0, currentAvatar.color);
+        avatarGradient.addColorStop(1, currentAvatar.color + '80');
+        
+        // Add glow effect with avatar color
+        ctx.shadowColor = currentAvatar.color;
+        ctx.shadowBlur = 12;
+        
+        ctx.fillStyle = avatarGradient;
+        ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // Draw emoji/character on top
+        ctx.font = `${CELL_SIZE - 4}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
+        ctx.strokeText(currentAvatar.emoji, centerX, centerY);
+        ctx.fillText(currentAvatar.emoji, centerX, centerY);
     }
     
-    ctx.fill();
-    
-    // Reset shadow
-    ctx.shadowBlur = 0;
-    
-    // Animate mouth
-    pacman.mouthOpen = !pacman.mouthOpen;
+    // Animate mouth for classic mode
+    if (selectedAvatar === 'classic') {
+        pacman.mouthOpen = !pacman.mouthOpen;
+    }
 }
 
 function drawGhosts() {
@@ -794,9 +1300,17 @@ function draw() {
 
 function gameLoop() {
     if (gameRunning) {
-        // Dynamic speed based on power mode - authentic Pacman mechanics
-        const pacmanSpeed = powerMode ? PACMAN_POWER_SPEED : PACMAN_NORMAL_SPEED;
-        const ghostSpeed = powerMode ? GHOST_VULNERABLE_SPEED : GHOST_NORMAL_SPEED;
+        // Dynamic speed based on power mode and level
+        const pacmanSpeed = powerMode ? speeds.pacmanPower : speeds.pacman;
+        const ghostSpeed = powerMode ? speeds.ghostVulnerable : speeds.ghost;
+        
+        // Update game mode specific mechanics
+        if (currentGameMode === 'shifting-maze') {
+            shiftMaze();
+        } else if (currentGameMode === 'ghost-control') {
+            updateAIPacman();
+            handleGhostControl();
+        }
         
         // Move Pacman at variable speed
         if (animationFrame % pacmanSpeed === 0) {
@@ -814,6 +1328,66 @@ function gameLoop() {
     draw();
     animationFrame++;
     requestAnimationFrame(gameLoop);
+}
+
+// Level system functions
+function nextLevel() {
+    currentLevel++;
+    speeds = getSpeedForLevel(currentLevel);
+    resetGameState();
+    gameRunning = true;
+    levelElement.textContent = `Level: ${currentLevel}`;
+    messageElement.textContent = `Level ${currentLevel}`;
+    messageElement.className = "level-indicator";
+    
+    // Clear level indicator after 2 seconds
+    setTimeout(() => {
+        if (gameRunning) {
+            messageElement.textContent = "";
+            messageElement.className = "";
+        }
+    }, 2000);
+    
+    gameLoop();
+}
+
+function restartGame() {
+    currentLevel = 1;
+    speeds = getSpeedForLevel(currentLevel);
+    score = 0;
+    lives = 3;
+    scoreElement.textContent = `Score: ${score}`;
+    livesElement.textContent = `Lives: ${lives}`;
+    levelElement.textContent = `Level: ${currentLevel}`;
+    resetGameState();
+    gameRunning = true;
+    messageElement.textContent = "";
+    messageElement.className = "";
+    gameLoop();
+}
+
+function resetGameState() {
+    // Reset pacman position
+    pacman.x = 13;
+    pacman.y = 15;
+    pacman.direction = 0;
+    pacman.nextDirection = 0;
+    
+    // Reset ghost positions
+    ghosts[0].x = 11; ghosts[0].y = 9; ghosts[0].vulnerable = false;
+    ghosts[1].x = 13; ghosts[1].y = 9; ghosts[1].vulnerable = false;
+    ghosts[2].x = 15; ghosts[2].y = 9; ghosts[2].vulnerable = false;
+    
+    // Reset power mode
+    powerMode = false;
+    powerModeTimer = 0;
+    powerBlinkTimer = 0;
+    ghostsEatenInPowerMode = 0;
+    gameWon = false;
+    dotsCollected = 0;
+    
+    // Reinitialize dots and pellets
+    initializeDots();
 }
 
 // Initialize and start game
@@ -865,4 +1439,7 @@ function showFloatingPoints(x, y, points) {
 }
 
 // Start the game when page loads
-window.addEventListener('load', initGame);
+window.addEventListener('load', () => {
+    // Show mode selection screen initially
+    showModeSelection();
+});

@@ -82,7 +82,7 @@ class GameMenu {
         // Add loading animation
         this.showLoadingAnimation(gameType);
 
-        // Navigate to the selected game
+        // Navigate to the selected game (faster navigation)
         setTimeout(() => {
             switch (gameType) {
                 case 'pacman':
@@ -103,8 +103,11 @@ class GameMenu {
                 case 'puzzle':
                     window.location.href = 'puzzle.html';
                     break;
+                case 'adult-games':
+                    window.location.href = 'adult-games.html';
+                    break;
                 case 'math-tables':
-                    window.location.href = 'math-tables.html';
+                    window.location.href = 'math-tables-simple.html';
                     break;
                 case 'bedtime-stories':
                     window.location.href = 'bedtime-stories.html';
@@ -113,7 +116,7 @@ class GameMenu {
                     console.log(`Game ${gameType} not implemented yet`);
                     alert('This game is coming soon!');
             }
-        }, 800);
+        }, 200); // Reduced from 800ms to 200ms for much faster navigation
     }
 
     showLoadingAnimation(gameType) {

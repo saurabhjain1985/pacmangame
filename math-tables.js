@@ -74,13 +74,19 @@ class MathTablesGame {
             });
         });
 
-        // Table selection for practice mode
-        const tableBtns = document.querySelectorAll('.table-btn');
-        tableBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const table = parseInt(btn.dataset.table);
-                this.startPracticeMode(table);
-            });
+        // Table selection for practice mode (handle both single and mixed practice)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('table-btn')) {
+                if (e.target.dataset.table) {
+                    // Single table practice
+                    const table = parseInt(e.target.dataset.table);
+                    this.startPracticeMode(table);
+                } else if (e.target.dataset.tables) {
+                    // Mixed practice
+                    const tables = e.target.dataset.tables;
+                    this.startPracticeMode(tables);
+                }
+            }
         });
 
         // Learning controls
@@ -140,14 +146,79 @@ class MathTablesGame {
     }
 
     showPracticeMode() {
+        // Update practice mode to show only relevant tables for the selected grade
+        this.updatePracticeSelection();
         this.showScreen('practice-selection');
     }
 
-    startPracticeMode(table) {
-        console.log('Starting practice mode for table:', table);
-        this.currentTable = table;
-        this.currentGrade = 'practice';
-        this.resetGameStats(); // Reset only stats, keep grade/table info
+    updatePracticeSelection() {
+        const tableGrid = document.querySelector('.table-grid');
+        if (!tableGrid) return;
+
+        tableGrid.innerHTML = '';
+
+        // Show all available tables but group them by difficulty
+        const allTables = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        const easyTables = [2, 3, 4, 5, 10];
+        const mediumTables = [6, 7, 8, 9];
+        const hardTables = [11, 12, 13, 14, 15];
+
+        // Create sections
+        this.createTableSection(tableGrid, 'Easy Tables (Great for beginners)', easyTables, 'easy');
+        this.createTableSection(tableGrid, 'Medium Tables (Building confidence)', mediumTables, 'medium');
+        this.createTableSection(tableGrid, 'Hard Tables (Challenge mode)', hardTables, 'hard');
+
+        // Add mixed practice options
+        const mixedSection = document.createElement('div');
+        mixedSection.className = 'mixed-practice-section';
+        mixedSection.innerHTML = `
+            <h4>🎲 Mixed Practice</h4>
+            <button class="table-btn mixed-btn" data-tables="2,3,4,5">Easy Mix (2-5 tables)</button>
+            <button class="table-btn mixed-btn" data-tables="6,7,8,9">Medium Mix (6-9 tables)</button>
+            <button class="table-btn mixed-btn" data-tables="2,3,4,5,6,7,8,9,10">All Common Tables</button>
+            <button class="table-btn mixed-btn" data-tables="2,3,4,5,6,7,8,9,10,11,12">Complete Set</button>
+        `;
+        tableGrid.appendChild(mixedSection);
+    }
+
+    createTableSection(container, title, tables, difficulty) {
+        const section = document.createElement('div');
+        section.className = `table-section ${difficulty}`;
+        
+        const header = document.createElement('h4');
+        header.textContent = title;
+        header.className = 'section-header';
+        section.appendChild(header);
+
+        tables.forEach(table => {
+            const button = document.createElement('button');
+            button.className = `table-btn ${difficulty}`;
+            button.dataset.table = table;
+            button.textContent = `${table} Times Table`;
+            section.appendChild(button);
+        });
+
+        container.appendChild(section);
+    }
+
+    startPracticeMode(tableOrTables) {
+        console.log('Starting practice mode for:', tableOrTables);
+        
+        if (typeof tableOrTables === 'string' && tableOrTables.includes(',')) {
+            // Mixed practice mode
+            this.currentTables = tableOrTables.split(',').map(t => parseInt(t));
+            this.currentTable = null;
+            this.currentGrade = 'mixed-practice';
+            console.log('Mixed practice mode with tables:', this.currentTables);
+        } else {
+            // Single table practice
+            this.currentTable = parseInt(tableOrTables);
+            this.currentTables = null;
+            this.currentGrade = 'practice';
+            console.log('Single table practice mode:', this.currentTable);
+        }
+        
+        this.resetGameStats();
         this.showLearningScreen();
     }
 
@@ -283,7 +354,14 @@ class MathTablesGame {
         return new Promise((resolve) => {
             this.currentQuestions = [];
             
-            // Validate current table
+            // Handle mixed practice mode
+            if (this.currentGrade === 'mixed-practice' && this.currentTables) {
+                this.generateMixedQuestions();
+                resolve();
+                return;
+            }
+            
+            // Validate current table for single table mode
             if (!this.currentTable) {
                 console.error('Cannot generate questions: No table selected');
                 resolve();
@@ -291,11 +369,11 @@ class MathTablesGame {
             }
 
             const maxNumber = this.currentGrade === 'practice' ? 15 : 
-                             this.gradeConfigs[this.currentGrade].maxNumber;
+                             this.gradeConfigs[this.currentGrade] ? this.gradeConfigs[this.currentGrade].maxNumber : 12;
             const questionCount = this.currentGrade === 'practice' ? 15 : 
-                                 this.gradeConfigs[this.currentGrade].questionsPerLevel;
+                                 this.gradeConfigs[this.currentGrade] ? this.gradeConfigs[this.currentGrade].questionsPerLevel : 12;
 
-            // Generate unique questions
+            // Generate unique questions for single table
             const usedQuestions = new Set();
             let attempts = 0;
             const maxAttempts = questionCount * 3; // Safety limit
@@ -328,6 +406,41 @@ class MathTablesGame {
                     }
                 }
             }
+
+            // Shuffle questions
+            this.shuffleArray(this.currentQuestions);
+            resolve();
+        });
+    }
+
+    generateMixedQuestions() {
+        const questionCount = 20; // More questions for mixed practice
+        const maxNumber = 12;
+        const usedQuestions = new Set();
+        let attempts = 0;
+        const maxAttempts = questionCount * 5;
+
+        while (this.currentQuestions.length < questionCount && attempts < maxAttempts) {
+            attempts++;
+            
+            // Randomly select a table from the current tables
+            const randomTable = this.currentTables[Math.floor(Math.random() * this.currentTables.length)];
+            const multiplier = Math.floor(Math.random() * maxNumber) + 1;
+            const questionKey = `${randomTable}x${multiplier}`;
+            
+            if (!usedQuestions.has(questionKey)) {
+                usedQuestions.add(questionKey);
+                this.currentQuestions.push({
+                    table: randomTable,
+                    multiplier: multiplier,
+                    answer: randomTable * multiplier
+                });
+            }
+        }
+
+        // Shuffle questions
+        this.shuffleArray(this.currentQuestions);
+    }
 
             // Shuffle questions
             this.currentQuestions = this.shuffleArray(this.currentQuestions);

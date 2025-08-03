@@ -9,6 +9,9 @@
 <body>
     <div class="container">
         <header>
+            <div class="header-nav">
+                <button class="back-to-games-btn" onclick="goBackToMainGames()">← Back to Games</button>
+            </div>
             <h1>🧠 Challenge Zone</h1>
             <p>Advanced Games for Adults & Teens</p>
         </header>
@@ -208,8 +211,8 @@
                     </div>
                     
                     <div class="custom-upload">
-                        <input type="file" id="custom-image" accept="image/*" onchange="loadCustomImage(this)">
-                        <label for="custom-image" class="upload-btn">📁 Upload Custom Image</label>
+                        <input type="file" id="image-upload" accept="image/*">
+                        <label for="image-upload" class="upload-btn">📁 Upload Custom Image</label>
                     </div>
                 </div>
                 
@@ -233,5 +236,22 @@
     <script src="money-academy.js"></script>
     <script src="puzzle-builder.js"></script>
     <script src="adult-games.js"></script>
+    
+    <!-- Feedback Widget -->
+    <link rel="stylesheet" href="feedback-widget.css">
+    <script src="feedback-widget.js"></script>
+    
+    <!-- Pizza Payment Widget -->
+    <link rel="stylesheet" href="pizza-payment.css">
+    <script src="pizza-payment.js"></script>
+    
+    <script>
+        // Initialize feedback widget
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initializeFeedbackWidget === 'function') {
+                initializeFeedbackWidget();
+            }
+        });
+    </script>
 </body>
 </html>

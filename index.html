@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iOS Games Collection - Choose Your Adventure</title>
+    <title>Neevara Games Collection - Choose Your Adventure</title>
     <meta name="description" content="A collection of modern iOS-style games including Pac-Man and Memory games">
     <meta name="keywords" content="games, html5, javascript, ios, apple, pacman, memory, puzzle">
-    <link rel="stylesheet" href="main-menu.css">
+    <link rel="stylesheet" href="main-menu.css?v=2024080301">
+    <script src="main-menu.js?v=2024080301"></script>
 </head>
 <body>
     <div id="main-container">
         <header>
-            <h1 id="main-title">🎮 iOS Games Collection</h1>
+            <h1 id="main-title">🎮 Neevara Games Collection</h1>
             <p id="subtitle">Choose your favorite game to play</p>
         </header>
         
@@ -81,6 +82,19 @@
                 <button class="play-btn" onclick="playGame('breakout')">Play Now</button>
             </div>
             
+            <!-- Adult & Teen Games Card -->
+            <div class="game-card highlight-card" data-game="adult-games">
+                <div class="game-icon">🧠</div>
+                <h3 class="game-title">🌟 Challenge Zone</h3>
+                <p class="game-description">Advanced games for adults & teens - Sudoku, puzzles, and financial education</p>
+                <div class="game-features">
+                    <span class="feature">🔢 Sudoku Master</span>
+                    <span class="feature">⚡ Reaction Trainer</span>
+                    <span class="feature">💰 Money Academy</span>
+                </div>
+                <button class="play-btn" onclick="playGame('adult-games')">Enter Challenge Zone</button>
+            </div>
+            
             <!-- Puzzle Games Card -->
             <div class="game-card" data-game="puzzle">
                 <div class="game-icon">🎲</div>
@@ -98,13 +112,13 @@
             <div class="game-card" data-game="math-tables">
                 <div class="game-icon">🔢</div>
                 <h3 class="game-title">Math Tables Master</h3>
-                <p class="game-description">Learn multiplication tables from Grade 2-6 with fun quizzes</p>
+                <p class="game-description">Choose your tables and practice multiplication with personalized quizzes</p>
                 <div class="game-features">
-                    <span class="feature">📚 Grade 2-6 Levels</span>
-                    <span class="feature">🎯 Interactive Learning</span>
-                    <span class="feature">🏆 Progress Tracking</span>
+                    <span class="feature">🎯 Choose Your Tables</span>
+                    <span class="feature">🔄 Multiple Choice & Input</span>
+                    <span class="feature">📊 Instant Results</span>
                 </div>
-                <button class="play-btn" onclick="playGame('math-tables')">Learn Now</button>
+                <button class="play-btn" onclick="playGame('math-tables')">Start Practice</button>
             </div>
             
             <!-- Bedtime Stories Card -->
@@ -137,13 +151,50 @@
         <footer>
             <p>🎮 Built with HTML5, CSS3 & JavaScript</p>
             <p>Optimized for mobile and desktop</p>
+            <div class="footer-actions">
+                <p class="made-with-love">Made with <span class="heart">❤️</span> by Neevara</p>
+                <button id="buy-pizza-btn" class="subtle-pizza-btn">🍕 Buy me a Pizza</button>
+            </div>
         </footer>
     </div>
     
     <!-- Feedback Widget -->
     <link rel="stylesheet" href="feedback-widget.css">
-    <script src="feedback-widget-new.js"></script>
+    <script src="feedback-widget-simple.js"></script>
     
-    <script src="main-menu.js"></script>
+    <!-- Pizza Payment Widget -->
+    <link rel="stylesheet" href="pizza-payment.css">
+    <script src="pizza-payment.js"></script>
+    
+    <script>
+        // Initialize widgets
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize feedback widget
+            if (typeof initializeFeedbackWidget === 'function') {
+                initializeFeedbackWidget();
+            }
+            
+            // Initialize pizza payment widget (but hide the floating one)
+            let pizzaWidget = null;
+            if (typeof PizzaPaymentWidget === 'function') {
+                pizzaWidget = new PizzaPaymentWidget();
+                // Hide the floating widget since we have footer button
+                const floatingWidget = document.querySelector('.pizza-payment-widget');
+                if (floatingWidget) {
+                    floatingWidget.style.display = 'none';
+                }
+            }
+            
+            // Connect footer pizza button to widget
+            const pizzaBtn = document.getElementById('buy-pizza-btn');
+            if (pizzaBtn && pizzaWidget) {
+                pizzaBtn.addEventListener('click', function() {
+                    pizzaWidget.openModal();
+                });
+            }
+        });
+    </script>
+    
+    <script src="main-menu.js?v=2024080301"></script>
 </body>
 </html>

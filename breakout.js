@@ -13,9 +13,9 @@ class BreakoutGame {
         
         // Game settings based on difficulty
         this.difficulties = {
-            easy: { ballSpeed: 3, paddleWidth: 100, scoreMultiplier: 1 },
-            medium: { ballSpeed: 4, paddleWidth: 80, scoreMultiplier: 1.5 },
-            hard: { ballSpeed: 5, paddleWidth: 60, scoreMultiplier: 2 }
+            easy: { ballSpeed: 3, paddleWidth: 100, scoreMultiplier: 1, brickRows: 6 },
+            medium: { ballSpeed: 4, paddleWidth: 80, scoreMultiplier: 1.5, brickRows: 7 },
+            hard: { ballSpeed: 5, paddleWidth: 60, scoreMultiplier: 2, brickRows: 8 }
         };
         
         // Game objects
@@ -55,6 +55,12 @@ class BreakoutGame {
         this.brickPadding = 5;
         this.brickOffsetTop = 60;
         this.brickOffsetLeft = 35;
+        
+        // Special abilities for faster completion
+        this.powerUps = [];
+        this.multiball = false;
+        this.extraBalls = [];
+        this.fastBreak = false; // Enables one-hit brick destruction
         
         // Input handling
         this.keys = {};
@@ -103,6 +109,27 @@ class BreakoutGame {
                         break;
                     case 'Escape':
                         this.pauseGame();
+                        break;
+                    // Cheat keys for faster completion
+                    case 'f':
+                        e.preventDefault();
+                        this.fastBreak = !this.fastBreak;
+                        console.log('Fast break mode:', this.fastBreak ? 'ON' : 'OFF');
+                        break;
+                    case 'm':
+                        e.preventDefault();
+                        this.createMultiballs();
+                        console.log('Multiballs activated!');
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        this.nextLevel();
+                        console.log('Skipped to next level!');
+                        break;
+                    case 'b':
+                        e.preventDefault();
+                        this.destroyRandomBricks(10);
+                        console.log('Destroyed 10 random bricks!');
                         break;
                 }
             }
@@ -188,18 +215,27 @@ class BreakoutGame {
     setupLevel() {
         const config = this.difficulties[this.difficulty];
         
-        // Setup paddle
-        this.paddle.width = config.paddleWidth;
+        // Setup paddle (gets smaller with each level)
+        this.paddle.width = Math.max(50, config.paddleWidth - (this.level - 1) * 5);
         this.paddle.x = (this.canvasWidth - this.paddle.width) / 2;
         this.paddle.y = this.canvasHeight - 30;
         
-        // Setup ball
-        this.ball.speed = config.ballSpeed;
+        // Setup ball (gets faster with each level)
+        this.ball.speed = config.ballSpeed + (this.level - 1) * 0.3;
         this.ball.x = this.canvasWidth / 2;
         this.ball.y = this.paddle.y - this.ball.radius;
         this.ball.dx = 0;
         this.ball.dy = 0;
         this.ball.launched = false;
+        
+        // Adjust brick rows based on difficulty and level
+        this.brickRows = Math.min(config.brickRows + Math.floor((this.level - 1) / 2), 10);
+        
+        // Reset power-ups for new level
+        this.multiball = false;
+        this.extraBalls = [];
+        this.fastBreak = false;
+        this.powerUps = [];
         
         // Create bricks
         this.createBricks();
@@ -217,13 +253,19 @@ class BreakoutGame {
                     height: this.brickHeight,
                     status: 1, // 1 = visible, 0 = destroyed
                     color: this.getBrickColor(r),
-                    points: (this.brickRows - r) * 10 // Higher rows worth more points
+                    points: (this.brickRows - r) * 10, // Higher rows worth more points
+                    powerUp: Math.random() < 0.15 ? this.getRandomPowerUp() : null // 15% chance for power-up
                 };
                 this.bricks.push(brick);
             }
         }
         
-        console.log('Created', this.bricks.length, 'bricks');
+        console.log('Created', this.bricks.length, 'bricks with power-ups');
+    }
+    
+    getRandomPowerUp() {
+        const powerUps = ['multiball', 'fastbreak', 'bigpaddle', 'slowball', 'fireball'];
+        return powerUps[Math.floor(Math.random() * powerUps.length)];
     }
     
     getBrickColor(row) {
@@ -313,6 +355,94 @@ class BreakoutGame {
             // Ball follows paddle when not launched
             this.ball.x = this.paddle.x + this.paddle.width / 2;
         }
+        
+        // Update power-ups
+        this.updatePowerUps();
+    }
+    
+    updatePowerUps() {
+        for (let i = this.powerUps.length - 1; i >= 0; i--) {
+            const powerUp = this.powerUps[i];
+            
+            if (!powerUp.active) continue;
+            
+            powerUp.y += powerUp.dy;
+            
+            // Check collision with paddle
+            if (powerUp.y + powerUp.height > this.paddle.y &&
+                powerUp.x + powerUp.width > this.paddle.x &&
+                powerUp.x < this.paddle.x + this.paddle.width) {
+                
+                this.activatePowerUp(powerUp.type);
+                this.powerUps.splice(i, 1);
+                this.playSound('powerup');
+                continue;
+            }
+            
+            // Remove if off screen
+            if (powerUp.y > this.canvasHeight) {
+                this.powerUps.splice(i, 1);
+            }
+        }
+    }
+    
+    activatePowerUp(type) {
+        console.log('🎁 Power-up activated:', type);
+        
+        switch(type) {
+            case 'multiball':
+                this.createMultiballs();
+                break;
+            case 'fastbreak':
+                this.fastBreak = true;
+                setTimeout(() => this.fastBreak = false, 8000);
+                break;
+            case 'bigpaddle':
+                this.paddle.width = Math.min(150, this.paddle.width * 1.5);
+                setTimeout(() => this.paddle.width = this.difficulties[this.difficulty].paddleWidth, 10000);
+                break;
+            case 'slowball':
+                this.ball.speed *= 0.7;
+                setTimeout(() => this.ball.speed = this.difficulties[this.difficulty].ballSpeed + (this.level - 1) * 0.3, 8000);
+                break;
+            case 'fireball':
+                // Destroy multiple bricks in a line
+                this.destroyRandomBricks(5);
+                break;
+        }
+    }
+    
+    createMultiballs() {
+        // Add 2 extra balls
+        for (let i = 0; i < 2; i++) {
+            this.extraBalls.push({
+                x: this.ball.x,
+                y: this.ball.y,
+                radius: this.ball.radius,
+                dx: this.ball.speed * (Math.random() > 0.5 ? 1 : -1),
+                dy: -this.ball.speed,
+                speed: this.ball.speed
+            });
+        }
+    }
+    
+    destroyRandomBricks(count) {
+        const activeBricks = this.bricks.filter(b => b.status === 1);
+        const toDestroy = Math.min(count, activeBricks.length);
+        
+        for (let i = 0; i < toDestroy; i++) {
+            const randomIndex = Math.floor(Math.random() * activeBricks.length);
+            const brick = activeBricks[randomIndex];
+            brick.status = 0;
+            this.score += brick.points * this.difficulties[this.difficulty].scoreMultiplier;
+            this.bricksDestroyed++;
+            activeBricks.splice(randomIndex, 1);
+        }
+        
+        this.updateDisplay();
+        if (this.bricks.every(b => b.status === 0)) {
+            this.levelComplete();
+        }
     }
     
     checkBrickCollisions() {
@@ -326,10 +456,20 @@ class BreakoutGame {
                     this.ball.dy = -this.ball.dy;
                     brick.status = 0; // Destroy brick
                     
+                    // Handle power-up drop
+                    if (brick.powerUp) {
+                        this.dropPowerUp(brick.x + brick.width/2, brick.y + brick.height, brick.powerUp);
+                    }
+                    
                     this.score += brick.points * this.difficulties[this.difficulty].scoreMultiplier;
                     this.bricksDestroyed++;
                     this.updateDisplay();
                     this.playSound('brick');
+                    
+                    // Fast break mode destroys adjacent bricks
+                    if (this.fastBreak) {
+                        this.destroyAdjacentBricks(brick);
+                    }
                     
                     // Check if all bricks destroyed
                     if (this.bricks.every(b => b.status === 0)) {
@@ -340,6 +480,35 @@ class BreakoutGame {
                 }
             }
         }
+    }
+    
+    dropPowerUp(x, y, type) {
+        this.powerUps.push({
+            x: x - 15,
+            y: y,
+            width: 30,
+            height: 15,
+            type: type,
+            dy: 2,
+            active: true
+        });
+    }
+    
+    destroyAdjacentBricks(centerBrick) {
+        for (let brick of this.bricks) {
+            if (brick.status === 1 && brick !== centerBrick) {
+                const distance = Math.sqrt(
+                    Math.pow(brick.x - centerBrick.x, 2) + 
+                    Math.pow(brick.y - centerBrick.y, 2)
+                );
+                if (distance < 100) { // Within range
+                    brick.status = 0;
+                    this.score += brick.points * this.difficulties[this.difficulty].scoreMultiplier * 0.5;
+                    this.bricksDestroyed++;
+                }
+            }
+        }
+        this.updateDisplay();
     }
     
     loseLife() {
@@ -381,7 +550,20 @@ class BreakoutGame {
     
     nextLevel() {
         this.level++;
-        this.ball.speed += 0.5; // Increase ball speed each level
+        console.log(`🎮 Advancing to Level ${this.level}`);
+        
+        // Progressive difficulty increases
+        this.ball.speed += 0.3; // Faster ball
+        this.paddle.speed += 0.5; // Faster paddle to compensate
+        
+        // Every 3rd level, enable fast break mode for 10 seconds
+        if (this.level % 3 === 0) {
+            this.fastBreak = true;
+            setTimeout(() => {
+                this.fastBreak = false;
+            }, 10000);
+        }
+        
         this.setupLevel();
         this.gameState = 'playing';
         this.showScreen('game-screen');

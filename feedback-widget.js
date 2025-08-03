@@ -14,7 +14,7 @@ class FeedbackWidget {
         // Create feedback widget HTML
         const widgetHTML = `
             <div class="feedback-widget">
-                <button class="feedback-trigger" onclick="feedbackWidget.openModal()">
+                <button class="feedback-trigger" id="feedback-trigger-btn">
                     💬 Feedback
                 </button>
             </div>
@@ -46,8 +46,18 @@ class FeedbackWidget {
                                 <span class="btn-subtitle">Opens in new tab • Takes 2 minutes</span>
                             </a>
                             
-                            <button type="button" class="btn-cancel" onclick="feedbackWidget.closeModal()">
+                            <button type="button" class="btn-cancel" id="feedback-close-btn">
                                 Maybe Later
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add to body
+        document.body.insertAdjacentHTML('beforeend', widgetHTML);
+    }
                             </button>
                         </div>
                         
@@ -136,35 +146,34 @@ class FeedbackWidget {
     }
 
     attachEventListeners() {
-        // Form submission
-        document.getElementById('feedbackFormElement').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.submitFeedback();
-        });
+        // Add click listener to feedback trigger button
+        const triggerBtn = document.getElementById('feedback-trigger-btn');
+        if (triggerBtn) {
+            triggerBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Feedback button clicked');
+                this.openModal();
+            });
+        }
 
-        // Character counter
-        const messageTextarea = document.getElementById('feedbackMessage');
-        const charCount = document.getElementById('charCount');
-        
-        messageTextarea.addEventListener('input', () => {
-            const count = messageTextarea.value.length;
-            charCount.textContent = count;
-            
-            if (count > 950) {
-                charCount.style.color = '#f44336';
-            } else if (count > 800) {
-                charCount.style.color = '#ff9800';
-            } else {
-                charCount.style.color = '#999';
-            }
-        });
+        // Add click listener to close button
+        const closeBtn = document.getElementById('feedback-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.closeModal();
+            });
+        }
 
         // Close modal on outside click
-        document.getElementById('feedbackModal').addEventListener('click', (e) => {
-            if (e.target.id === 'feedbackModal') {
-                this.closeModal();
-            }
-        });
+        const modal = document.getElementById('feedbackModal');
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target.id === 'feedbackModal') {
+                    this.closeModal();
+                }
+            });
+        }
 
         // Close modal on Escape key
         document.addEventListener('keydown', (e) => {
@@ -175,19 +184,29 @@ class FeedbackWidget {
     }
 
     openModal() {
-        document.getElementById('feedbackModal').classList.add('show');
-        document.body.style.overflow = 'hidden';
-        
-        // Focus on first input
-        setTimeout(() => {
-            document.getElementById('feedbackType').focus();
-        }, 100);
+        const modal = document.getElementById('feedbackModal');
+        if (modal) {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            console.log('Feedback modal opened');
+        }
     }
 
     closeModal() {
-        document.getElementById('feedbackModal').classList.remove('show');
-        document.body.style.overflow = '';
-        this.resetForm();
+        const modal = document.getElementById('feedbackModal');
+        if (modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            console.log('Feedback modal closed');
+        }
+    }
+
+    trackClick() {
+        console.log('Feedback form link clicked');
+        // Track the click for analytics if needed
+        setTimeout(() => {
+            this.closeModal();
+        }, 1000);
     }
 
     resetForm() {
@@ -321,6 +340,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize widget
     feedbackWidget = new FeedbackWidget();
 });
+
+// Global initialization function
+function initializeFeedbackWidget() {
+    if (typeof feedbackWidget === 'undefined' || !feedbackWidget) {
+        feedbackWidget = new FeedbackWidget();
+        console.log('✅ Feedback Widget Initialized');
+    }
+    return feedbackWidget;
+}
 
 // Export for use in other modules if needed
 if (typeof module !== 'undefined' && module.exports) {

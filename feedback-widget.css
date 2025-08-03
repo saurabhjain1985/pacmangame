@@ -6,23 +6,36 @@
     z-index: 1000;
     width: 60px;
     height: 60px;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
     color: white;
-    border: none;
+    border: 3px solid rgba(255, 255, 255, 0.8);
     border-radius: 50%;
     font-size: 24px;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    animation: feedbackPulse 3s ease-in-out infinite;
+}
+
+@keyframes feedbackPulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 6px 30px rgba(78, 205, 196, 0.6);
+    }
 }
 
 .feedback-widget-fab:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 8px 35px rgba(255, 107, 107, 0.7);
+    animation: none;
 }
 
 .fab-tooltip {

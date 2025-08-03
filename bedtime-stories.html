@@ -3,143 +3,417 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bedtime Story Generator</title>
+    <title>🌙 Magical Bedtime Stories</title>
     <link rel="stylesheet" href="bedtime-stories.css">
 </head>
 <body>
-    <div class="story-container">
-        <header class="story-header">
-            <h1>🌙 Bedtime Story Generator</h1>
-            <p>Create magical bedtime stories with your favorite characters</p>
-        </header>
-
-        <div class="story-form-container">
-            <div class="form-section">
-                <h2>📝 Story Settings</h2>
-                
-                <div class="input-group">
-                    <label for="characters">Main Characters (separate with commas)</label>
-                    <input type="text" id="characters" placeholder="e.g., Luna the fairy, Max the brave knight, Sparkle the unicorn">
-                    <div class="input-hint">Add up to 5 characters for your story</div>
-                </div>
-
-                <div class="input-group">
-                    <label for="theme">Story Theme</label>
-                    <select id="theme">
-                        <option value="adventure">🗺️ Adventure & Exploration</option>
-                        <option value="friendship">👫 Friendship & Kindness</option>
-                        <option value="magic">✨ Magic & Fantasy</option>
-                        <option value="animals">🐾 Animal Friends</option>
-                        <option value="space">🚀 Space Adventure</option>
-                        <option value="ocean">🌊 Ocean Adventure</option>
-                        <option value="forest">🌲 Forest Mystery</option>
-                        <option value="dreams">💭 Dreams & Imagination</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <label for="storyLength">Story Length</label>
-                    <select id="storyLength">
-                        <option value="short">📖 Short (2-3 minutes)</option>
-                        <option value="medium">📚 Medium (5-7 minutes)</option>
-                        <option value="long">📓 Long (10-12 minutes)</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <label for="mood">Story Mood</label>
-                    <select id="mood">
-                        <option value="peaceful">😌 Peaceful & Calming</option>
-                        <option value="exciting">🎉 Exciting & Fun</option>
-                        <option value="heartwarming">❤️ Heartwarming</option>
-                        <option value="mysterious">🔍 Mysterious</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <label for="setting">Story Setting (Optional)</label>
-                    <input type="text" id="setting" placeholder="e.g., enchanted castle, magical garden, cozy village">
-                    <div class="input-hint">Leave blank for automatic setting based on theme</div>
-                </div>
-
-                <div class="form-actions">
-                    <button class="btn-generate" onclick="generateStory()">
-                        ✨ Generate My Story
-                    </button>
-                    <button class="btn-surprise" onclick="generateSurpriseStory()">
-                        🎲 Surprise Me!
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="story-output-container" id="storyOutput" style="display: none;">
-            <div class="story-header-output">
-                <h2 id="storyTitle">Your Magical Story</h2>
-                <div class="story-meta">
-                    <span id="readingTime">📖 5 minutes</span>
-                    <span id="storyTheme">✨ Magic</span>
-                </div>
-            </div>
-
-            <div class="story-content">
-                <div class="story-text" id="storyText">
-                    <!-- Generated story will appear here -->
-                </div>
-            </div>
-
-            <div class="story-actions">
-                <div class="voice-controls">
-                    <label for="voiceSelect">🎙️ Choose Voice:</label>
-                    <select id="voiceSelect" class="voice-selector">
-                        <option value="">Loading voices...</option>
-                    </select>
-                    <div class="voice-settings">
-                        <label for="voiceSpeed">Speed: <span id="speedValue">0.8x</span></label>
-                        <input type="range" id="voiceSpeed" min="0.5" max="1.5" step="0.1" value="0.8">
-                        <label for="voicePitch">Pitch: <span id="pitchValue">1.1</span></label>
-                        <input type="range" id="voicePitch" min="0.8" max="1.5" step="0.1" value="1.1">
+    <div class="story-universe">
+        <!-- Animated Background -->
+        <div class="stars"></div>
+        <div class="twinkling"></div>
+        <div class="clouds"></div>
+        
+        <div class="story-container">
+            <!-- Magical Header -->
+            <header class="story-header">
+                <div class="header-magic">
+                    <div class="magic-wand">🪄</div>
+                    <h1 class="title-animated">🌙 Magical Story Creator 🌟</h1>
+                    <div class="subtitle-container">
+                        <p class="subtitle-animated">Where dreams come to life and adventures begin...</p>
+                        <div class="floating-elements">
+                            <span class="float-emoji">✨</span>
+                            <span class="float-emoji">🦋</span>
+                            <span class="float-emoji">🌟</span>
+                            <span class="float-emoji">🦄</span>
+                        </div>
                     </div>
                 </div>
-                
-                <button class="btn-read" onclick="readStoryAloud()">
-                    🔊 Read Aloud
-                </button>
-                <button class="btn-save" onclick="saveStory()">
-                    💾 Save Story
-                </button>
-                <button class="btn-share" onclick="shareStory()">
-                    📤 Share
-                </button>
-                <button class="btn-new" onclick="showStoryForm()">
-                    📝 New Story
-                </button>
+            </header>
+
+            <!-- Interactive Story Builder -->
+            <div class="story-builder" id="storyBuilder">
+                <div class="builder-steps">
+                    <div class="step-indicator">
+                        <div class="step active" data-step="1">
+                            <div class="step-icon">👫</div>
+                            <span>Characters</span>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-icon">🎭</div>
+                            <span>Theme</span>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-icon">⚙️</div>
+                            <span>Settings</span>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-icon">✨</div>
+                            <span>Magic!</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Character Selection -->
+                    <div class="step-content active" data-step="1">
+                        <div class="step-header">
+                            <h2>👫 Who's in Your Story?</h2>
+                            <p>Choose your heroes and friends for this magical adventure!</p>
+                        </div>
+                        
+                        <div class="character-builder">
+                            <div class="quick-characters">
+                                <h3>🎭 Quick Character Ideas</h3>
+                                <div class="character-chips">
+                                    <div class="character-chip" data-character="Luna the brave princess">👸 Luna the brave princess</div>
+                                    <div class="character-chip" data-character="Max the friendly dragon">🐉 Max the friendly dragon</div>
+                                    <div class="character-chip" data-character="Sparkle the unicorn">🦄 Sparkle the unicorn</div>
+                                    <div class="character-chip" data-character="Willow the wise owl">🦉 Willow the wise owl</div>
+                                    <div class="character-chip" data-character="Ruby the magical cat">🐱 Ruby the magical cat</div>
+                                    <div class="character-chip" data-character="Oliver the kind robot">🤖 Oliver the kind robot</div>
+                                </div>
+                            </div>
+                            
+                            <div class="custom-character">
+                                <h3>✏️ Create Your Own Characters</h3>
+                                <div class="character-input-container">
+                                    <input type="text" id="characters" placeholder="Type your characters here or click ideas above...">
+                                    <div class="character-counter">
+                                        <span id="characterCount">0</span> characters added
+                                    </div>
+                                </div>
+                                <div class="character-tips">
+                                    💡 <strong>Tips:</strong> Try "Bella the singing mermaid" or "Storm the space explorer"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Theme Selection -->
+                    <div class="step-content" data-step="2">
+                        <div class="step-header">
+                            <h2>🎭 What Kind of Adventure?</h2>
+                            <p>Choose the magical world for your story!</p>
+                        </div>
+                        
+                        <div class="theme-selector">
+                            <div class="theme-grid">
+                                <div class="theme-card" data-theme="adventure">
+                                    <div class="theme-icon">🗺️</div>
+                                    <h3>Epic Adventure</h3>
+                                    <p>Brave quests, hidden treasures, and heroic journeys</p>
+                                    <div class="theme-preview">🏰 ⚔️ 🗝️ 🐉</div>
+                                </div>
+                                
+                                <div class="theme-card" data-theme="friendship">
+                                    <div class="theme-icon">💖</div>
+                                    <h3>Friendship Magic</h3>
+                                    <p>Heartwarming tales of kindness and friendship</p>
+                                    <div class="theme-preview">🌈 🤗 🌸 💫</div>
+                                </div>
+                                
+                                <div class="theme-card" data-theme="magic">
+                                    <div class="theme-icon">✨</div>
+                                    <h3>Enchanted World</h3>
+                                    <p>Spells, wizards, and magical creatures</p>
+                                    <div class="theme-preview">🪄 🦄 🌟 🔮</div>
+                                </div>
+                                
+                                <div class="theme-card" data-theme="space">
+                                    <div class="theme-icon">🚀</div>
+                                    <h3>Space Adventure</h3>
+                                    <p>Explore galaxies and meet alien friends</p>
+                                    <div class="theme-preview">🌌 👽 🛸 ⭐</div>
+                                </div>
+                                
+                                <div class="theme-card" data-theme="ocean">
+                                    <div class="theme-icon">🌊</div>
+                                    <h3>Ocean Mystery</h3>
+                                    <p>Underwater kingdoms and sea creature friends</p>
+                                    <div class="theme-preview">🧜‍♀️ 🐙 🐠 💎</div>
+                                </div>
+                                
+                                <div class="theme-card" data-theme="dreams">
+                                    <div class="theme-icon">💭</div>
+                                    <h3>Dreamland</h3>
+                                    <p>Peaceful adventures in the land of dreams</p>
+                                    <div class="theme-preview">☁️ 🌙 💤 🌈</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Story Settings -->
+                    <div class="step-content" data-step="3">
+                        <div class="step-header">
+                            <h2>⚙️ Perfect Your Story</h2>
+                            <p>Make it just right for bedtime!</p>
+                        </div>
+                        
+                        <div class="settings-grid">
+                            <div class="setting-card">
+                                <h3>📖 Story Length</h3>
+                                <div class="length-options">
+                                    <div class="length-option" data-length="short">
+                                        <div class="length-icon">⚡</div>
+                                        <div class="length-info">
+                                            <strong>Quick Tale</strong>
+                                            <span>2-3 minutes</span>
+                                        </div>
+                                    </div>
+                                    <div class="length-option active" data-length="medium">
+                                        <div class="length-icon">📚</div>
+                                        <div class="length-info">
+                                            <strong>Perfect Story</strong>
+                                            <span>5-7 minutes</span>
+                                        </div>
+                                    </div>
+                                    <div class="length-option" data-length="long">
+                                        <div class="length-icon">📓</div>
+                                        <div class="length-info">
+                                            <strong>Epic Adventure</strong>
+                                            <span>10-12 minutes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-card">
+                                <h3>🎭 Story Mood</h3>
+                                <div class="mood-options">
+                                    <div class="mood-option active" data-mood="peaceful">
+                                        <span class="mood-emoji">😌</span>
+                                        <span>Peaceful & Calming</span>
+                                    </div>
+                                    <div class="mood-option" data-mood="exciting">
+                                        <span class="mood-emoji">🎉</span>
+                                        <span>Fun & Exciting</span>
+                                    </div>
+                                    <div class="mood-option" data-mood="heartwarming">
+                                        <span class="mood-emoji">❤️</span>
+                                        <span>Heartwarming</span>
+                                    </div>
+                                    <div class="mood-option" data-mood="mysterious">
+                                        <span class="mood-emoji">🔍</span>
+                                        <span>Mysterious</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="custom-setting">
+                            <h3>🏰 Special Setting (Optional)</h3>
+                            <input type="text" id="setting" placeholder="magical castle, enchanted forest, cloud kingdom...">
+                            <div class="setting-hint">💡 Leave blank for automatic magic!</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Magic Creation -->
+                    <div class="step-content" data-step="4">
+                        <div class="step-header">
+                            <h2>✨ Ready for Magic?</h2>
+                            <p>Your story is ready to come to life!</p>
+                        </div>
+                        
+                        <div class="magic-buttons">
+                            <button class="btn-magic-create" onclick="generateStory()">
+                                <div class="btn-content">
+                                    <span class="btn-icon">✨</span>
+                                    <span class="btn-text">Create My Story</span>
+                                    <span class="btn-sparkles">🌟</span>
+                                </div>
+                            </button>
+                            
+                            <button class="btn-magic-surprise" onclick="generateSurpriseStory()">
+                                <div class="btn-content">
+                                    <span class="btn-icon">🎲</span>
+                                    <span class="btn-text">Surprise Me!</span>
+                                    <span class="btn-sparkles">🎊</span>
+                                </div>
+                            </button>
+                        </div>
+                        
+                        <div class="story-preview" id="storyPreview">
+                            <!-- Dynamic preview will appear here -->
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="step-navigation">
+                        <button class="btn-nav btn-prev" onclick="previousStep()" style="display: none;">
+                            <span>← Back</span>
+                        </button>
+                        <button class="btn-nav btn-next" onclick="nextStep()">
+                            <span>Next →</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Magical Story Display -->
+            <div class="story-experience" id="storyOutput" style="display: none;">
+                <div class="story-book">
+                    <div class="book-cover">
+                        <div class="cover-decoration">
+                            <div class="cover-stars">✨ ⭐ 🌟 ✨</div>
+                            <h2 class="story-title" id="storyTitle">Your Magical Story</h2>
+                            <div class="story-meta-badges">
+                                <span class="meta-badge" id="readingTime">📖 5 minutes</span>
+                                <span class="meta-badge" id="storyTheme">✨ Magic</span>
+                            </div>
+                            <div class="cover-illustration">📚</div>
+                        </div>
+                    </div>
+                    
+                    <div class="book-pages">
+                        <div class="story-content">
+                            <div class="story-text" id="storyText">
+                                <!-- Generated story will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Audio Controls -->
+                <div class="story-player">
+                    <div class="player-header">
+                        <h3>🎧 Story Player</h3>
+                        <div class="player-subtitle">Listen to your magical tale</div>
+                    </div>
+                    
+                    <div class="voice-selection">
+                        <div class="voice-grid">
+                            <div class="voice-card active" data-voice-type="gentle">
+                                <div class="voice-avatar">👩</div>
+                                <div class="voice-info">
+                                    <strong>Gentle Voice</strong>
+                                    <span>Soft & Soothing</span>
+                                </div>
+                            </div>
+                            <div class="voice-card" data-voice-type="warm">
+                                <div class="voice-avatar">👨</div>
+                                <div class="voice-info">
+                                    <strong>Warm Voice</strong>
+                                    <span>Kind & Caring</span>
+                                </div>
+                            </div>
+                            <div class="voice-card" data-voice-type="magical">
+                                <div class="voice-avatar">✨</div>
+                                <div class="voice-info">
+                                    <strong>Magical Voice</strong>
+                                    <span>Enchanting</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="voice-fine-tune">
+                            <div class="voice-control">
+                                <label>🐌 Speed 🐰</label>
+                                <input type="range" id="voiceSpeed" min="0.5" max="1.5" step="0.1" value="0.8">
+                                <span id="speedValue">0.8x</span>
+                            </div>
+                            <div class="voice-control">
+                                <label>🎵 Pitch 🎶</label>
+                                <input type="range" id="voicePitch" min="0.8" max="1.5" step="0.1" value="1.1">
+                                <span id="pitchValue">1.1</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden technical voice selector -->
+                        <select id="voiceSelect" style="display: none;">
+                            <option value="">Loading voices...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="player-controls">
+                        <button class="btn-play-main" onclick="readStoryAloud()">
+                            <div class="play-icon">🔊</div>
+                            <span class="play-text">Read My Story</span>
+                            <div class="play-animation"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Story Actions -->
+                <div class="story-actions">
+                    <button class="action-btn save-btn" onclick="saveStory()">
+                        <span class="btn-icon">💾</span>
+                        <span>Save Story</span>
+                    </button>
+                    <button class="action-btn share-btn" onclick="shareStory()">
+                        <span class="btn-icon">📤</span>
+                        <span>Share</span>
+                    </button>
+                    <button class="action-btn new-btn" onclick="showStoryForm()">
+                        <span class="btn-icon">✨</span>
+                        <span>New Story</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Magical Library -->
+            <div class="story-library">
+                <div class="library-header">
+                    <h3>📚 Your Magical Library</h3>
+                    <p>All your saved adventures</p>
+                </div>
+                <div class="saved-stories-grid" id="savedStoriesList">
+                    <!-- Saved stories will appear here -->
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <a href="index.html" class="btn-back-home">
+                    <span class="back-icon">🏠</span>
+                    <span>Back to Games</span>
+                </a>
             </div>
         </div>
 
-        <div class="saved-stories-container">
-            <h3>📚 Your Saved Stories</h3>
-            <div class="saved-stories-list" id="savedStoriesList">
-                <!-- Saved stories will appear here -->
-            </div>
-        </div>
-
-        <div class="navigation">
-            <a href="index.html" class="btn-back">🏠 Back to Games</a>
-        </div>
-    </div>
-
-    <!-- Loading overlay -->
-    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>Creating your magical story...</p>
-            <div class="loading-tips" id="loadingTips">
-                ✨ Gathering magical ingredients...
+        <!-- Enhanced Loading Experience -->
+        <div class="loading-universe" id="loadingOverlay" style="display: none;">
+            <div class="loading-stars"></div>
+            <div class="loading-content">
+                <div class="magic-cauldron">
+                    <div class="cauldron">🪄</div>
+                    <div class="magic-bubbles">
+                        <div class="bubble">✨</div>
+                        <div class="bubble">🌟</div>
+                        <div class="bubble">💫</div>
+                        <div class="bubble">⭐</div>
+                    </div>
+                </div>
+                <h3 class="loading-title">Creating Your Magical Story...</h3>
+                <div class="loading-tips" id="loadingTips">
+                    ✨ Gathering magical ingredients...
+                </div>
+                <div class="loading-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="bedtime-stories.js"></script>
+    
+    <!-- Feedback Widget -->
+    <link rel="stylesheet" href="feedback-widget.css">
+    <script src="feedback-widget.js"></script>
+    
+    <!-- Pizza Payment Widget -->
+    <link rel="stylesheet" href="pizza-payment.css">
+    <script src="pizza-payment.js"></script>
+    
+    <script>
+        // Initialize widgets
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initializeFeedbackWidget === 'function') {
+                initializeFeedbackWidget();
+            }
+        });
+    </script>
+    <script src="bedtime-stories-interactive.js"></script>
 </body>
 </html>

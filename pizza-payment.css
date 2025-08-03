@@ -1,0 +1,226 @@
+/* Pizza Payment Widget Styles */
+.pizza-payment-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 999;
+    background: linear-gradient(45deg, #ff6b35, #f7931e);
+    color: white;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 25px;
+    padding: 12px 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Comic Neue', cursive;
+    font-weight: 600;
+    font-size: 14px;
+    animation: pizzaBounce 4s ease-in-out infinite;
+}
+
+@keyframes pizzaBounce {
+    0%, 100% { 
+        transform: translateY(0) scale(1);
+    }
+    25% { 
+        transform: translateY(-3px) scale(1.02);
+    }
+    50% { 
+        transform: translateY(0) scale(1);
+    }
+    75% { 
+        transform: translateY(-1px) scale(1.01);
+    }
+}
+
+.pizza-payment-widget:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(255, 107, 53, 0.6);
+    animation: none;
+}
+
+.pizza-icon {
+    font-size: 20px;
+    animation: pizzaSpin 6s linear infinite;
+}
+
+@keyframes pizzaSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.pizza-payment-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    z-index: 1001;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.pizza-payment-content {
+    background: linear-gradient(135deg, #ff6b35, #f7931e, #ffcc02);
+    padding: 2rem;
+    border-radius: 20px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    color: white;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.pizza-payment-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: pizzaShimmer 3s ease-in-out infinite;
+}
+
+@keyframes pizzaShimmer {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+}
+
+.pizza-payment-header {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pizza-payment-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.pizza-amount-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.pizza-amount-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.pizza-amount-btn:hover,
+.pizza-amount-btn.selected {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.05);
+}
+
+.pizza-upi-info {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(10px);
+}
+
+.pizza-upi-id {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    letter-spacing: 1px;
+}
+
+.pizza-payment-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.pizza-pay-btn {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.pizza-pay-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.pizza-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pizza-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .pizza-payment-widget {
+        bottom: 90px; /* Above feedback widget */
+        left: 20px;
+        padding: 10px 16px;
+        font-size: 12px;
+    }
+    
+    .pizza-icon {
+        font-size: 18px;
+    }
+    
+    .pizza-payment-content {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    .pizza-payment-header {
+        font-size: 1.5rem;
+    }
+    
+    .pizza-amount-selector {
+        grid-template-columns: 1fr;
+    }
+    
+    .pizza-payment-buttons {
+        flex-direction: column;
+    }
+}

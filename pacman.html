@@ -3,40 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pac-Man iOS - Modern Pac-Man Game</title>
-    <meta name="description" content="A modern, Apple-inspired Pac-Man game with 3 smart ghosts and beautiful iOS design">
-    <meta name="keywords" content="pacman, game, html5, javascript, ios, apple, retro">
+    <title>Pac-Man Collection - Multiple Game Modes</title>
+    <meta name="description" content="Collection of Pac-Man game variants including classic, ghost control, shifting maze, and avatar modes">
+    <meta name="keywords" content="pacman, game, html5, javascript, ios, apple, retro, collection">
     <link rel="stylesheet" href="pacman.css">
     <script src="game-audio.js"></script>
 </head>
 <body>
     <div id="game-container">
         <div id="back-button" onclick="goBack()">← Back to Games</div>
-        <h1 id="game-title">Pac-Man iOS</h1>
-        <div id="hud">
-            <span id="score">Score: 0</span>
-            <span id="lives">Lives: 3</span>
-        </div>
-        <canvas id="game-canvas" width="560" height="420"></canvas>
-        <div id="message"></div>
         
-        <!-- Mobile Controls -->
-        <div id="mobile-controls">
-            <div class="control-pad">
-                <div class="control-btn" data-direction="up" title="Move Up">▲</div>
-                <div class="control-btn" data-direction="left" title="Move Left">◀</div>
-                <div class="control-btn" data-direction="right" title="Move Right">▶</div>
-                <div class="control-btn" data-direction="down" title="Move Down">▼</div>
+        <!-- Game Mode Selection Screen -->
+        <div id="mode-selection" class="screen active">
+            <h1 id="main-title">🎮 Pac-Man Collection</h1>
+            <div id="mode-grid">
+                <div class="mode-card" onclick="selectMode('classic')">
+                    <div class="mode-icon">🟡</div>
+                    <h3>Classic Pac-Man</h3>
+                    <p>The original experience - eat dots, avoid ghosts!</p>
+                    <div class="mode-features">
+                        <span>✅ Original gameplay</span>
+                        <span>🎯 3 Smart ghosts</span>
+                        <span>💊 Power pellets</span>
+                    </div>
+                </div>
+                
+                <div class="mode-card" onclick="selectMode('ghost-control')">
+                    <div class="mode-icon">👻</div>
+                    <h3>Ghost Hunter</h3>
+                    <p>Control the ghosts and trap the AI Pac-Man!</p>
+                    <div class="mode-features">
+                        <span>🎮 Control ghosts</span>
+                        <span>🤖 AI Pac-Man</span>
+                        <span>👁️ Limited vision</span>
+                    </div>
+                </div>
+                
+                <div class="mode-card" onclick="selectMode('shifting-maze')">
+                    <div class="mode-icon">🌀</div>
+                    <h3>Shifting Maze</h3>
+                    <p>Maze tiles randomly shift every 20 seconds!</p>
+                    <div class="mode-features">
+                        <span>⏰ Dynamic maze</span>
+                        <span>🔄 Auto-shifting</span>
+                        <span>🧩 Puzzle challenge</span>
+                    </div>
+                </div>
+                
+                <div class="mode-card" onclick="selectMode('avatar-mode')">
+                    <div class="mode-icon">🎭</div>
+                    <h3>Avatar Collection</h3>
+                    <p>Choose your character - Trump, Shrek, Bezos & more!</p>
+                    <div class="mode-features">
+                        <span>🎨 Custom avatars</span>
+                        <span>👑 Celebrity mode</span>
+                        <span>🎪 Fun characters</span>
+                    </div>
+                </div>
+            </div>
+            <div id="mode-instructions">
+                <p>🕹️ Choose your preferred Pac-Man experience!</p>
+                <p>Each mode offers unique gameplay mechanics and challenges.</p>
             </div>
         </div>
         
-        <div id="controls">
-            <p>🖥️ Desktop: Use arrow keys to move Pac-Man</p>
-            <p>📱 Mobile: Tap the D-pad buttons to move</p>
-            <p>🎯 Eat all dots to win! Avoid the 3 ghosts!</p>
-            <p>💊 Eat power pellets (big dots) to chase ghosts!</p>
-            <div id="share-info">
-                <p>🎮 Built with HTML5, CSS3 & JavaScript</p>
+        <!-- Avatar Selection Screen -->
+        <div id="avatar-selection" class="screen">
+            <h2 id="avatar-title">🎭 Choose Your Avatar</h2>
+            <div id="avatar-grid">
+                <div class="avatar-card active" data-avatar="classic" onclick="selectAvatar('classic')">
+                    <div class="avatar-icon">🟡</div>
+                    <h4>Classic Pac-Man</h4>
+                    <p>The original yellow dot-muncher</p>
+                </div>
+                
+                <div class="avatar-card" data-avatar="trump" onclick="selectAvatar('trump')">
+                    <div class="avatar-icon">🍊</div>
+                    <h4>Donald Trump</h4>
+                    <p>"Make Pac-Man Great Again!"</p>
+                </div>
+                
+                <div class="avatar-card" data-avatar="shrek" onclick="selectAvatar('shrek')">
+                    <div class="avatar-icon">🟢</div>
+                    <h4>Shrek</h4>
+                    <p>"Better out than in, I always say!"</p>
+                </div>
+                
+                <div class="avatar-card" data-avatar="bezos" onclick="selectAvatar('bezos')">
+                    <div class="avatar-icon">📦</div>
+                    <h4>Jeff Bezos</h4>
+                    <p>"Delivering dots to your doorstep"</p>
+                </div>
+                
+                <div class="avatar-card" data-avatar="musk" onclick="selectAvatar('musk')">
+                    <div class="avatar-icon">🚀</div>
+                    <h4>Elon Musk</h4>
+                    <p>"To the Mars... I mean, maze!"</p>
+                </div>
+                
+                <div class="avatar-card" data-avatar="mario" onclick="selectAvatar('mario')">
+                    <div class="avatar-icon">🔴</div>
+                    <h4>Mario</h4>
+                    <p>"Mamma mia! Wrong game!"</p>
+                </div>
+            </div>
+            <div class="avatar-actions">
+                <button class="btn-back" onclick="showModeSelection()">← Back to Modes</button>
+                <button class="btn-start" onclick="startGameWithAvatar()">Start Game →</button>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <h1 id="game-title">Pac-Man Classic</h1>
+            <div id="hud">
+                <span id="score">Score: 0</span>
+                <span id="level">Level: 1</span>
+                <span id="lives">Lives: 3</span>
+                <span id="mode-info" style="display: none;"></span>
+                <button id="restart-btn" onclick="restartGame()" title="Restart Game">🔄</button>
+                <button id="mode-btn" onclick="showModeSelection()" title="Change Mode">🎮</button>
+            </div>
+            <canvas id="game-canvas" width="560" height="420"></canvas>
+            <div id="message"></div>
+            
+            <!-- Mobile Controls -->
+            <div id="mobile-controls">
+                <div class="control-pad">
+                    <div class="control-btn" data-direction="up" title="Move Up">▲</div>
+                    <div class="control-btn" data-direction="left" title="Move Left">◀</div>
+                    <div class="control-btn" data-direction="right" title="Move Right">▶</div>
+                    <div class="control-btn" data-direction="down" title="Move Down">▼</div>
+                </div>
+            </div>
+            
+            <div id="controls">
+                <p id="control-text">🖥️ Desktop: Use arrow keys to move Pac-Man</p>
+                <p>📱 Mobile: Tap the D-pad buttons to move</p>
+                <p id="objective-text">🎯 Eat all dots to win! Avoid the 3 ghosts!</p>
+                <p>💊 Eat power pellets (big dots) to chase ghosts!</p>
+                <div id="share-info">
+                    <p>🎮 Built with HTML5, CSS3 & JavaScript</p>
+                </div>
             </div>
         </div>
     </div>
@@ -46,5 +154,9 @@
             window.location.href = 'index.html';
         }
     </script>
+    
+    <!-- Feedback Widget -->
+    <link rel="stylesheet" href="feedback-widget.css">
+    <script src="feedback-widget-new.js"></script>
 </body>
 </html>

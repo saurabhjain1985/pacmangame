@@ -203,20 +203,62 @@ class BedtimeStoryGenerator {
         this.speechSynth = window.speechSynthesis;
         this.isReading = false;
         this.selectedVoice = null;
-        
+
         // Load voices and populate voice selector
         this.loadVoices();
-        
+
         // Some browsers load voices asynchronously
         if (this.speechSynth.onvoiceschanged !== undefined) {
             this.speechSynth.onvoiceschanged = () => this.loadVoices();
         }
-        
+
         // Set up voice controls event listeners
         this.setupVoiceControls();
+        
+        // Add page navigation listeners to stop speech
+        this.setupNavigationListeners();
     }
     
-    loadVoices() {
+    setupNavigationListeners() {
+        // Stop speech when user navigates away or refreshes
+        window.addEventListener('beforeunload', () => {
+            this.stopReading();
+        });
+        
+        // Stop speech when user uses browser back/forward buttons
+        window.addEventListener('popstate', () => {
+            this.stopReading();
+        });
+        
+        // Stop speech when user clicks away from the page
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && this.isReading) {
+                this.stopReading();
+            }
+        });
+        
+        // Stop speech when clicking back to games button
+        const backButton = document.querySelector('.btn-back');
+        if (backButton) {
+            backButton.addEventListener('click', () => {
+                this.stopReading();
+            });
+        }
+    }
+    
+    stopReading() {
+        if (this.speechSynth && this.isReading) {
+            this.speechSynth.cancel();
+            this.isReading = false;
+            
+            // Reset button appearance
+            const readBtn = document.querySelector('.btn-read');
+            if (readBtn) {
+                readBtn.innerHTML = '🔊 Read Aloud';
+                readBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            }
+        }
+    }    loadVoices() {
         const voiceSelect = document.getElementById('voiceSelect');
         if (!voiceSelect) return; // Controls not ready yet
         
@@ -226,64 +268,75 @@ class BedtimeStoryGenerator {
         
         voiceSelect.innerHTML = '';
         
-        // Group voices by language and type
-        const voiceGroups = {
-            'English (Recommended)': [],
-            'Other Languages': []
-        };
+        // Select only high-quality voices suitable for bedtime stories
+        const preferredVoices = [
+            // Female voices (gentle and soothing)
+            { names: ['Samantha', 'Victoria', 'Karen', 'Susan'], gender: 'female', label: '👩 Gentle Female Voice' },
+            { names: ['Microsoft Zira', 'Microsoft Hazel', 'Google UK English Female', 'Google US English Female'], gender: 'female', label: '🌟 Soothing Female Voice' },
+            
+            // Male voices (warm and calming)
+            { names: ['Alex', 'Daniel', 'Thomas'], gender: 'male', label: '👨 Warm Male Voice' },
+            { names: ['Microsoft David', 'Google UK English Male', 'Google US English Male'], gender: 'male', label: '🎙️ Calm Male Voice' }
+        ];
         
-        voices.forEach((voice, index) => {
-            // Prioritize English voices for bedtime stories
-            if (voice.lang.startsWith('en')) {
-                voiceGroups['English (Recommended)'].push({ voice, index });
-            } else {
-                voiceGroups['Other Languages'].push({ voice, index });
+        const selectedVoices = [];
+        
+        // Find the best available voices
+        for (const voiceGroup of preferredVoices) {
+            for (const preferredName of voiceGroup.names) {
+                const foundVoice = voices.find(voice => 
+                    voice.name.includes(preferredName) && 
+                    voice.lang.startsWith('en') &&
+                    !selectedVoices.some(sv => sv.voice.name === voice.name)
+                );
+                
+                if (foundVoice) {
+                    selectedVoices.push({
+                        voice: foundVoice,
+                        label: voiceGroup.label,
+                        index: voices.indexOf(foundVoice)
+                    });
+                    break; // Only one voice per group
+                }
             }
+            
+            // Stop when we have 4 voices
+            if (selectedVoices.length >= 4) break;
+        }
+        
+        // If we don't have enough quality voices, add fallbacks
+        if (selectedVoices.length < 2) {
+            const fallbackVoices = voices.filter(voice => 
+                voice.lang.startsWith('en') && 
+                !selectedVoices.some(sv => sv.voice.name === voice.name)
+            ).slice(0, 4 - selectedVoices.length);
+            
+            fallbackVoices.forEach(voice => {
+                const isFemale = voice.name.toLowerCase().includes('female') || 
+                                voice.name.toLowerCase().includes('woman') ||
+                                ['zira', 'hazel', 'susan', 'karen'].some(name => voice.name.toLowerCase().includes(name));
+                
+                selectedVoices.push({
+                    voice: voice,
+                    label: isFemale ? '👩 Female Voice' : '👨 Male Voice',
+                    index: voices.indexOf(voice)
+                });
+            });
+        }
+        
+        // Add selected voices to dropdown
+        selectedVoices.forEach(({voice, label, index}) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = label;
+            voiceSelect.appendChild(option);
         });
         
-        // Add English voices first
-        if (voiceGroups['English (Recommended)'].length > 0) {
-            const englishGroup = document.createElement('optgroup');
-            englishGroup.label = 'English (Recommended)';
-            
-            voiceGroups['English (Recommended)'].forEach(({voice, index}) => {
-                const option = document.createElement('option');
-                option.value = index;
-                
-                // Create descriptive names for better UX
-                let displayName = voice.name;
-                if (voice.name.includes('Female') || voice.name.includes('Woman')) {
-                    displayName += ' 👩 (Gentle)';
-                } else if (voice.name.includes('Male') || voice.name.includes('Man')) {
-                    displayName += ' 👨 (Warm)';
-                } else if (voice.name.includes('Samantha') || voice.name.includes('Victoria') || voice.name.includes('Karen')) {
-                    displayName += ' 🌟 (Premium)';
-                }
-                
-                option.textContent = displayName;
-                englishGroup.appendChild(option);
-            });
-            
-            voiceSelect.appendChild(englishGroup);
+        // Auto-select the first voice (usually the best quality)
+        if (selectedVoices.length > 0) {
+            voiceSelect.value = selectedVoices[0].index;
+            this.selectedVoice = selectedVoices[0].voice;
         }
-        
-        // Add other language voices
-        if (voiceGroups['Other Languages'].length > 0) {
-            const otherGroup = document.createElement('optgroup');
-            otherGroup.label = 'Other Languages';
-            
-            voiceGroups['Other Languages'].forEach(({voice, index}) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${voice.name} (${voice.lang})`;
-                otherGroup.appendChild(option);
-            });
-            
-            voiceSelect.appendChild(otherGroup);
-        }
-        
-        // Auto-select a good default voice
-        this.selectBestDefaultVoice(voices);
     }
     
     selectBestDefaultVoice(voices) {
@@ -347,10 +400,33 @@ class BedtimeStoryGenerator {
         
         if (!voiceSelect) return; // Controls not ready yet
         
-        // Voice selection
+        // Voice selection with proper error handling
         voiceSelect.addEventListener('change', (e) => {
-            const voices = this.speechSynth.getVoices();
-            this.selectedVoice = voices[e.target.value] || null;
+            try {
+                const voices = this.speechSynth.getVoices();
+                const selectedIndex = parseInt(e.target.value);
+                
+                if (selectedIndex >= 0 && selectedIndex < voices.length) {
+                    this.selectedVoice = voices[selectedIndex];
+                    console.log('Voice selected:', this.selectedVoice.name);
+                    
+                    // Test the voice briefly
+                    if (this.speechSynth && !this.isReading) {
+                        this.speechSynth.cancel(); // Clear any pending speech
+                        const testUtterance = new SpeechSynthesisUtterance('Voice changed');
+                        testUtterance.voice = this.selectedVoice;
+                        testUtterance.rate = 0.8;
+                        testUtterance.pitch = 1.0;
+                        testUtterance.volume = 0.3;
+                        this.speechSynth.speak(testUtterance);
+                    }
+                } else {
+                    console.error('Invalid voice index:', selectedIndex);
+                }
+            } catch (error) {
+                console.error('Error changing voice:', error);
+                alert('Sorry, there was an error with the voice playback. Please try a different voice.');
+            }
         });
         
         // Speed control
@@ -369,24 +445,48 @@ class BedtimeStoryGenerator {
     }
 
     generateStory() {
-        const characters = document.getElementById('characters').value.trim();
-        const theme = document.getElementById('theme').value;
-        const length = document.getElementById('storyLength').value;
-        const mood = document.getElementById('mood').value;
-        const setting = document.getElementById('setting').value.trim();
+        // Get characters from the text input - need to check if it exists
+        const charactersElement = document.getElementById('characters');
+        const characters = charactersElement ? charactersElement.value.trim() : '';
+        
+        // Get theme from selected theme card
+        const selectedTheme = document.querySelector('.theme-card.selected');
+        const theme = selectedTheme ? selectedTheme.dataset.theme : 'adventure';
+        
+        // Get mood from selected mood option
+        const selectedMood = document.querySelector('.mood-option.active');
+        const mood = selectedMood ? selectedMood.dataset.mood : 'peaceful';
+        
+        // Use default values for length and setting since these aren't in the UI
+        const length = 'medium';
+        const setting = 'magical forest';
 
         if (!characters) {
             alert('Please enter at least one character for your story!');
             return;
         }
 
+        console.log('Starting story generation with:', { characters, theme, length, mood, setting });
         this.showLoading();
         
-        // Simulate AI processing time
+        // Simulate AI processing time with better error handling
         setTimeout(() => {
-            const story = this.createPersonalizedStory(characters, theme, length, mood, setting);
-            this.displayStory(story);
-            this.hideLoading();
+            try {
+                console.log('Creating personalized story...');
+                const story = this.createPersonalizedStory(characters, theme, length, mood, setting);
+                console.log('Story created successfully:', story);
+                
+                this.displayStory(story);
+                this.hideLoading();
+                console.log('Story display complete');
+            } catch (error) {
+                console.error('Error generating story:', error);
+                this.hideLoading();
+                alert('Sorry, there was an error creating your story. Please try again!');
+            }
+        }, 2000);
+    }
+            }
         }, 3000);
     }
 
@@ -766,65 +866,83 @@ class BedtimeStoryGenerator {
         const readBtn = document.querySelector('.btn-read');
         
         if (this.isReading) {
-            this.speechSynth.cancel();
-            this.isReading = false;
-            readBtn.innerHTML = '🔊 Read Aloud';
+            this.stopReading();
             return;
         }
 
-        const utterance = new SpeechSynthesisUtterance(this.currentStory.content);
-        
-        // Get user-selected settings
-        const voiceSpeed = document.getElementById('voiceSpeed');
-        const voicePitch = document.getElementById('voicePitch');
-        
-        // Apply custom settings or defaults
-        utterance.rate = voiceSpeed ? parseFloat(voiceSpeed.value) : 0.8;
-        utterance.pitch = voicePitch ? parseFloat(voicePitch.value) : 1.1;
-        utterance.volume = 0.8;
-
-        // Use selected voice or auto-select a good one
-        if (this.selectedVoice) {
-            utterance.voice = this.selectedVoice;
-        } else {
-            // Fallback to auto-selection
-            const voices = this.speechSynth.getVoices();
-            const gentleVoice = voices.find(voice => 
-                voice.lang.startsWith('en') && (
-                    voice.name.includes('Female') || 
-                    voice.name.includes('Woman') ||
-                    voice.name.includes('Samantha') ||
-                    voice.name.includes('Victoria') ||
-                    voice.name.includes('Karen')
-                )
-            );
-            
-            if (gentleVoice) {
-                utterance.voice = gentleVoice;
-                this.selectedVoice = gentleVoice;
+        try {
+            // Check if speech synthesis is available
+            if (!this.speechSynth || !this.speechSynth.getVoices) {
+                throw new Error('Speech synthesis not available');
             }
+
+            const utterance = new SpeechSynthesisUtterance(this.currentStory.content);
+            
+            // Get user-selected settings
+            const voiceSpeed = document.getElementById('voiceSpeed');
+            const voicePitch = document.getElementById('voicePitch');
+            
+            // Apply custom settings or defaults
+            utterance.rate = voiceSpeed ? parseFloat(voiceSpeed.value) : 0.8;
+            utterance.pitch = voicePitch ? parseFloat(voicePitch.value) : 1.1;
+            utterance.volume = 0.8;
+
+            // Use selected voice with validation
+            if (this.selectedVoice) {
+                utterance.voice = this.selectedVoice;
+                console.log('Using selected voice:', this.selectedVoice.name);
+            } else {
+                // Fallback to auto-selection
+                const voices = this.speechSynth.getVoices();
+                const gentleVoice = voices.find(voice => 
+                    voice.lang.startsWith('en') && (
+                        voice.name.includes('Female') || 
+                        voice.name.includes('Woman') ||
+                        voice.name.includes('Samantha') ||
+                        voice.name.includes('Victoria') ||
+                        voice.name.includes('Karen')
+                    )
+                );
+                
+                if (gentleVoice) {
+                    utterance.voice = gentleVoice;
+                    this.selectedVoice = gentleVoice;
+                    console.log('Using fallback voice:', gentleVoice.name);
+                }
+            }
+
+            utterance.onstart = () => {
+                this.isReading = true;
+                readBtn.innerHTML = '⏸️ Stop Reading';
+                readBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
+                console.log('Started reading story');
+            };
+
+            utterance.onend = () => {
+                this.isReading = false;
+                readBtn.innerHTML = '🔊 Read Aloud';
+                readBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                console.log('Finished reading story');
+            };
+
+            utterance.onerror = (event) => {
+                this.isReading = false;
+                readBtn.innerHTML = '🔊 Read Aloud';
+                readBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                console.error('Speech synthesis error:', event.error);
+                alert('Sorry, there was an error with the voice playback. Please try a different voice.');
+            };
+
+            // Clear any existing speech and start new one
+            this.speechSynth.cancel();
+            setTimeout(() => {
+                this.speechSynth.speak(utterance);
+            }, 100);
+            
+        } catch (error) {
+            console.error('Error in readStoryAloud:', error);
+            alert('Sorry, voice playback is not available on this device or browser.');
         }
-
-        utterance.onstart = () => {
-            this.isReading = true;
-            readBtn.innerHTML = '⏸️ Stop Reading';
-            readBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
-        };
-
-        utterance.onend = () => {
-            this.isReading = false;
-            readBtn.innerHTML = '🔊 Read Aloud';
-            readBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
-        };
-
-        utterance.onerror = () => {
-            this.isReading = false;
-            readBtn.innerHTML = '🔊 Read Aloud';
-            readBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
-            alert('Sorry, there was an error with the voice playback. Please try a different voice.');
-        };
-
-        this.speechSynth.speak(utterance);
     }
 
     saveStory() {
@@ -944,6 +1062,48 @@ function shareStory() {
     storyGenerator.shareStory();
 }
 
+// Navigation functions for the step-by-step interface
+function nextStep() {
+    const steps = document.querySelectorAll('.step');
+    const currentStep = document.querySelector('.step.active');
+    const currentIndex = Array.from(steps).indexOf(currentStep);
+    
+    if (currentIndex < steps.length - 1) {
+        currentStep.classList.remove('active');
+        steps[currentIndex + 1].classList.add('active');
+        
+        // Update navigation buttons
+        updateNavigationButtons(currentIndex + 1, steps.length);
+    }
+}
+
+function previousStep() {
+    const steps = document.querySelectorAll('.step');
+    const currentStep = document.querySelector('.step.active');
+    const currentIndex = Array.from(steps).indexOf(currentStep);
+    
+    if (currentIndex > 0) {
+        currentStep.classList.remove('active');
+        steps[currentIndex - 1].classList.add('active');
+        
+        // Update navigation buttons
+        updateNavigationButtons(currentIndex - 1, steps.length);
+    }
+}
+
+function updateNavigationButtons(currentIndex, totalSteps) {
+    const prevBtn = document.querySelector('.btn-prev');
+    const nextBtn = document.querySelector('.btn-next');
+    
+    if (prevBtn) {
+        prevBtn.style.display = currentIndex === 0 ? 'none' : 'inline-block';
+    }
+    
+    if (nextBtn) {
+        nextBtn.style.display = currentIndex === totalSteps - 1 ? 'none' : 'inline-block';
+    }
+}
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
     storyGenerator = new BedtimeStoryGenerator();
@@ -954,4 +1114,32 @@ document.addEventListener('DOMContentLoaded', () => {
             // Voices are now loaded
         });
     }
+    
+    // Set default selections
+    const firstThemeCard = document.querySelector('.theme-card[data-theme="adventure"]');
+    if (firstThemeCard) {
+        firstThemeCard.classList.add('selected');
+    }
+    
+    // Add event listeners for theme cards
+    const themeCards = document.querySelectorAll('.theme-card');
+    themeCards.forEach(card => {
+        card.addEventListener('click', () => {
+            // Remove selected class from all cards
+            themeCards.forEach(c => c.classList.remove('selected'));
+            // Add selected class to clicked card
+            card.classList.add('selected');
+        });
+    });
+    
+    // Add event listeners for mood options
+    const moodOptions = document.querySelectorAll('.mood-option');
+    moodOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Remove active class from all options
+            moodOptions.forEach(o => o.classList.remove('active'));
+            // Add active class to clicked option
+            option.classList.add('active');
+        });
+    });
 });

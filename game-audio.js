@@ -25,6 +25,8 @@ class GameAudioManager {
             gameOver: { frequency: 200, duration: 0.8, type: 'triangle' }, // Game over
             levelComplete: { frequency: 600, duration: 0.5, type: 'square' }, // Level complete
             ghost: { frequency: 150, duration: 0.2, type: 'sawtooth' }, // Ghost eaten
+            ghostEaten: { frequency: 350, duration: 0.4, type: 'sine' }, // Enhanced ghost eaten
+            bonus: { frequency: 900, duration: 0.3, type: 'square' }, // Bonus/multiple ghosts
             achievement: { frequency: 1000, duration: 0.4, type: 'sine' }, // Achievement/high score
             button: { frequency: 500, duration: 0.05, type: 'sine' }, // Button click
             error: { frequency: 300, duration: 0.15, type: 'triangle' }, // Error/invalid move
@@ -274,7 +276,17 @@ class GameAudioManager {
     pacmanSounds = {
         eatDot: () => { this.playSound('collect'); this.hapticFeedback('collect'); },
         eatPowerPellet: () => { this.playSound('powerUp'); this.hapticFeedback('powerUp'); },
-        eatGhost: () => { this.playSound('ghost'); this.hapticFeedback('success'); },
+        ghostEaten: () => { 
+            // Enhanced ghost eating sound with celebration
+            this.playSound('ghostEaten'); 
+            this.hapticFeedback('success');
+            // Play a bonus chirp after a short delay
+            setTimeout(() => {
+                this.playSound('bonus', 500, 0.15);
+            }, 200);
+        },
+        eatGhost: () => { this.pacmanSounds.ghostEaten(); }, // Alias for backwards compatibility
+        bonus: () => { this.playSound('bonus'); this.hapticFeedback('success'); },
         death: () => { this.playSound('gameOver'); this.hapticFeedback('gameOver'); },
         levelUp: () => { this.playSound('levelComplete'); this.hapticFeedback('success'); }
     }

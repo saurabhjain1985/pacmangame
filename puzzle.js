@@ -80,20 +80,27 @@ class PuzzleGameManager {
         this.currentGame = gameType;
         this.resetStats();
         this.showScreen(gameType);
-        this.startTimer();
-
+        
         switch (gameType) {
             case 'sliding':
+                this.startTimer();
                 this.initSlidingPuzzle();
                 break;
             case 'wordsearch':
+                this.startTimer();
                 this.initWordSearch();
                 break;
             case 'number':
+                this.startTimer();
                 this.initNumberPuzzle();
                 break;
             case 'pattern':
+                this.startTimer();
                 this.initPatternMatch();
+                break;
+            case 'builder':
+                // Don't start timer until puzzle is created
+                this.initPuzzleBuilder();
                 break;
         }
     }
@@ -881,6 +888,16 @@ class PuzzleGameManager {
         }
         
         this.updateStats();
+    }
+
+    initPuzzleBuilder() {
+        console.log('Initializing Puzzle Builder...');
+        // Initialize the puzzle builder from the separate file
+        if (typeof initPuzzleBuilder === 'function') {
+            initPuzzleBuilder();
+        } else {
+            console.error('Puzzle Builder not loaded! Make sure puzzle-builder.js is included.');
+        }
     }
 }
 

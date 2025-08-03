@@ -46,6 +46,176 @@ body {
     position: relative;
 }
 
+/* Screen Management */
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Mode Selection Styles */
+#main-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+#mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.mode-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.mode-card:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.mode-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.mode-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #FFD700;
+}
+
+.mode-card p {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.mode-features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mode-features span {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+}
+
+#mode-instructions {
+    margin-top: 2rem;
+    opacity: 0.8;
+}
+
+/* Avatar Selection Styles */
+#avatar-title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.avatar-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.avatar-card:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.avatar-card.active {
+    border-color: #FFD700;
+    background: rgba(255, 215, 0, 0.2);
+}
+
+.avatar-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.avatar-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #FFD700;
+}
+
+.avatar-card p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.avatar-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-back, .btn-start {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 1rem 2rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-start {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    border: none;
+}
+
+.btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
 #game-title {
     font-size: 32px;
     font-weight: 700;
@@ -60,6 +230,7 @@ body {
 #hud {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
     font-size: 18px;
     font-weight: 600;
@@ -70,9 +241,29 @@ body {
     padding: 10px 20px;
     border-radius: 15px;
     backdrop-filter: blur(10px);
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-#score, #lives {
+#restart-btn, #mode-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    color: white;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    margin-left: 10px;
+}
+
+#restart-btn:hover, #mode-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+#score, #lives, #level {
     color: transparent;
     background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
     -webkit-background-clip: text;
@@ -305,6 +496,45 @@ body {
     animation: glow 1s ease-in-out infinite alternate;
 }
 
+.level-complete, .game-complete {
+    color: #4ECDC4 !important;
+    text-shadow: 0 0 20px #4ECDC4;
+    animation: glow 1s ease-in-out infinite alternate;
+}
+
+.level-complete button, .game-complete button, .game-over button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    color: white;
+    padding: 12px 20px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.level-complete button:hover, .game-complete button:hover, .game-over button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.final-score {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #FFD93D;
+    text-shadow: 0 0 10px #FFD93D;
+}
+
+.level-indicator {
+    color: #FFD93D !important;
+    text-shadow: 0 0 20px #FFD93D;
+    animation: levelPulse 0.5s ease-in-out;
+}
+
 .game-over {
     color: #FF6B6B !important;
     text-shadow: 0 0 20px #FF6B6B;
@@ -319,4 +549,10 @@ body {
 @keyframes pulse {
     from { transform: scale(1); }
     to { transform: scale(1.05); }
+}
+
+@keyframes levelPulse {
+    0% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
 }
