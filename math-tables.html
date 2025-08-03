@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Tables Master - Learn Multiplication</title>
+    <link rel="stylesheet" href="math-tables.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="back-button">← Back to Games</div>
+        
+        <header>
+            <h1 id="game-title">🔢 Math Tables Master</h1>
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+                <span id="progress-text">Level 1</span>
+            </div>
+            <div id="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Streak</span>
+                    <span id="streak">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Level</span>
+                    <span id="current-level">1</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Grade Selection Screen -->
+        <div id="grade-selection-screen" class="screen active">
+            <h2>🎒 Choose Your Grade</h2>
+            <p>Select your grade to start learning multiplication tables!</p>
+            
+            <div class="grade-grid">
+                <div class="grade-card" data-grade="2">
+                    <div class="grade-icon">📚</div>
+                    <h3>Grade 2</h3>
+                    <p>Tables: 2, 3, 4</p>
+                    <p>Numbers: 1-5</p>
+                    <div class="difficulty-badge easy">Easy</div>
+                    <button class="start-btn">Start Learning</button>
+                </div>
+                
+                <div class="grade-card" data-grade="3">
+                    <div class="grade-icon">📖</div>
+                    <h3>Grade 3</h3>
+                    <p>Tables: 2, 3, 4, 5</p>
+                    <p>Numbers: 1-8</p>
+                    <div class="difficulty-badge easy">Easy</div>
+                    <button class="start-btn">Start Learning</button>
+                </div>
+                
+                <div class="grade-card" data-grade="4">
+                    <div class="grade-icon">📝</div>
+                    <h3>Grade 4</h3>
+                    <p>Tables: 2-8</p>
+                    <p>Numbers: 1-10</p>
+                    <div class="difficulty-badge medium">Medium</div>
+                    <button class="start-btn">Start Learning</button>
+                </div>
+                
+                <div class="grade-card" data-grade="5">
+                    <div class="grade-icon">🎓</div>
+                    <h3>Grade 5</h3>
+                    <p>Tables: 2-12</p>
+                    <p>Numbers: 1-12</p>
+                    <div class="difficulty-badge medium">Medium</div>
+                    <button class="start-btn">Start Learning</button>
+                </div>
+                
+                <div class="grade-card" data-grade="6">
+                    <div class="grade-icon">🏆</div>
+                    <h3>Grade 6</h3>
+                    <p>Tables: 2-15</p>
+                    <p>Numbers: 1-15</p>
+                    <div class="difficulty-badge hard">Advanced</div>
+                    <button class="start-btn">Start Learning</button>
+                </div>
+                
+                <div class="grade-card special" data-grade="practice">
+                    <div class="grade-icon">🎯</div>
+                    <h3>Practice Mode</h3>
+                    <p>Choose any table</p>
+                    <p>Custom practice</p>
+                    <div class="difficulty-badge special">Custom</div>
+                    <button class="start-btn">Practice Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Practice Mode Selection -->
+        <div id="practice-selection-screen" class="screen">
+            <h2>🎯 Practice Mode</h2>
+            <p>Choose which multiplication table to practice:</p>
+            
+            <div class="table-selector">
+                <div class="table-grid">
+                    <button class="table-btn" data-table="2">2 Times Table</button>
+                    <button class="table-btn" data-table="3">3 Times Table</button>
+                    <button class="table-btn" data-table="4">4 Times Table</button>
+                    <button class="table-btn" data-table="5">5 Times Table</button>
+                    <button class="table-btn" data-table="6">6 Times Table</button>
+                    <button class="table-btn" data-table="7">7 Times Table</button>
+                    <button class="table-btn" data-table="8">8 Times Table</button>
+                    <button class="table-btn" data-table="9">9 Times Table</button>
+                    <button class="table-btn" data-table="10">10 Times Table</button>
+                    <button class="table-btn" data-table="11">11 Times Table</button>
+                    <button class="table-btn" data-table="12">12 Times Table</button>
+                    <button class="table-btn" data-table="13">13 Times Table</button>
+                    <button class="table-btn" data-table="14">14 Times Table</button>
+                    <button class="table-btn" data-table="15">15 Times Table</button>
+                </div>
+            </div>
+            
+            <div class="practice-controls">
+                <button class="action-btn back-to-grades-btn">← Back to Grades</button>
+            </div>
+        </div>
+
+        <!-- Learning Screen -->
+        <div id="learning-screen" class="screen">
+            <h2 id="table-title">Learning 2 Times Table</h2>
+            <p id="learning-subtitle">Let's learn step by step!</p>
+            
+            <div id="learning-display">
+                <div id="table-chart">
+                    <!-- Table chart will be populated by JavaScript -->
+                </div>
+                
+                <div class="learning-controls">
+                    <button class="action-btn" id="show-table-btn">📋 Show Full Table</button>
+                    <button class="action-btn" id="start-quiz-btn">🧠 Start Quiz</button>
+                    <button class="action-btn back-to-grades-btn">← Back</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen">
+            <h2 id="quiz-title">Quiz Time!</h2>
+            <p id="quiz-subtitle">Answer the multiplication questions</p>
+            
+            <div id="question-area">
+                <div id="question-display">
+                    <span id="first-number">2</span>
+                    <span class="operator">×</span>
+                    <span id="second-number">3</span>
+                    <span class="equals">=</span>
+                    <span id="answer-placeholder">?</span>
+                </div>
+                
+                <div id="answer-options">
+                    <!-- Answer options will be populated by JavaScript -->
+                </div>
+                
+                <div id="feedback-area">
+                    <!-- Feedback messages will appear here -->
+                </div>
+            </div>
+            
+            <div class="quiz-controls">
+                <button class="action-btn" id="hint-btn">💡 Hint</button>
+                <button class="action-btn" id="skip-btn">⏭️ Skip</button>
+                <button class="action-btn back-to-learning-btn">📚 Back to Learning</button>
+            </div>
+        </div>
+
+        <!-- Level Complete Screen -->
+        <div id="level-complete-screen" class="screen">
+            <h2>🎉 Level Complete!</h2>
+            <p id="level-complete-message">Great job! You're getting better at multiplication!</p>
+            
+            <div class="achievement-display">
+                <div class="achievement-icon" id="achievement-icon">🌟</div>
+                <h3 id="achievement-title">Table Master!</h3>
+                <p id="achievement-description">You've mastered the 2 times table!</p>
+            </div>
+            
+            <div class="level-stats">
+                <div class="level-stat">
+                    <span class="stat-label">Questions Answered</span>
+                    <span id="questions-answered">0</span>
+                </div>
+                <div class="level-stat">
+                    <span class="stat-label">Correct Answers</span>
+                    <span id="correct-answers">0</span>
+                </div>
+                <div class="level-stat">
+                    <span class="stat-label">Accuracy</span>
+                    <span id="accuracy">0%</span>
+                </div>
+                <div class="level-stat">
+                    <span class="stat-label">Stars Earned</span>
+                    <span id="stars-earned">⭐⭐⭐</span>
+                </div>
+            </div>
+            
+            <div class="level-complete-buttons">
+                <button class="action-btn" id="next-level-btn">➡️ Next Level</button>
+                <button class="action-btn" id="retry-level-btn">🔄 Try Again</button>
+                <button class="action-btn back-to-grades-btn">🎒 Choose Grade</button>
+            </div>
+        </div>
+
+        <!-- Progress Overview Screen -->
+        <div id="progress-screen" class="screen">
+            <h2>📊 Your Progress</h2>
+            <p>See how well you're doing with each multiplication table!</p>
+            
+            <div id="progress-overview">
+                <!-- Progress cards will be populated by JavaScript -->
+            </div>
+            
+            <div class="progress-controls">
+                <button class="action-btn back-to-grades-btn">← Back to Grades</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="math-tables.js"></script>
+</body>
+</html>

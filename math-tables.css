@@ -1,0 +1,800 @@
+/* Math Tables Master - Kid-Friendly Design */
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&family=Fredoka+One:wght@400&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Comic Neue', cursive;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    min-height: 100vh;
+    color: #ffffff;
+    overflow-x: hidden;
+    padding: 20px;
+    position: relative;
+}
+
+/* Animated background elements */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    animation: floatingBubbles 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes floatingBubbles {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+#game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+}
+
+#back-button {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+#back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+header {
+    margin-bottom: 3rem;
+    padding-top: 2rem;
+}
+
+#game-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24, #f0932b);
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbowShift 3s ease-in-out infinite;
+}
+
+@keyframes rainbowShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+#progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 8px;
+    margin-bottom: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+#progress-fill {
+    background: linear-gradient(90deg, #4ecdc4, #44a08d);
+    height: 20px;
+    border-radius: 50px;
+    width: 0%;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+#progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+#progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 1.2rem;
+    min-width: 120px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.stat span:last-child {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4ecdc4;
+    text-shadow: 0 2px 10px rgba(78, 205, 196, 0.3);
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    animation: slideInUp 0.6s ease-out;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes slideInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px) scale(0.95); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}
+
+/* Grade Selection */
+.grade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.grade-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    padding: 2.5rem;
+    text-align: center;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.grade-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.grade-card:hover::before {
+    left: 100%;
+}
+
+.grade-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.grade-card.special {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(78, 205, 196, 0.2));
+    border-color: rgba(255, 193, 7, 0.5);
+}
+
+.grade-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 60%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    80% { transform: translateY(-5px); }
+}
+
+.grade-card h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.grade-card p {
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.difficulty-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 1rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.difficulty-badge.easy {
+    background: rgba(76, 175, 80, 0.8);
+    color: white;
+}
+
+.difficulty-badge.medium {
+    background: rgba(255, 193, 7, 0.8);
+    color: white;
+}
+
+.difficulty-badge.hard {
+    background: rgba(244, 67, 54, 0.8);
+    color: white;
+}
+
+.difficulty-badge.special {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.start-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    padding: 15px 35px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    font-family: 'Comic Neue', cursive;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.start-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
+    filter: brightness(1.1);
+}
+
+.start-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Table Selector */
+.table-selector {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+}
+
+.table-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.table-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Comic Neue', cursive;
+}
+
+.table-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Learning Display */
+#learning-display {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+#table-chart {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 3rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+}
+
+.table-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.table-row:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+}
+
+.table-row span {
+    margin: 0 10px;
+}
+
+.equals {
+    color: #4ecdc4;
+    font-weight: 700;
+}
+
+.result {
+    color: #f9ca24;
+    font-weight: 700;
+    font-size: 1.4em;
+}
+
+/* Quiz Area */
+#question-area {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+#question-display {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 3rem;
+    margin-bottom: 3rem;
+    font-size: 3rem;
+    font-weight: 700;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+#question-display span {
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.operator {
+    color: #4ecdc4;
+}
+
+.equals {
+    color: #f9ca24;
+}
+
+#answer-placeholder {
+    color: #ff6b6b;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+#answer-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.answer-option {
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    color: white;
+    padding: 25px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Comic Neue', cursive;
+}
+
+.answer-option:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.answer-option.correct {
+    background: rgba(76, 175, 80, 0.8);
+    border-color: #4CAF50;
+    animation: correctBounce 0.6s ease-in-out;
+}
+
+.answer-option.incorrect {
+    background: rgba(244, 67, 54, 0.8);
+    border-color: #f44336;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes correctBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+#feedback-area {
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.feedback-message {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 1rem 2rem;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.feedback-message.success {
+    background: rgba(76, 175, 80, 0.8);
+    color: white;
+}
+
+.feedback-message.error {
+    background: rgba(244, 67, 54, 0.8);
+    color: white;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Achievement Display */
+.achievement-display {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 3rem;
+    margin: 3rem auto;
+    max-width: 600px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+}
+
+.achievement-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.1); }
+    to { transform: rotate(360deg) scale(1); }
+}
+
+.achievement-display h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #f9ca24;
+    text-shadow: 0 3px 15px rgba(249, 202, 36, 0.5);
+}
+
+/* Level Stats */
+.level-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 3rem auto;
+}
+
+.level-stat {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.level-stat .stat-label {
+    display: block;
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.level-stat span:last-child {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #4ecdc4;
+    text-shadow: 0 2px 10px rgba(78, 205, 196, 0.3);
+}
+
+/* Action Buttons */
+.learning-controls,
+.quiz-controls,
+.practice-controls,
+.level-complete-buttons,
+.progress-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    font-family: 'Comic Neue', cursive;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn:active {
+    transform: translateY(-1px);
+}
+
+#next-level-btn {
+    background: linear-gradient(45deg, #4ecdc4, #44a08d);
+    border-color: rgba(78, 205, 196, 0.5);
+}
+
+#next-level-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* Progress Overview */
+#progress-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto 3rem;
+}
+
+.progress-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.progress-card h4 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #f9ca24;
+}
+
+.stars {
+    font-size: 2rem;
+    margin: 1rem 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+    
+    #game-title {
+        font-size: 2.5rem;
+    }
+    
+    .grade-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1rem 0;
+    }
+    
+    .grade-card {
+        padding: 2rem;
+    }
+    
+    .table-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    #question-display {
+        font-size: 2rem;
+        padding: 2rem;
+        gap: 0.5rem;
+    }
+    
+    .answer-option {
+        padding: 20px;
+        font-size: 1.5rem;
+    }
+    
+    .level-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .learning-controls,
+    .quiz-controls,
+    .level-complete-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-btn {
+        width: 250px;
+        padding: 18px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .table-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #answer-options {
+        grid-template-columns: 1fr;
+    }
+    
+    #question-display {
+        font-size: 1.8rem;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    
+    .grade-icon {
+        font-size: 3rem;
+    }
+    
+    .achievement-icon {
+        font-size: 4rem;
+    }
+}
+
+/* Fun animations for correct answers */
+.celebration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #f9ca24;
+    animation: confettiFall 3s linear forwards;
+}
+
+@keyframes confettiFall {
+    0% { 
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
