@@ -191,12 +191,26 @@ class BedtimeStoryGenerator {
         this.savedStories = JSON.parse(localStorage.getItem('bedtimeStories') || '[]');
         this.currentStory = null;
         
-        this.init();
+        // Initialize with error handling
+        try {
+            this.init();
+        } catch (error) {
+            console.warn('Bedtime Stories: Init failed, but class created successfully:', error);
+        }
     }
 
     init() {
-        this.displaySavedStories();
-        this.setupSpeechSynthesis();
+        try {
+            this.displaySavedStories();
+        } catch (error) {
+            console.warn('Bedtime Stories: displaySavedStories failed:', error);
+        }
+        
+        try {
+            this.setupSpeechSynthesis();
+        } catch (error) {
+            console.warn('Bedtime Stories: setupSpeechSynthesis failed:', error);
+        }
     }
 
     setupSpeechSynthesis() {
@@ -467,53 +481,48 @@ class BedtimeStoryGenerator {
             console.log('Story parameters:', { characters, theme, length, mood, setting });
 
             // Provide default characters if none entered
+            let finalCharacters = characters;
             if (!characters) {
                 console.log('No characters provided, using default characters');
                 const defaultCharacters = ['Luna the brave princess', 'Sparkle the magical unicorn'];
-                charactersElement.value = defaultCharacters.join(', ');
+                finalCharacters = defaultCharacters.join(', ');
+                if (charactersElement) {
+                    charactersElement.value = finalCharacters;
+                }
             }
 
-            const finalCharacters = charactersElement.value.trim();
             console.log('Starting story generation with:', { characters: finalCharacters, theme, length, mood, setting });
             
-            this.showLoading();
-            console.log('Loading overlay shown');
+            // LOADING DISABLED FOR TESTING - story will show immediately
+            console.log('⚡ Loading overlay DISABLED - showing story immediately');
+            // this.showLoading(); // DISABLED
             
-            // Simulate AI processing time with better error handling
-            setTimeout(() => {
-                try {
-                    console.log('Creating personalized story...');
-                    const story = this.createPersonalizedStory(finalCharacters, theme, length, mood, setting);
-                    console.log('Story created successfully:', story ? 'Story object created' : 'Story creation failed');
-                    
-                    if (story) {
-                        this.displayStory(story);
-                        console.log('Story displayed successfully');
-                    } else {
-                        throw new Error('Story creation returned null');
-                    }
-                    
-                    this.hideLoading();
-                    console.log('Loading hidden, story display complete');
-                } catch (error) {
-                    console.error('Error in story creation/display:', error);
-                    this.hideLoading();
-                    alert('Sorry, there was an error creating your story. Please try again!');
+            // Immediate story generation without delay
+            console.log('� Creating story immediately...');
+            
+            try {
+                const story = this.createPersonalizedStory(finalCharacters, theme, length, mood, setting);
+                console.log('Story creation result:', story);
+                
+                if (story) {
+                    console.log('📺 Displaying story immediately...');
+                    this.displayStory(story);
+                    console.log('✅ Story displayed successfully');
+                } else {
+                    console.error('❌ Story creation returned null/undefined');
+                    throw new Error('Story creation returned null');
                 }
-            }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Error in story creation/display:', error);
+                alert('Sorry, there was an error creating your story. Please try again!');
+            }
             
         } catch (error) {
             console.error('Bedtime Stories: Error in generateStory:', error);
             this.hideLoading();
             alert('There was an error generating your story. Please try again!');
         }
-    }
-            } catch (error) {
-                console.error('Error generating story:', error);
-                this.hideLoading();
-                alert('Sorry, there was an error creating your story. Please try again!');
-            }
-        }, 2000);
     }
 
     generateSurpriseStory() {
@@ -818,7 +827,7 @@ class BedtimeStoryGenerator {
     }
 
     displayStory(story) {
-        console.log('Displaying story:', story.title);
+        console.log('📺 displayStory() called with story:', story.title);
         this.currentStory = story;
         
         // Update story elements if they exist
@@ -829,16 +838,28 @@ class BedtimeStoryGenerator {
         const outputElement = document.getElementById('storyOutput');
         const builderElement = document.getElementById('storyBuilder');
         
+        console.log('📍 Elements found:', {
+            titleElement: !!titleElement,
+            readingTimeElement: !!readingTimeElement,
+            themeElement: !!themeElement,
+            textElement: !!textElement,
+            outputElement: !!outputElement,
+            builderElement: !!builderElement
+        });
+        
         if (titleElement) {
             titleElement.textContent = story.title;
+            console.log('✅ Title set:', story.title);
         }
         
         if (readingTimeElement) {
             readingTimeElement.textContent = `📖 ${story.readingTime}`;
+            console.log('✅ Reading time set:', story.readingTime);
         }
         
         if (themeElement) {
             themeElement.textContent = `${this.getThemeEmoji(story.theme)} ${story.theme.charAt(0).toUpperCase() + story.theme.slice(1)}`;
+            console.log('✅ Theme set:', story.theme);
         }
         
         if (textElement) {
@@ -847,15 +868,19 @@ class BedtimeStoryGenerator {
                 `<p class="story-paragraph">${paragraph}</p>`
             ).join('');
             textElement.innerHTML = formattedContent;
+            console.log('✅ Story text set, length:', formattedContent.length);
         }
         
         // Show story output and hide builder
         if (builderElement) {
             builderElement.style.display = 'none';
+            console.log('✅ Builder hidden');
         }
         
         if (outputElement) {
             outputElement.style.display = 'block';
+            console.log('✅ Story output shown');
+            
             // Initialize voice controls now that they're visible
             setTimeout(() => {
                 this.loadVoices();
@@ -864,6 +889,7 @@ class BedtimeStoryGenerator {
             
             // Scroll to story
             outputElement.scrollIntoView({ behavior: 'smooth' });
+            console.log('✅ Scrolled to story');
         }
         
         console.log('Story display completed successfully');
@@ -901,24 +927,84 @@ class BedtimeStoryGenerator {
     }
 
     showLoading() {
+        console.log('🔄 showLoading() called - DISABLED for testing');
+        // Loading disabled - stories will show immediately
+        return;
+        
         const overlay = document.getElementById('loadingOverlay');
         const tips = document.getElementById('loadingTips');
         
-        overlay.style.display = 'flex';
+        if (overlay) {
+            overlay.style.display = 'flex';
+            console.log('✅ Loading overlay shown');
+        }
         
         // Cycle through loading tips
         let tipIndex = 0;
         this.loadingInterval = setInterval(() => {
-            tips.textContent = this.loadingTips[tipIndex];
-            tipIndex = (tipIndex + 1) % this.loadingTips.length;
+            if (tips) {
+                tips.textContent = this.loadingTips[tipIndex];
+                tipIndex = (tipIndex + 1) % this.loadingTips.length;
+            }
         }, 800);
     }
 
     hideLoading() {
-        document.getElementById('loadingOverlay').style.display = 'none';
+        console.log('🔄 hideLoading() called');
+        
+        // Force hide all possible loading elements
+        const loadingSelectors = [
+            '#loadingOverlay',
+            '.loading-universe',
+            '.loading-overlay',
+            '[class*="loading"]'
+        ];
+        
+        let hiddenCount = 0;
+        loadingSelectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                if (element.style.display !== 'none') {
+                    element.style.display = 'none';
+                    element.style.visibility = 'hidden';
+                    element.style.opacity = '0';
+                    hiddenCount++;
+                    console.log(`✅ Hidden loading element: ${selector}`);
+                }
+            });
+        });
+        
+        console.log(`✅ Total loading elements hidden: ${hiddenCount}`);
+        
+        // Clear interval
         if (this.loadingInterval) {
             clearInterval(this.loadingInterval);
+            console.log('✅ Loading interval cleared');
         }
+        
+        // Force show story elements
+        const storyOutput = document.getElementById('storyOutput');
+        const storyBuilder = document.getElementById('storyBuilder');
+        
+        if (storyOutput) {
+            storyOutput.style.display = 'block';
+            storyOutput.style.visibility = 'visible';
+            storyOutput.style.opacity = '1';
+            console.log('✅ Story output forced visible');
+        }
+        
+        if (storyBuilder) {
+            storyBuilder.style.display = 'none';
+            console.log('✅ Story builder hidden');
+        }
+        
+        // Scroll to story
+        setTimeout(() => {
+            if (storyOutput) {
+                storyOutput.scrollIntoView({ behavior: 'smooth' });
+                console.log('✅ Scrolled to story');
+            }
+        }, 100);
     }
 
     readStoryAloud() {
@@ -1060,6 +1146,11 @@ class BedtimeStoryGenerator {
     displaySavedStories() {
         const container = document.getElementById('savedStoriesList');
         
+        if (!container) {
+            console.log('Bedtime Stories: savedStoriesList container not found, skipping display');
+            return;
+        }
+        
         if (this.savedStories.length === 0) {
             container.innerHTML = '<p style="text-align: center; color: #666;">No saved stories yet. Create your first story above!</p>';
             return;
@@ -1097,13 +1188,22 @@ class BedtimeStoryGenerator {
 }
 
 // Global functions for HTML buttons
+// Global variables
 let storyGenerator;
 
 function generateStory() {
+    if (!storyGenerator) {
+        console.error('Story generator not initialized');
+        return;
+    }
     storyGenerator.generateStory();
 }
 
 function generateSurpriseStory() {
+    if (!storyGenerator) {
+        console.error('Story generator not initialized');
+        return;
+    }
     storyGenerator.generateSurpriseStory();
 }
 
@@ -1171,6 +1271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     try {
         storyGenerator = new BedtimeStoryGenerator();
+        window.storyGenerator = storyGenerator; // Make it globally accessible
         console.log('Bedtime Stories: Story generator created successfully');
     } catch (error) {
         console.error('Bedtime Stories: Error creating story generator:', error);
@@ -1221,3 +1322,90 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('Bedtime Stories: Initialization complete');
 });
+
+// Global force display function
+function forceDisplayStory() {
+    console.log('🚨 FORCE DISPLAY STORY ACTIVATED');
+    
+    // NUCLEAR OPTION: Remove ALL loading overlays completely
+    const loadingElements = document.querySelectorAll('#loadingOverlay, .loading-universe, .loading-overlay, [class*="loading"], [id*="loading"]');
+    loadingElements.forEach(element => {
+        console.log('🗑️ Removing loading element:', element.className || element.id);
+        element.remove(); // Completely remove from DOM
+    });
+    
+    // Additional CSS injection to override any lingering styles
+    const style = document.createElement('style');
+    style.innerHTML = `
+        #loadingOverlay, .loading-universe, .loading-overlay, [class*="loading"], [id*="loading"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            z-index: -9999 !important;
+        }
+        #storyOutput {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            z-index: 1000 !important;
+            position: relative !important;
+        }
+        #storyBuilder {
+            display: none !important;
+        }
+    `;
+    document.head.appendChild(style);
+    console.log('💉 CSS override injected');
+    
+    // Force show story output
+    const storyOutput = document.getElementById('storyOutput');
+    const storyBuilder = document.getElementById('storyBuilder');
+    
+    if (storyOutput) {
+        storyOutput.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 1000 !important; position: relative !important;';
+        console.log('✅ Story output forced visible with CSS override');
+    }
+    
+    if (storyBuilder) {
+        storyBuilder.style.cssText = 'display: none !important;';
+        console.log('✅ Story builder hidden with CSS override');
+    }
+    
+    // If no story exists, create an emergency story
+    if (!storyOutput || !storyOutput.innerHTML.trim()) {
+        console.log('🚨 No story found, creating emergency story');
+        const emergencyStory = `
+            <div class="story-content" style="padding: 20px; background: white; margin: 20px; border-radius: 10px;">
+                <h2 class="story-title">🌟 Emergency Test Story</h2>
+                <div class="story-text">
+                    <p>Once upon a time, in a magical kingdom far away, there lived a brave little character who loved adventures.</p>
+                    <p>They discovered that sometimes the most magical things happen when we least expect them.</p>
+                    <p>And they all lived happily ever after! ✨</p>
+                </div>
+                <div class="story-actions">
+                    <button class="btn-primary" onclick="location.reload()">🔄 Try Again</button>
+                </div>
+            </div>
+        `;
+        
+        if (storyOutput) {
+            storyOutput.innerHTML = emergencyStory;
+        }
+    }
+    
+    // Force scroll to story with multiple attempts
+    setTimeout(() => {
+        if (storyOutput) {
+            storyOutput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.scrollTo({ top: storyOutput.offsetTop - 50, behavior: 'smooth' });
+        }
+    }, 100);
+    
+    setTimeout(() => {
+        if (storyOutput) {
+            storyOutput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 500);
+    
+    console.log('🚨 Nuclear force display completed - all loading overlays removed');
+}
