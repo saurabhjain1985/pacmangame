@@ -8,6 +8,13 @@ let puzzleInterval = null;
 let isDragging = false;
 let dragElement = null;
 
+// Make functions available globally
+window.selectedImage = null;
+window.createPuzzle = createPuzzle;
+window.shufflePuzzle = shufflePuzzle;
+window.showHint = showHint;
+window.resetPuzzleBuilder = resetPuzzleBuilder;
+
 function initPuzzleBuilder() {
     console.log('Initializing Puzzle Builder...');
     setupImageSelection();
@@ -20,6 +27,14 @@ function initPuzzleBuilder() {
             loadCustomImage(this);
         });
     }
+    
+    // Enable create puzzle button when image is selected
+    window.addEventListener('imageSelected', () => {
+        const createBtn = document.querySelector('.create-puzzle-btn');
+        if (createBtn) {
+            createBtn.disabled = false;
+        }
+    });
 }
 
 function setupImageSelection() {
@@ -47,7 +62,18 @@ function selectPresetImage(imgElement) {
     // Select new image
     imgElement.classList.add('selected');
     selectedImage = imgElement.src;
+    window.selectedImage = selectedImage;
     console.log('Selected image set to:', selectedImage);
+    
+    // Enable create button
+    const createBtn = document.querySelector('.create-puzzle-btn');
+    if (createBtn) {
+        createBtn.disabled = false;
+    }
+    
+    // Dispatch custom event
+    window.dispatchEvent(new CustomEvent('imageSelected'));
+}
     
     // Enable create button
     const createBtn = document.querySelector('.create-puzzle-btn');

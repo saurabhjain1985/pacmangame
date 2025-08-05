@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puzzle Games - Brain Training Collection</title>
-    <link rel="stylesheet" href="puzzle.css">
-</head>
+    <link rel="stylesheet" href="puzzle.css">`n    <link rel="stylesheet" href="main-menu.css">
+    <script src="universal-back-button.js"></script>`n</head>
 <body>
     <div id="game-container">
         <div id="back-button" onclick="goBack()">← Back to Games</div>
@@ -316,28 +316,58 @@
         }
     </style>
     <script src="game-audio.js"></script>
-    <script src="puzzle-builder.js"></script>
     <script src="puzzle.js"></script>
-    <script src="feedback-widget.js"></script>
-    
-    <!-- Pizza Payment Widget -->
-    <link rel="stylesheet" href="pizza-payment.css">
-    <script src="pizza-payment.js"></script>
+    <script src="puzzle-builder-clean.js"></script>
     
     <script>
-        // Initialize widgets
+        // Initialize puzzle games when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof initializeFeedbackWidget === 'function') {
-                initializeFeedbackWidget();
+            console.log('Puzzle page loaded, initializing...');
+            
+            // Initialize the main puzzle manager
+            if (typeof PuzzleGameManager !== 'undefined') {
+                window.puzzleManager = new PuzzleGameManager();
+                console.log('Puzzle manager initialized');
+            }
+            
+            // Initialize clean puzzle builder
+            if (typeof initPuzzleBuilder === 'function') {
+                initPuzzleBuilder();
+                console.log('Clean puzzle builder initialized');
+            } else {
+                console.error('Puzzle builder function not found');
             }
         });
+        
+        // Fix back button navigation - go back to puzzle selection screen
+        function goBack() {
+            // Check if we're in a specific puzzle game
+            const activeScreen = document.querySelector('.screen.active');
+            const selectionScreen = document.getElementById('selection-screen');
+            
+            if (activeScreen && activeScreen !== selectionScreen) {
+                // We're in a specific game, go back to puzzle selection
+                activeScreen.classList.remove('active');
+                selectionScreen.classList.add('active');
+                
+                // Reset game title
+                document.getElementById('game-title').textContent = '🎲 Puzzle Games';
+                
+                // Reset stats
+                document.getElementById('score').textContent = '0';
+                document.getElementById('time').textContent = '00:00';
+                document.getElementById('moves').textContent = '0';
+                
+                console.log('Returned to puzzle selection screen');
+            } else {
+                // We're already on selection screen, go back to main games
+                window.location.href = 'index.html#puzzle';
+            }
+        }
     </script>
     
-    <!-- Fixed Puzzle Builder Script -->
-    <script src="puzzle-builder-fixed.js"></script>
-    
     <!-- Feedback Widget -->
-    <link rel="stylesheet" href="feedback-widget.css">
-    <script src="feedback-widget-new.js"></script>
+    <!-- Feedback widget CSS removed -->
+    <!-- Feedback widget script removed -->
 </body>
 </html>

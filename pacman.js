@@ -1,4 +1,6 @@
 // Pac-Man Collection - Multiple Game Modes
+console.log('Pac-Man: JavaScript file loaded successfully');
+
 // Game constants
 const CELL_SIZE = 20;
 const MAZE_WIDTH = 28;
@@ -35,13 +37,13 @@ const getSpeedForLevel = (level) => {
 // Dynamic speed based on level
 let speeds = getSpeedForLevel(currentLevel);
 
-// Game elements
-const canvas = document.getElementById('game-canvas');
-const ctx = canvas ? canvas.getContext('2d') : null;
-const scoreElement = document.getElementById('score');
-const livesElement = document.getElementById('lives');
-const levelElement = document.getElementById('level');
-const messageElement = document.getElementById('message');
+// Game elements - will be initialized when DOM is ready
+let canvas = null;
+let ctx = null;
+let scoreElement = null;
+let livesElement = null;
+let levelElement = null;
+let messageElement = null;
 
 // Game state
 let score = 0;
@@ -150,28 +152,72 @@ const ghosts = [
 
 // Screen Management Functions
 function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-    document.getElementById(screenId).classList.add('active');
+    try {
+        console.log(`Pac-Man: Showing screen: ${screenId}`);
+        
+        const screens = document.querySelectorAll('.screen');
+        if (screens.length === 0) {
+            console.error('Pac-Man: No screens found with .screen class');
+            return false;
+        }
+        
+        screens.forEach(screen => {
+            screen.classList.remove('active');
+        });
+        
+        const targetScreen = document.getElementById(screenId);
+        if (!targetScreen) {
+            console.error(`Pac-Man: Screen element '${screenId}' not found`);
+            return false;
+        }
+        
+        targetScreen.classList.add('active');
+        console.log(`Pac-Man: Successfully switched to screen: ${screenId}`);
+        return true;
+    } catch (error) {
+        console.error('Pac-Man: Error in showScreen:', error);
+        return false;
+    }
 }
 
 function showModeSelection() {
-    showScreen('mode-selection');
-    resetGame();
+    console.log('Pac-Man: Showing mode selection...');
+    if (showScreen('mode-selection')) {
+        resetGame();
+        console.log('Pac-Man: Mode selection screen shown successfully');
+    } else {
+        console.error('Pac-Man: Failed to show mode selection screen');
+        // Fallback: try to show game directly
+        console.log('Pac-Man: Attempting fallback to direct game start');
+        try {
+            showScreen('game-screen');
+            startGame();
+        } catch (fallbackError) {
+            console.error('Pac-Man: Fallback also failed:', fallbackError);
+        }
+    }
 }
 
 function selectMode(mode) {
-    currentGameMode = mode;
-    
-    if (mode === 'avatar-mode') {
-        showScreen('avatar-selection');
-    } else {
-        selectedAvatar = 'classic';
-        startGame();
+    try {
+        console.log('Pac-Man: selectMode called with:', mode);
+        currentGameMode = mode;
+        
+        if (mode === 'avatar-mode') {
+            console.log('Pac-Man: Switching to avatar selection');
+            showScreen('avatar-selection');
+        } else {
+            console.log('Pac-Man: Starting game with mode:', mode);
+            selectedAvatar = 'classic';
+            startGame();
+        }
+        
+        updateGameTitle();
+        console.log('Pac-Man: selectMode completed successfully');
+    } catch (error) {
+        console.error('Pac-Man: Error in selectMode:', error);
+        console.error('Pac-Man: Error stack:', error.stack);
     }
-    
-    updateGameTitle();
 }
 
 function selectAvatar(avatar) {
@@ -188,15 +234,162 @@ function startGameWithAvatar() {
     startGame();
 }
 
-function startGame() {
-    showScreen('game-screen');
-    resetGame();
-    initializeGame();
-    updateGameTitle();
-    updateControls();
+// Debug function for testing
+function debugTest() {
+    console.log('Pac-Man: Debug test called');
     
-    if (canvas && ctx) {
+    // Show game screen
+    showScreen('game-screen');
+    
+    // Wait a moment for screen transition
+    setTimeout(() => {
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        
+        console.log('Debug: Canvas element:', canvas);
+        console.log('Debug: Canvas context:', ctx);
+        
+        if (canvas && ctx) {
+            console.log('Debug: Canvas dimensions:', canvas.width, 'x', canvas.height);
+            
+            // Clear and draw test pattern
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw colorful test pattern
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(0, 0, 140, 105);
+            
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(140, 0, 140, 105);
+            
+            ctx.fillStyle = '#0000ff';
+            ctx.fillRect(280, 0, 140, 105);
+            
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(420, 0, 140, 105);
+            
+            ctx.fillStyle = '#ff00ff';
+            ctx.fillRect(0, 105, 140, 105);
+            
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(140, 105, 140, 105);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(280, 105, 140, 105);
+            
+            ctx.fillStyle = '#888888';
+            ctx.fillRect(420, 105, 140, 105);
+            
+            // Draw text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText('CANVAS TEST', 180, 250);
+            
+            ctx.fillStyle = 'black';
+            ctx.font = '16px Arial';
+            ctx.fillText('If you see this, canvas is working!', 140, 280);
+            
+            console.log('Debug: Test pattern drawn successfully');
+        } else {
+            console.error('Debug: Canvas or context not available');
+        }
+    }, 500);
+}
+
+// Test function to verify canvas is working
+function testCanvas() {
+    console.log('Pac-Man: Testing canvas...');
+    
+    if (!canvas || !ctx) {
+        console.error('Pac-Man: Canvas or context not available for test');
+        return;
+    }
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw a simple test pattern
+    ctx.fillStyle = 'red';
+    ctx.fillRect(10, 10, 100, 100);
+    
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(120, 10, 100, 100);
+    
+    ctx.fillStyle = 'green';
+    ctx.fillRect(230, 10, 100, 100);
+    
+    // Draw some text
+    ctx.fillStyle = 'white';
+    ctx.font = '20px Arial';
+    ctx.fillText('Canvas Test', 10, 150);
+    
+    console.log('Pac-Man: Test pattern drawn');
+}
+
+function startGame() {
+    try {
+        console.log('Pac-Man: Starting game...');
+        
+        // Initialize DOM elements if not already done
+        if (!canvas) {
+            canvas = document.getElementById('game-canvas');
+            ctx = canvas ? canvas.getContext('2d') : null;
+            scoreElement = document.getElementById('score');
+            livesElement = document.getElementById('lives');
+            levelElement = document.getElementById('level');
+            messageElement = document.getElementById('message');
+            
+            console.log('Pac-Man: DOM elements initialized', {
+                canvas: !!canvas,
+                ctx: !!ctx,
+                scoreElement: !!scoreElement,
+                livesElement: !!livesElement,
+                levelElement: !!levelElement,
+                messageElement: !!messageElement
+            });
+        }
+        
+        if (!canvas || !ctx) {
+            console.error('Pac-Man: Canvas or context not available!');
+            return;
+        }
+        
+        // Log canvas properties
+        console.log('Pac-Man: Canvas properties', {
+            width: canvas.width,
+            height: canvas.height,
+            clientWidth: canvas.clientWidth,
+            clientHeight: canvas.clientHeight
+        });
+        
+        console.log('Pac-Man: Calling showScreen...');
+        showScreen('game-screen');
+        
+        console.log('Pac-Man: Calling resetGame...');
+        resetGame();
+        
+        console.log('Pac-Man: Calling initializeGame...');
+        initializeGame();
+        
+        console.log('Pac-Man: Calling updateGameTitle...');
+        updateGameTitle();
+        
+        console.log('Pac-Man: Calling updateControls...');
+        updateControls();
+        
+        console.log('Pac-Man: Starting game loop...');
+        
+        // Draw initial game state immediately
+        draw();
+        
+        // Start the game loop
+        console.log('Pac-Man: About to call gameLoop()');
         gameLoop();
+        
+        console.log('Pac-Man: startGame completed successfully');
+    } catch (error) {
+        console.error('Pac-Man: Error in startGame:', error);
+        console.error('Pac-Man: Error stack:', error.stack);
     }
 }
 
@@ -240,8 +433,14 @@ function updateControls() {
 
 // Game Initialization
 function initializeGame() {
+    console.log('Pac-Man: Initializing game...');
+    
     // Reset maze to original state
     maze = JSON.parse(JSON.stringify(originalMaze));
+    
+    // Initialize dots and power pellets
+    initializeDots();
+    console.log('Pac-Man: Dots initialized:', dots.length, 'dots,', powerPellets.length, 'power pellets');
     
     // Reset positions
     pacman.x = 13;
@@ -265,15 +464,11 @@ function initializeGame() {
     shiftTimer = 0;
     lastShiftTime = Date.now();
     
-    // Count total dots
-    let totalDots = 0;
-    for (let row of maze) {
-        for (let cell of row) {
-            if (cell === 0 || cell === 5) totalDots++;
-        }
+    if (messageElement) {
+        messageElement.textContent = '';
     }
     
-    messageElement.textContent = '';
+    console.log('Pac-Man: Game initialized successfully');
 }
 
 // Maze Shifting Logic (for shifting-maze mode)
@@ -1045,249 +1240,121 @@ function checkCollision() {
 
 // Drawing functions
 function drawMaze() {
-    // Create gradient for walls
-    const wallGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    wallGradient.addColorStop(0, '#667eea');
-    wallGradient.addColorStop(1, '#764ba2');
+    console.log('Pac-Man: drawMaze called');
+    console.log('- Maze dimensions:', MAZE_HEIGHT, 'x', MAZE_WIDTH);
+    console.log('- Cell size:', CELL_SIZE);
+    console.log('- Maze exists:', !!maze);
     
-    ctx.fillStyle = wallGradient;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    if (!maze) {
+        console.error('Pac-Man: No maze data!');
+        return;
+    }
+    
+    // Use simple colors for debugging
+    ctx.fillStyle = '#4444ff'; // Blue walls
+    ctx.strokeStyle = '#ffffff'; // White borders
     ctx.lineWidth = 1;
     
+    let wallCount = 0;
     for (let y = 0; y < MAZE_HEIGHT; y++) {
         for (let x = 0; x < MAZE_WIDTH; x++) {
-            if (maze[y][x] === 1) {
-                // Draw rounded rectangle for walls
-                const cornerRadius = 3;
-                ctx.beginPath();
-                ctx.roundRect(x * CELL_SIZE + 1, y * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2, cornerRadius);
-                ctx.fill();
-                ctx.stroke();
+            if (maze[y] && maze[y][x] === 1) {
+                wallCount++;
+                // Draw simple rectangle for walls
+                const rectX = x * CELL_SIZE;
+                const rectY = y * CELL_SIZE;
+                
+                ctx.fillRect(rectX, rectY, CELL_SIZE, CELL_SIZE);
+                ctx.strokeRect(rectX, rectY, CELL_SIZE, CELL_SIZE);
             }
         }
     }
+    
+    console.log('Pac-Man: Drew', wallCount, 'wall tiles');
 }
 
 function drawDots() {
-    // Create gradient for regular dots
-    const dotGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 4);
-    dotGradient.addColorStop(0, '#FFD700');
-    dotGradient.addColorStop(1, '#FFA500');
+    console.log('Pac-Man: drawDots called, dots:', dots.length, 'powerPellets:', powerPellets.length);
     
+    // Draw regular dots
+    ctx.fillStyle = '#ffff00'; // Yellow dots
+    let dotsDrawn = 0;
     for (let dot of dots) {
         const centerX = dot.x * CELL_SIZE + CELL_SIZE / 2;
         const centerY = dot.y * CELL_SIZE + CELL_SIZE / 2;
         
-        // Add glow effect
-        ctx.shadowColor = '#FFD700';
-        ctx.shadowBlur = 8;
-        
-        ctx.fillStyle = dotGradient;
         ctx.beginPath();
         ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
         ctx.fill();
+        dotsDrawn++;
     }
     
-    // Draw power pellets with authentic Pacman blinking
+    // Draw power pellets
+    ctx.fillStyle = '#ffff00'; // Yellow power pellets
+    let pelletsDrawn = 0;
     for (let pellet of powerPellets) {
-        // Authentic blinking effect - blink every 15 frames like original Pacman
-        if (Math.floor(animationFrame / 15) % 2 === 0) {
-            const centerX = pellet.x * CELL_SIZE + CELL_SIZE / 2;
-            const centerY = pellet.y * CELL_SIZE + CELL_SIZE / 2;
-            
-            // Create authentic power pellet gradient
-            const powerGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 8);
-            powerGradient.addColorStop(0, '#FFFFFF');
-            powerGradient.addColorStop(0.5, '#FFD700');
-            powerGradient.addColorStop(1, '#FFA500');
-            
-            // Add glow effect like original game
-            ctx.shadowColor = '#FFFF00';
-            ctx.shadowBlur = 10;
-            
-            ctx.fillStyle = powerGradient;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 7, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Reset shadow
-            ctx.shadowBlur = 0;
-        }
+        const centerX = pellet.x * CELL_SIZE + CELL_SIZE / 2;
+        const centerY = pellet.y * CELL_SIZE + CELL_SIZE / 2;
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 7, 0, Math.PI * 2);
+        ctx.fill();
+        pelletsDrawn++;
     }
     
-    // Reset shadow
-    ctx.shadowBlur = 0;
+    console.log('Pac-Man: Drew', dotsDrawn, 'dots and', pelletsDrawn, 'power pellets');
 }
 
 function drawPacman() {
+    console.log('Pac-Man: drawPacman called, position:', pacman.x, pacman.y);
+    
     const centerX = pacman.x * CELL_SIZE + CELL_SIZE / 2;
     const centerY = pacman.y * CELL_SIZE + CELL_SIZE / 2;
     const radius = CELL_SIZE / 2 - 2;
     
-    // Check if using avatar mode or selected avatar
-    const currentAvatar = avatars[selectedAvatar];
+    // Draw simple yellow circle for Pac-Man
+    ctx.fillStyle = '#ffff00'; // Yellow
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.fill();
     
-    if (selectedAvatar === 'classic') {
-        // Original Pac-Man drawing
-        const pacmanGradient = ctx.createRadialGradient(centerX - 3, centerY - 3, 0, centerX, centerY, radius);
-        pacmanGradient.addColorStop(0, '#FFE135');
-        pacmanGradient.addColorStop(1, '#F39C12');
-        
-        // Add glow effect
-        ctx.shadowColor = '#FFE135';
-        ctx.shadowBlur = 15;
-        
-        ctx.fillStyle = pacmanGradient;
-        ctx.beginPath();
-        
-        if (pacman.mouthOpen) {
-            // Draw Pac-Man with mouth open
-            const mouthAngle = Math.PI / 3;
-            const startAngle = (pacman.direction * Math.PI / 2) - mouthAngle / 2;
-            const endAngle = (pacman.direction * Math.PI / 2) + mouthAngle / 2;
-            
-            ctx.arc(centerX, centerY, radius, endAngle, startAngle);
-            ctx.lineTo(centerX, centerY);
-        } else {
-            // Draw full circle
-            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        }
-        
-        ctx.fill();
-        ctx.shadowBlur = 0;
-    } else {
-        // Draw avatar-based character
-        const avatarGradient = ctx.createRadialGradient(centerX - 3, centerY - 3, 0, centerX, centerY, radius);
-        avatarGradient.addColorStop(0, currentAvatar.color);
-        avatarGradient.addColorStop(1, currentAvatar.color + '80');
-        
-        // Add glow effect with avatar color
-        ctx.shadowColor = currentAvatar.color;
-        ctx.shadowBlur = 12;
-        
-        ctx.fillStyle = avatarGradient;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        
-        // Draw emoji/character on top
-        ctx.font = `${CELL_SIZE - 4}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 1;
-        ctx.strokeText(currentAvatar.emoji, centerX, centerY);
-        ctx.fillText(currentAvatar.emoji, centerX, centerY);
-    }
+    // Draw a simple mouth (optional for debugging)
+    ctx.fillStyle = '#000000'; // Black mouth
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, 0, Math.PI / 4);
+    ctx.closePath();
+    ctx.fill();
     
-    // Animate mouth for classic mode
-    if (selectedAvatar === 'classic') {
-        pacman.mouthOpen = !pacman.mouthOpen;
-    }
+    console.log('Pac-Man: Drew Pacman at', centerX, centerY);
 }
 
 function drawGhosts() {
+    console.log('Pac-Man: drawGhosts called, ghosts:', ghosts.length);
+    
     ghosts.forEach((ghost, index) => {
         const centerX = ghost.x * CELL_SIZE + CELL_SIZE / 2;
         const centerY = ghost.y * CELL_SIZE + CELL_SIZE / 2;
         const radius = CELL_SIZE / 2 - 2;
         
-        // Authentic Pacman ghost colors
-        const ghostColors = [
-            { primary: '#FF0000', secondary: '#CC0000', name: 'Blinky' },  // Red
-            { primary: '#FFB8FF', secondary: '#FF69B4', name: 'Pinky' },  // Pink
-            { primary: '#00FFFF', secondary: '#00CCCC', name: 'Inky' },   // Cyan
-            { primary: '#FFB852', secondary: '#FF8C00', name: 'Sue' }     // Orange
-        ];
+        // Simple colored circles for ghosts  
+        const colors = ['#ff0000', '#ffb8ff', '#00ffff', '#ffb852']; // Red, Pink, Cyan, Orange
+        ctx.fillStyle = colors[index] || '#ff0000';
         
-        const ghostColor = ghostColors[index] || ghostColors[0];
-        
-        // Create gradient for ghost based on its color and vulnerability
-        const ghostGradient = ctx.createRadialGradient(centerX - 3, centerY - 5, 0, centerX, centerY, radius);
-        
-        if (ghost.vulnerable && powerMode) {
-            // Vulnerable ghost - blue color with authentic blinking when power mode ending
-            if (ghost.blinking) {
-                // Blink between blue and white/normal color
-                const blinkPhase = Math.floor(animationFrame / 8) % 2;
-                if (blinkPhase === 0) {
-                    // Blue vulnerable state
-                    ghostGradient.addColorStop(0, '#4169E1');
-                    ghostGradient.addColorStop(1, '#0000FF');
-                    ctx.shadowColor = '#0000FF';
-                } else {
-                    // White blinking state (authentic Pacman behavior)
-                    ghostGradient.addColorStop(0, '#FFFFFF');
-                    ghostGradient.addColorStop(1, '#E0E0E0');
-                    ctx.shadowColor = '#FFFFFF';
-                }
-            } else {
-                // Solid blue vulnerable state
-                ghostGradient.addColorStop(0, '#4169E1');
-                ghostGradient.addColorStop(1, '#0000FF');
-                ctx.shadowColor = '#0000FF';
-            }
-        } else {
-            // Authentic ghost colors with enhanced gradients
-            ghostGradient.addColorStop(0, ghostColor.primary);
-            ghostGradient.addColorStop(1, ghostColor.secondary);
-            ctx.shadowColor = ghostColor.primary;
-        }
-        
-        // Add glow effect
-        ctx.shadowBlur = 10;
-        
-        // Draw ghost body
-        ctx.fillStyle = ghostGradient;
         ctx.beginPath();
-        ctx.arc(centerX, centerY - radius / 2, radius, Math.PI, 0);
-        ctx.lineTo(centerX + radius, centerY + radius);
-        ctx.lineTo(centerX + radius * 0.5, centerY + radius * 0.7);
-        ctx.lineTo(centerX, centerY + radius);
-        ctx.lineTo(centerX - radius * 0.5, centerY + radius * 0.7);
-        ctx.lineTo(centerX - radius, centerY + radius);
-        ctx.closePath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         ctx.fill();
-        
-        // Reset shadow
-        ctx.shadowBlur = 0;
-        
-        // Draw eyes with modern style
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(centerX - radius * 0.3, centerY - radius * 0.3, radius * 0.25, 0, Math.PI * 2);
-        ctx.arc(centerX + radius * 0.3, centerY - radius * 0.3, radius * 0.25, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Eye pupils - different for vulnerable ghosts
-        if (ghost.vulnerable && powerMode) {
-            // Scared eyes - looking down
-            ctx.fillStyle = '#FF0000';
-            ctx.beginPath();
-            ctx.arc(centerX - radius * 0.3, centerY - radius * 0.2, radius * 0.12, 0, Math.PI * 2);
-            ctx.arc(centerX + radius * 0.3, centerY - radius * 0.2, radius * 0.12, 0, Math.PI * 2);
-            ctx.fill();
-        } else {
-            // Normal pupils
-            ctx.fillStyle = '#2C3E50';
-            ctx.beginPath();
-            ctx.arc(centerX - radius * 0.3, centerY - radius * 0.3, radius * 0.12, 0, Math.PI * 2);
-            ctx.arc(centerX + radius * 0.3, centerY - radius * 0.3, radius * 0.12, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Eye highlights
-            ctx.fillStyle = '#FFFFFF';
-            ctx.beginPath();
-            ctx.arc(centerX - radius * 0.25, centerY - radius * 0.35, radius * 0.06, 0, Math.PI * 2);
-            ctx.arc(centerX + radius * 0.35, centerY - radius * 0.35, radius * 0.06, 0, Math.PI * 2);
-            ctx.fill();
-        }
     });
+    
+    console.log('Pac-Man: Drew', ghosts.length, 'ghosts');
 }
 
 function draw() {
+    if (!ctx || !canvas) {
+        console.error('Pac-Man: No context or canvas in draw()');
+        return;
+    }
+    
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -1299,6 +1366,8 @@ function draw() {
 }
 
 function gameLoop() {
+    console.log('Pac-Man: gameLoop called, gameRunning:', gameRunning);
+    
     if (gameRunning) {
         // Dynamic speed based on power mode and level
         const pacmanSpeed = powerMode ? speeds.pacmanPower : speeds.pacman;
@@ -1325,6 +1394,7 @@ function gameLoop() {
         checkCollision();
     }
     
+    console.log('Pac-Man: About to call draw()');
     draw();
     animationFrame++;
     requestAnimationFrame(gameLoop);
@@ -1440,6 +1510,27 @@ function showFloatingPoints(x, y, points) {
 
 // Start the game when page loads
 window.addEventListener('load', () => {
+    console.log('Pac-Man: Page loaded, initializing...');
+    
+    // Check if essential elements exist
+    const canvas = document.getElementById('game-canvas');
+    const scoreElement = document.getElementById('score');
+    const livesElement = document.getElementById('lives');
+    const levelElement = document.getElementById('level');
+    const messageElement = document.getElementById('message');
+    
+    if (!canvas) {
+        console.error('Pac-Man: game-canvas element not found!');
+        return;
+    }
+    
+    if (!scoreElement || !livesElement || !levelElement || !messageElement) {
+        console.error('Pac-Man: Essential UI elements missing!');
+        return;
+    }
+    
+    console.log('Pac-Man: All elements found, showing mode selection...');
+    
     // Show mode selection screen initially
     showModeSelection();
 });

@@ -109,6 +109,9 @@ class GameMenu {
                 case 'math-tables':
                     window.location.href = 'math-tables-simple.html';
                     break;
+                case 'multiplication-master':
+                    window.location.href = 'multiplication-master.html';
+                    break;
                 case 'bedtime-stories':
                     window.location.href = 'bedtime-stories.html';
                     break;

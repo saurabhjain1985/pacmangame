@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Check</title>
+    <script src="universal-back-button.js"></script>`n</head>
+<body>
+    <h1>Game Debug Check</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Test Pac-Man elements
+        console.log('=== PAC-MAN DEBUG ===');
+        const pacmanElements = [
+            'game-canvas', 'score', 'lives', 'level', 'message',
+            'mode-selection', 'avatar-selection', 'game-screen'
+        ];
+        
+        // Test Bedtime Stories elements  
+        console.log('=== BEDTIME STORIES DEBUG ===');
+        const storyElements = [
+            'characters', 'theme', 'storyLength', 'mood', 'setting',
+            'storyTitle', 'readingTime', 'storyTheme', 'storyText',
+            'voiceSelect', 'voiceSpeed', 'voicePitch', 'speedValue', 'pitchValue'
+        ];
+        
+        let results = '<h2>Pac-Man Elements Check:</h2>';
+        
+        // Check if we're on pacman page
+        if (window.location.href.includes('pacman')) {
+            pacmanElements.forEach(id => {
+                const element = document.getElementById(id);
+                results += `<p>${id}: ${element ? '✅ Found' : '❌ Missing'}</p>`;
+            });
+        }
+        
+        // Check if we're on bedtime stories page
+        if (window.location.href.includes('bedtime')) {
+            results += '<h2>Bedtime Stories Elements Check:</h2>';
+            storyElements.forEach(id => {
+                const element = document.getElementById(id);
+                results += `<p>${id}: ${element ? '✅ Found' : '❌ Missing'}</p>`;
+            });
+        }
+        
+        document.getElementById('results').innerHTML = results;
+    </script>
+</body>
+</html>

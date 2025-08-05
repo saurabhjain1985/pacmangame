@@ -6,9 +6,15 @@ body {
     color: #ffffff;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
-    overflow-x: auto;
+    overflow-x: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #back-button {
@@ -83,9 +89,11 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.mode-card:hover {
+.mode-card:hover, .mode-card:active {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.2);
@@ -152,9 +160,11 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.avatar-card:hover {
+.avatar-card:hover, .avatar-card:active {
     background: rgba(255, 255, 255, 0.2);
     transform: scale(1.05);
 }
@@ -162,6 +172,7 @@ body {
 .avatar-card.active {
     border-color: #FFD700;
     background: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
 
 .avatar-icon {
@@ -199,9 +210,15 @@ body {
     transition: all 0.3s ease;
     font-size: 1rem;
     font-weight: 500;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px; /* iOS accessibility guideline */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.btn-back:hover {
+.btn-back:hover, .btn-back:active {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
 }
@@ -211,7 +228,7 @@ body {
     border: none;
 }
 
-.btn-start:hover {
+.btn-start:hover, .btn-start:active {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
@@ -378,6 +395,7 @@ body {
 @media (max-width: 768px) {
     body {
         padding: 5px;
+        overflow-x: hidden;
     }
     
     #game-container {
@@ -385,77 +403,300 @@ body {
         margin: 0;
         border-radius: 15px;
         max-width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
     
+    #back-button {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        padding: 8px 15px;
+        font-size: 12px;
+        z-index: 1001;
+    }
+    
+    /* Mode Selection Mobile Styles */
+    #main-title {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        margin-top: 50px; /* Account for back button */
+    }
+    
+    #mode-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0 10px;
+    }
+    
+    .mode-card {
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .mode-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .mode-card p {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .mode-icon {
+        font-size: 3rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .mode-features {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    
+    .mode-features span {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+    
+    #mode-instructions {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+    
+    /* Avatar Selection Mobile Styles */
+    #avatar-title {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        margin-top: 50px; /* Account for back button */
+    }
+    
+    #avatar-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0 10px;
+    }
+    
+    .avatar-card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+    
+    .avatar-card h4 {
+        font-size: 1rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .avatar-card p {
+        font-size: 0.75rem;
+    }
+    
+    .avatar-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .avatar-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0 10px;
+    }
+    
+    .btn-back, .btn-start {
+        flex: 1;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        border-radius: 12px;
+    }
+    
+    /* Game Screen Mobile Styles */
     #game-title {
-        font-size: 24px;
+        font-size: 20px;
         margin-bottom: 15px;
+        margin-top: 50px; /* Account for back button */
     }
     
     #hud {
-        font-size: 16px;
+        font-size: 14px;
         margin-bottom: 15px;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    #hud span {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 12px;
     }
     
     #game-canvas {
         max-width: 100%;
         height: auto;
+        margin: 0 auto;
+        display: block;
     }
     
     #mobile-controls {
         display: flex;
+        justify-content: center;
+        margin-top: 20px;
     }
     
     .control-pad {
-        grid-template-columns: 70px 70px 70px;
-        grid-template-rows: 70px 70px 70px;
-        gap: 6px;
+        grid-template-columns: 60px 60px 60px;
+        grid-template-rows: 60px 60px 60px;
+        gap: 8px;
         padding: 15px;
     }
     
     .control-btn {
-        font-size: 24px;
-        border-radius: 15px;
+        font-size: 20px;
+        border-radius: 12px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
     }
     
     #controls {
         margin-top: 15px;
+        padding: 10px;
+        font-size: 12px;
     }
     
     #controls p {
-        font-size: 12px;
-        margin: 5px 0;
+        font-size: 11px;
+        margin: 3px 0;
     }
     
     #share-info {
         font-size: 10px;
+    }
+    
+    #message {
+        font-size: 18px;
+        margin-top: 15px;
+        padding: 10px;
     }
 }
 
 /* Extra small phones */
 @media (max-width: 480px) {
     #game-container {
-        padding: 10px;
+        padding: 8px;
+        border-radius: 10px;
     }
     
+    #back-button {
+        padding: 6px 12px;
+        font-size: 11px;
+        top: 8px;
+        left: 8px;
+    }
+    
+    /* Mode Selection Extra Small */
+    #main-title {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        margin-top: 45px;
+    }
+    
+    .mode-card {
+        padding: 1rem;
+    }
+    
+    .mode-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .mode-card p {
+        font-size: 0.8rem;
+    }
+    
+    .mode-icon {
+        font-size: 2.5rem;
+    }
+    
+    .mode-features span {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+    }
+    
+    /* Avatar Selection Extra Small */
+    #avatar-title {
+        font-size: 1.5rem;
+        margin-top: 45px;
+    }
+    
+    #avatar-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    
+    .avatar-card {
+        padding: 0.8rem;
+    }
+    
+    .avatar-card h4 {
+        font-size: 0.9rem;
+    }
+    
+    .avatar-card p {
+        font-size: 0.7rem;
+    }
+    
+    .avatar-icon {
+        font-size: 2rem;
+    }
+    
+    .btn-back, .btn-start {
+        padding: 10px 15px;
+        font-size: 0.8rem;
+    }
+    
+    /* Game Screen Extra Small */
     #game-title {
-        font-size: 20px;
+        font-size: 18px;
+        margin-top: 45px;
     }
     
     #hud {
-        font-size: 14px;
+        font-size: 12px;
+        gap: 5px;
+    }
+    
+    #hud span {
+        padding: 4px 8px;
+        font-size: 11px;
     }
     
     .control-pad {
-        grid-template-columns: 60px 60px 60px;
-        grid-template-rows: 60px 60px 60px;
-        gap: 4px;
+        grid-template-columns: 55px 55px 55px;
+        grid-template-rows: 55px 55px 55px;
+        gap: 6px;
         padding: 12px;
     }
     
     .control-btn {
-        font-size: 20px;
-        border-radius: 12px;
+        font-size: 18px;
+        border-radius: 10px;
+    }
+    
+    #controls {
+        padding: 8px;
+        font-size: 11px;
+    }
+    
+    #message {
+        font-size: 16px;
+        margin-top: 10px;
+        padding: 8px;
     }
 }
 

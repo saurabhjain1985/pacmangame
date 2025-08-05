@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neevara Games Collection - Choose Your Adventure</title>
+    <title>Seed to Skill Games Collection - Choose Your Adventure</title>
     <meta name="description" content="A collection of modern iOS-style games including Pac-Man and Memory games">
     <meta name="keywords" content="games, html5, javascript, ios, apple, pacman, memory, puzzle">
     <link rel="stylesheet" href="main-menu.css?v=2024080301">
@@ -12,13 +12,13 @@
 <body>
     <div id="main-container">
         <header>
-            <h1 id="main-title">🎮 Neevara Games Collection</h1>
+            <h1 id="main-title">🎮 Seed to Skill Games Collection</h1>
             <p id="subtitle">Choose your favorite game to play</p>
         </header>
         
         <div id="games-grid">
-            <!-- Pac-Man Game Card -->
-            <div class="game-card" data-game="pacman">
+            <!-- Pac-Man Game Card - HIDDEN -->
+            <div class="game-card" data-game="pacman" style="display: none;">
                 <div class="game-icon">🟡</div>
                 <h3 class="game-title">Pac-Man iOS</h3>
                 <p class="game-description">Classic arcade action with 3 smart ghosts and power-ups</p>
@@ -96,7 +96,7 @@
             </div>
             
             <!-- Puzzle Games Card -->
-            <div class="game-card" data-game="puzzle">
+            <div class="game-card" data-game="puzzle" id="puzzle">
                 <div class="game-icon">🎲</div>
                 <h3 class="game-title">Puzzle Games</h3>
                 <p class="game-description">Collection of brain-teasing puzzle games</p>
@@ -119,6 +119,19 @@
                     <span class="feature">📊 Instant Results</span>
                 </div>
                 <button class="play-btn" onclick="playGame('math-tables')">Start Practice</button>
+            </div>
+            
+            <!-- Multiplication Master Game Card -->
+            <div class="game-card" data-game="multiplication-master">
+                <div class="game-icon">🧮</div>
+                <h3 class="game-title">Multiplication Master</h3>
+                <p class="game-description">Advanced multiplication training with levels, streaks, and achievements</p>
+                <div class="game-features">
+                    <span class="feature">🎯 Progressive Levels</span>
+                    <span class="feature">🔥 Streak System</span>
+                    <span class="feature">🏆 Achievement Badges</span>
+                </div>
+                <button class="play-btn" onclick="playGame('multiplication-master')">Master Math</button>
             </div>
             
             <!-- Bedtime Stories Card -->
@@ -153,45 +166,83 @@
             <p>Optimized for mobile and desktop</p>
             <div class="footer-actions">
                 <p class="made-with-love">Made with <span class="heart">❤️</span> by Neevara</p>
+                <button id="feedback-btn" class="subtle-feedback-btn">💬 Give Feedback</button>
                 <button id="buy-pizza-btn" class="subtle-pizza-btn">🍕 Buy me a Pizza</button>
             </div>
         </footer>
     </div>
     
-    <!-- Feedback Widget -->
-    <link rel="stylesheet" href="feedback-widget.css">
-    <script src="feedback-widget-simple.js"></script>
-    
-    <!-- Pizza Payment Widget -->
+    <!-- Pizza Payment Widget (footer only) -->
     <link rel="stylesheet" href="pizza-payment.css">
     <script src="pizza-payment.js"></script>
     
     <script>
-        // Initialize widgets
+        // Initialize widgets - Footer only, no floating widgets
+        let pizzaWidget = null; // Make it global so we can debug
+        
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize feedback widget
-            if (typeof initializeFeedbackWidget === 'function') {
-                initializeFeedbackWidget();
-            }
+            console.log('DOM loaded, initializing pizza widget...');
             
-            // Initialize pizza payment widget (but hide the floating one)
-            let pizzaWidget = null;
+            // Initialize pizza payment widget (but hide ALL floating elements)
             if (typeof PizzaPaymentWidget === 'function') {
                 pizzaWidget = new PizzaPaymentWidget();
-                // Hide the floating widget since we have footer button
-                const floatingWidget = document.querySelector('.pizza-payment-widget');
-                if (floatingWidget) {
-                    floatingWidget.style.display = 'none';
-                }
+                console.log('Pizza widget created:', pizzaWidget);
+                
+                // Hide the floating widget since we only want footer button
+                setTimeout(() => {
+                    const floatingWidgets = document.querySelectorAll('.pizza-payment-widget, .feedback-widget, .floating-widget, [class*="floating"]');
+                    console.log('Found floating widgets to hide:', floatingWidgets.length);
+                    floatingWidgets.forEach(widget => {
+                        widget.style.display = 'none';
+                    });
+                }, 100);
+            } else {
+                console.error('PizzaPaymentWidget class not found!');
             }
             
-            // Connect footer pizza button to widget
+            // Connect footer pizza button to widget modal only
             const pizzaBtn = document.getElementById('buy-pizza-btn');
+            console.log('Pizza button found:', pizzaBtn);
+            
             if (pizzaBtn && pizzaWidget) {
-                pizzaBtn.addEventListener('click', function() {
+                pizzaBtn.addEventListener('click', function(e) {
+                    console.log('Footer pizza button clicked');
+                    e.preventDefault();
                     pizzaWidget.openModal();
                 });
             }
+            
+            // Connect feedback button to TypeForm
+            const feedbackBtn = document.getElementById('feedback-btn');
+            if (feedbackBtn) {
+                feedbackBtn.addEventListener('click', function() {
+                    console.log('Feedback button clicked - opening TypeForm');
+                    window.open('https://form.typeform.com/to/pCJMxbd8', '_blank', 'noopener,noreferrer');
+                });
+            }
+            
+            // Handle navigation from puzzle games back to puzzle section
+            function handleAnchorNavigation() {
+                const hash = window.location.hash;
+                if (hash === '#puzzle') {
+                    const puzzleCard = document.getElementById('puzzle');
+                    if (puzzleCard) {
+                        puzzleCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Add highlight effect
+                        puzzleCard.style.transform = 'scale(1.05)';
+                        puzzleCard.style.transition = 'transform 0.3s ease';
+                        setTimeout(() => {
+                            puzzleCard.style.transform = 'scale(1)';
+                        }, 1000);
+                    }
+                }
+            }
+            
+            // Check for anchors on page load
+            handleAnchorNavigation();
+            
+            // Handle hash changes
+            window.addEventListener('hashchange', handleAnchorNavigation);
         });
     </script>
     

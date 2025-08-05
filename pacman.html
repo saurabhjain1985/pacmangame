@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Pac-Man Collection - Multiple Game Modes</title>
     <meta name="description" content="Collection of Pac-Man game variants including classic, ghost control, shifting maze, and avatar modes">
     <meta name="keywords" content="pacman, game, html5, javascript, ios, apple, retro, collection">
-    <link rel="stylesheet" href="pacman.css">
+    <link rel="stylesheet" href="pacman.css">`n    <link rel="stylesheet" href="main-menu.css">
     <script src="game-audio.js"></script>
-</head>
+    <script src="universal-back-button.js"></script>`n</head>
 <body>
     <div id="game-container">
         <div id="back-button" onclick="goBack()">← Back to Games</div>
@@ -16,8 +16,12 @@
         <!-- Game Mode Selection Screen -->
         <div id="mode-selection" class="screen active">
             <h1 id="main-title">🎮 Pac-Man Collection</h1>
+            
+            <!-- Debug button for testing -->
+            <button onclick="debugTest()" style="margin-bottom: 20px; padding: 10px; background: #ff6b6b; color: white; border: none; border-radius: 5px;">Debug Test Canvas</button>
+            
             <div id="mode-grid">
-                <div class="mode-card" onclick="selectMode('classic')">
+                <div class="mode-card" onclick="console.log('Classic clicked!'); selectMode('classic')">
                     <div class="mode-icon">🟡</div>
                     <h3>Classic Pac-Man</h3>
                     <p>The original experience - eat dots, avoid ghosts!</p>
@@ -148,7 +152,7 @@
             </div>
         </div>
     </div>
-    <script src="pacman.js"></script>
+    <script src="pacman-simple.js"></script>
     <script>
         function goBack() {
             window.location.href = 'index.html';
@@ -156,7 +160,7 @@
     </script>
     
     <!-- Feedback Widget -->
-    <link rel="stylesheet" href="feedback-widget.css">
-    <script src="feedback-widget-new.js"></script>
+    <!-- Feedback widget CSS removed -->
+    <!-- Feedback widget script removed -->
 </body>
 </html>

@@ -16,16 +16,29 @@ class PuzzleGameManager {
     init() {
         console.log('Puzzle Games initialized');
         this.setupEventListeners();
+        this.setupActionButtons();
         this.showScreen('selection');
         this.updateStats();
     }
 
     setupEventListeners() {
-        // Back button
+        // Back button - use the same logic as goBack function
         const backBtn = document.getElementById('back-button');
         if (backBtn) {
             backBtn.addEventListener('click', () => {
-                window.location.href = 'index.html';
+                // Check if we're in a specific puzzle game
+                const activeScreen = document.querySelector('.screen.active');
+                const selectionScreen = document.getElementById('selection-screen');
+                
+                if (activeScreen && activeScreen !== selectionScreen) {
+                    // We're in a specific game, go back to puzzle selection
+                    this.showScreen('selection');
+                    this.resetStats();
+                    console.log('Returned to puzzle selection screen');
+                } else {
+                    // We're already on selection screen, go back to main games
+                    window.location.href = 'index.html#puzzle';
+                }
             });
         }
 
@@ -53,14 +66,23 @@ class PuzzleGameManager {
     }
 
     setupActionButtons() {
-        // New Game buttons
+        // New Game buttons and Back buttons
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('new-game-btn')) {
                 this.newGame();
             }
             if (e.target.classList.contains('back-to-menu-btn')) {
+                // Always go back to puzzle selection screen from any puzzle game
                 this.showScreen('selection');
                 this.resetStats();
+                
+                // Reset game title
+                const gameTitle = document.getElementById('game-title');
+                if (gameTitle) {
+                    gameTitle.textContent = '🎲 Puzzle Games';
+                }
+                
+                console.log('Returned to puzzle selection from game screen');
             }
         });
     }

@@ -445,49 +445,75 @@ class BedtimeStoryGenerator {
     }
 
     generateStory() {
-        // Get characters from the text input - need to check if it exists
-        const charactersElement = document.getElementById('characters');
-        const characters = charactersElement ? charactersElement.value.trim() : '';
+        console.log('Bedtime Stories: generateStory called');
         
-        // Get theme from selected theme card
-        const selectedTheme = document.querySelector('.theme-card.selected');
-        const theme = selectedTheme ? selectedTheme.dataset.theme : 'adventure';
-        
-        // Get mood from selected mood option
-        const selectedMood = document.querySelector('.mood-option.active');
-        const mood = selectedMood ? selectedMood.dataset.mood : 'peaceful';
-        
-        // Use default values for length and setting since these aren't in the UI
-        const length = 'medium';
-        const setting = 'magical forest';
+        try {
+            // Get characters from the text input - need to check if it exists
+            const charactersElement = document.getElementById('characters');
+            const characters = charactersElement ? charactersElement.value.trim() : '';
+            
+            // Get theme from selected theme card
+            const selectedTheme = document.querySelector('.theme-card.selected');
+            const theme = selectedTheme ? selectedTheme.dataset.theme : 'adventure';
+            
+            // Get mood from selected mood option
+            const selectedMood = document.querySelector('.mood-option.active');
+            const mood = selectedMood ? selectedMood.dataset.mood : 'peaceful';
+            
+            // Use default values for length and setting since these aren't in the UI
+            const length = 'medium';
+            const setting = 'magical forest';
 
-        if (!characters) {
-            alert('Please enter at least one character for your story!');
-            return;
+            console.log('Story parameters:', { characters, theme, length, mood, setting });
+
+            // Provide default characters if none entered
+            if (!characters) {
+                console.log('No characters provided, using default characters');
+                const defaultCharacters = ['Luna the brave princess', 'Sparkle the magical unicorn'];
+                charactersElement.value = defaultCharacters.join(', ');
+            }
+
+            const finalCharacters = charactersElement.value.trim();
+            console.log('Starting story generation with:', { characters: finalCharacters, theme, length, mood, setting });
+            
+            this.showLoading();
+            console.log('Loading overlay shown');
+            
+            // Simulate AI processing time with better error handling
+            setTimeout(() => {
+                try {
+                    console.log('Creating personalized story...');
+                    const story = this.createPersonalizedStory(finalCharacters, theme, length, mood, setting);
+                    console.log('Story created successfully:', story ? 'Story object created' : 'Story creation failed');
+                    
+                    if (story) {
+                        this.displayStory(story);
+                        console.log('Story displayed successfully');
+                    } else {
+                        throw new Error('Story creation returned null');
+                    }
+                    
+                    this.hideLoading();
+                    console.log('Loading hidden, story display complete');
+                } catch (error) {
+                    console.error('Error in story creation/display:', error);
+                    this.hideLoading();
+                    alert('Sorry, there was an error creating your story. Please try again!');
+                }
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Bedtime Stories: Error in generateStory:', error);
+            this.hideLoading();
+            alert('There was an error generating your story. Please try again!');
         }
-
-        console.log('Starting story generation with:', { characters, theme, length, mood, setting });
-        this.showLoading();
-        
-        // Simulate AI processing time with better error handling
-        setTimeout(() => {
-            try {
-                console.log('Creating personalized story...');
-                const story = this.createPersonalizedStory(characters, theme, length, mood, setting);
-                console.log('Story created successfully:', story);
-                
-                this.displayStory(story);
-                this.hideLoading();
-                console.log('Story display complete');
+    }
             } catch (error) {
                 console.error('Error generating story:', error);
                 this.hideLoading();
                 alert('Sorry, there was an error creating your story. Please try again!');
             }
         }, 2000);
-    }
-            }
-        }, 3000);
     }
 
     generateSurpriseStory() {
@@ -792,31 +818,55 @@ class BedtimeStoryGenerator {
     }
 
     displayStory(story) {
+        console.log('Displaying story:', story.title);
         this.currentStory = story;
         
-        document.getElementById('storyTitle').textContent = story.title;
-        document.getElementById('readingTime').textContent = `📖 ${story.readingTime}`;
-        document.getElementById('storyTheme').textContent = `${this.getThemeEmoji(story.theme)} ${story.theme.charAt(0).toUpperCase() + story.theme.slice(1)}`;
+        // Update story elements if they exist
+        const titleElement = document.getElementById('storyTitle');
+        const readingTimeElement = document.getElementById('readingTime');
+        const themeElement = document.getElementById('storyTheme');
+        const textElement = document.getElementById('storyText');
+        const outputElement = document.getElementById('storyOutput');
+        const builderElement = document.getElementById('storyBuilder');
         
-        // Format story content with paragraphs
-        const formattedContent = story.content.split('\n\n').map(paragraph => 
-            `<p class="story-paragraph">${paragraph}</p>`
-        ).join('');
+        if (titleElement) {
+            titleElement.textContent = story.title;
+        }
         
-        document.getElementById('storyText').innerHTML = formattedContent;
+        if (readingTimeElement) {
+            readingTimeElement.textContent = `📖 ${story.readingTime}`;
+        }
         
-        // Show story output and hide form
-        document.querySelector('.story-form-container').style.display = 'none';
-        document.getElementById('storyOutput').style.display = 'block';
+        if (themeElement) {
+            themeElement.textContent = `${this.getThemeEmoji(story.theme)} ${story.theme.charAt(0).toUpperCase() + story.theme.slice(1)}`;
+        }
         
-        // Initialize voice controls now that they're visible
-        setTimeout(() => {
-            this.loadVoices();
-            this.setupVoiceControls();
-        }, 100);
+        if (textElement) {
+            // Format story content with paragraphs
+            const formattedContent = story.content.split('\n\n').map(paragraph => 
+                `<p class="story-paragraph">${paragraph}</p>`
+            ).join('');
+            textElement.innerHTML = formattedContent;
+        }
         
-        // Scroll to story
-        document.getElementById('storyOutput').scrollIntoView({ behavior: 'smooth' });
+        // Show story output and hide builder
+        if (builderElement) {
+            builderElement.style.display = 'none';
+        }
+        
+        if (outputElement) {
+            outputElement.style.display = 'block';
+            // Initialize voice controls now that they're visible
+            setTimeout(() => {
+                this.loadVoices();
+                this.setupVoiceControls();
+            }, 100);
+            
+            // Scroll to story
+            outputElement.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        console.log('Story display completed successfully');
     }
 
     getThemeEmoji(theme) {
@@ -834,9 +884,20 @@ class BedtimeStoryGenerator {
     }
 
     showStoryForm() {
-        document.querySelector('.story-form-container').style.display = 'block';
-        document.getElementById('storyOutput').style.display = 'none';
-        document.querySelector('.story-form-container').scrollIntoView({ behavior: 'smooth' });
+        const builderElement = document.getElementById('storyBuilder');
+        const outputElement = document.getElementById('storyOutput');
+        
+        if (builderElement) {
+            builderElement.style.display = 'block';
+        }
+        
+        if (outputElement) {
+            outputElement.style.display = 'none';
+        }
+        
+        if (builderElement) {
+            builderElement.scrollIntoView({ behavior: 'smooth' });
+        }
     }
 
     showLoading() {
@@ -1106,23 +1167,37 @@ function updateNavigationButtons(currentIndex, totalSteps) {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    storyGenerator = new BedtimeStoryGenerator();
+    console.log('Bedtime Stories: DOM loaded, initializing...');
+    
+    try {
+        storyGenerator = new BedtimeStoryGenerator();
+        console.log('Bedtime Stories: Story generator created successfully');
+    } catch (error) {
+        console.error('Bedtime Stories: Error creating story generator:', error);
+        return;
+    }
     
     // Load voices for speech synthesis
     if ('speechSynthesis' in window) {
         speechSynthesis.addEventListener('voiceschanged', () => {
-            // Voices are now loaded
+            console.log('Bedtime Stories: Voices loaded');
         });
+    } else {
+        console.warn('Bedtime Stories: Speech synthesis not supported');
     }
     
     // Set default selections
     const firstThemeCard = document.querySelector('.theme-card[data-theme="adventure"]');
     if (firstThemeCard) {
         firstThemeCard.classList.add('selected');
+        console.log('Bedtime Stories: Default theme selected');
+    } else {
+        console.warn('Bedtime Stories: Default theme card not found');
     }
     
     // Add event listeners for theme cards
     const themeCards = document.querySelectorAll('.theme-card');
+    console.log(`Bedtime Stories: Found ${themeCards.length} theme cards`);
     themeCards.forEach(card => {
         card.addEventListener('click', () => {
             // Remove selected class from all cards
@@ -1134,6 +1209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add event listeners for mood options
     const moodOptions = document.querySelectorAll('.mood-option');
+    console.log(`Bedtime Stories: Found ${moodOptions.length} mood options`);
     moodOptions.forEach(option => {
         option.addEventListener('click', () => {
             // Remove active class from all options
@@ -1142,4 +1218,6 @@ document.addEventListener('DOMContentLoaded', () => {
             option.classList.add('active');
         });
     });
+    
+    console.log('Bedtime Stories: Initialization complete');
 });

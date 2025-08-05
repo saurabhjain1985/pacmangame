@@ -158,6 +158,9 @@
     display: flex;
     gap: 10px;
     justify-content: center;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .pizza-pay-btn {
@@ -187,11 +190,15 @@
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .pizza-close-btn:hover {
     background: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.02);
 }
 
 /* Mobile Responsive */

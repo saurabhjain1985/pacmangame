@@ -58,7 +58,7 @@ class PizzaPaymentWidget {
                     <button class="pizza-pay-btn" id="pizza-pay-now">
                         💸 Pay ₹<span id="selected-amount">299</span>
                     </button>
-                    <button class="pizza-close-btn" id="pizza-close">
+                    <button class="pizza-close-btn" id="pizza-close" type="button">
                         ✖️ Close
                     </button>
                 </div>
@@ -77,19 +77,47 @@ class PizzaPaymentWidget {
             this.openModal();
         });
 
-        // Close modal - use a more robust selector
+        // Debug: Log modal and close button existence
+        console.log('Modal element:', this.modal);
         const closeBtn = this.modal.querySelector('#pizza-close');
+        const closeBtnByClass = this.modal.querySelector('.pizza-close-btn');
+        console.log('Close button by ID:', closeBtn);
+        console.log('Close button by class:', closeBtnByClass);
+
+        // Close modal - Method 1: Direct click on close button
         if (closeBtn) {
-            closeBtn.addEventListener('click', (e) => {
+            closeBtn.onclick = (e) => {
+                console.log('Close button clicked via onclick');
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Close button clicked');
+                this.closeModal();
+                return false;
+            };
+            
+            closeBtn.addEventListener('click', (e) => {
+                console.log('Close button clicked via addEventListener');
+                e.preventDefault();
+                e.stopPropagation();
                 this.closeModal();
             });
+        } else {
+            console.error('Close button not found by ID!');
         }
 
-        // Close on backdrop click
+        // Method 2: Event delegation on entire modal
         this.modal.addEventListener('click', (e) => {
+            console.log('Modal clicked, target:', e.target);
+            console.log('Target ID:', e.target.id);
+            console.log('Target classes:', e.target.className);
+            
+            if (e.target.id === 'pizza-close' || e.target.classList.contains('pizza-close-btn')) {
+                console.log('Close button detected via delegation');
+                e.preventDefault();
+                e.stopPropagation();
+                this.closeModal();
+                return false;
+            }
+            
             if (e.target === this.modal) {
                 console.log('Backdrop clicked');
                 this.closeModal();
@@ -143,13 +171,19 @@ class PizzaPaymentWidget {
     }
 
     closeModal() {
+        console.log('closeModal() called');
+        console.log('Modal display before:', this.modal.style.display);
+        
         const content = this.modal.querySelector('.pizza-payment-content');
-        content.style.transform = 'scale(0.8) translateY(50px)';
-        content.style.opacity = '0';
+        if (content) {
+            content.style.transform = 'scale(0.8) translateY(50px)';
+            content.style.opacity = '0';
+        }
         
         setTimeout(() => {
             this.modal.style.display = 'none';
             document.body.style.overflow = '';
+            console.log('Modal should be hidden now');
         }, 300);
     }
 
@@ -202,5 +236,5 @@ function initializePizzaPayment() {
     }
 }
 
-// Auto-initialize
-initializePizzaPayment();
+// Don't auto-initialize - let the main page control it
+// initializePizzaPayment();

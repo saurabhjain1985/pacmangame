@@ -19,6 +19,177 @@ body {
     padding: 20px;
 }
 
+/* Ensure all game containers have proper background and text contrast */
+.game-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    margin: 20px 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    color: #333;
+}
+
+.game-container h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+.game-container h3 {
+    color: #4A90E2;
+    margin-bottom: 20px;
+}
+
+.game-container p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Fix chapter content readability */
+.chapter-content {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 10px;
+    padding: 40px;
+    min-height: 400px;
+    color: #333;
+}
+
+.chapter-content h3 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-size: 2em;
+    text-align: center;
+}
+
+.chapter-content h4 {
+    color: #34495e;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.chapter-content p {
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+.chapter-content ul li {
+    color: #555;
+    margin-bottom: 8px;
+}
+
+/* Money Academy specific fixes */
+.infographic {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 30px;
+    margin: 30px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    color: #333;
+}
+
+.infographic h3, .infographic h4 {
+    color: #2c3e50;
+}
+
+.infographic p {
+    color: #555;
+}
+
+/* Timeline and service cards */
+.timeline-item {
+    text-align: center;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 2px solid #e3e6ea;
+    transition: all 0.3s;
+}
+
+.timeline-item h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.timeline-item p {
+    color: #555;
+    font-size: 0.9em;
+}
+
+.service-card {
+    background: #ffffff;
+    border: 2px solid #e3e6ea;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.service-card h4 {
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.service-card p {
+    color: #555;
+}
+
+/* Key concepts box */
+.key-concepts {
+    background: #f8f9fa;
+    border-left: 5px solid #4A90E2;
+    padding: 25px;
+    margin: 30px 0;
+    border-radius: 0 10px 10px 0;
+}
+
+.key-concepts h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.key-concepts li {
+    color: #555;
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+/* Interest calculator */
+.interest-calculator {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 25px;
+    margin: 30px 0;
+    border: 2px solid #e3e6ea;
+}
+
+.interest-calculator h4 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.calculator-inputs label {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Progress text fix */
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
 header {
     text-align: center;
     margin-bottom: 40px;
@@ -909,21 +1080,28 @@ header p {
 
 .quiz-container {
     text-align: center;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 15px;
+    padding: 30px;
+    margin: 20px 0;
+    color: #333;
 }
 
 .quiz-progress {
-    background: #e9ecef;
-    color: #6c757d;
-    padding: 10px;
-    border-radius: 5px;
+    background: #f8f9fa;
+    color: #495057;
+    padding: 15px;
+    border-radius: 8px;
     margin-bottom: 30px;
     font-weight: bold;
+    border: 2px solid #e9ecef;
 }
 
 .quiz-question h4 {
-    color: #4A90E2;
+    color: #2c3e50;
     font-size: 1.5em;
     margin-bottom: 30px;
+    line-height: 1.4;
 }
 
 .quiz-options {
@@ -934,26 +1112,44 @@ header p {
 }
 
 .quiz-option {
-    background: white;
+    background: #ffffff;
     border: 2px solid #dee2e6;
     padding: 15px 20px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1.1em;
     transition: all 0.3s;
+    color: #333;
+    text-align: left;
 }
 
 .quiz-option:hover {
     border-color: #4A90E2;
     background: #e8f4fd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.quiz-option.correct {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.quiz-option.incorrect {
+    background: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
 }
 
 .quiz-score {
     background: #d4edda;
     color: #155724;
-    padding: 15px;
-    border-radius: 5px;
+    padding: 20px;
+    border-radius: 10px;
     font-weight: bold;
+    font-size: 1.2em;
+    border: 2px solid #c3e6cb;
 }
 
 .coming-soon {
@@ -1162,4 +1358,99 @@ header p {
     .chapter-selector {
         grid-template-columns: 1fr;
     }
+}
+
+/* Navigation and Button Styles */
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.nav-button, .btn {
+    background: linear-gradient(135deg, #4A90E2, #357abd);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
+.nav-button:hover, .btn:hover {
+    background: linear-gradient(135deg, #357abd, #2c5f8a);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+    color: white;
+}
+
+.nav-button:active, .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
+.nav-button.secondary, .btn.secondary {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    color: white;
+}
+
+.nav-button.secondary:hover, .btn.secondary:hover {
+    background: linear-gradient(135deg, #5a6268, #495057);
+    color: white;
+}
+
+.nav-button.success, .btn.success {
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: white;
+}
+
+.nav-button.success:hover, .btn.success:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+    color: white;
+}
+
+/* Ensure all clickable elements have proper contrast */
+button, input[type="button"], input[type="submit"] {
+    background: linear-gradient(135deg, #4A90E2, #357abd);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+    background: linear-gradient(135deg, #357abd, #2c5f8a);
+    transform: translateY(-1px);
+}
+
+/* Form input styling */
+input[type="text"], input[type="number"], input[type="email"], 
+input[type="password"], textarea, select {
+    background: white;
+    color: #333;
+    border: 2px solid #dee2e6;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus,
+input[type="password"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }

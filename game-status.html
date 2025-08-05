@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Status Check</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .working { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .broken { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .test-button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+    </style>
+    <script src="universal-back-button.js"></script>`n</head>
+<body>
+    <h1>🎮 Game Status Checker</h1>
+    
+    <div id="pacman-status" class="status">
+        <h3>🟡 Pac-Man Game Status</h3>
+        <p id="pacman-result">Checking...</p>
+        <button class="test-button" onclick="testPacman()">Test Pac-Man</button>
+        <button class="test-button" onclick="window.open('pacman.html', '_blank')">Open Pac-Man</button>
+    </div>
+    
+    <div id="stories-status" class="status">
+        <h3>🌙 Bedtime Stories Status</h3>
+        <p id="stories-result">Checking...</p>
+        <button class="test-button" onclick="testStories()">Test Stories</button>
+        <button class="test-button" onclick="window.open('bedtime-stories.html', '_blank')">Open Stories</button>
+    </div>
+    
+    <div id="fixes" class="status">
+        <h3>🔧 Quick Fixes</h3>
+        <button class="test-button" onclick="fixPacman()">Fix Pac-Man</button>
+        <button class="test-button" onclick="fixStories()">Fix Stories</button>
+    </div>
+    
+    <script>
+        function testPacman() {
+            const result = document.getElementById('pacman-result');
+            const status = document.getElementById('pacman-status');
+            
+            // Test if essential functions exist
+            try {
+                const iframe = document.createElement('iframe');
+                iframe.src = 'pacman.html';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                iframe.onload = function() {
+                    try {
+                        const canvas = iframe.contentDocument.getElementById('game-canvas');
+                        const showModeSelection = iframe.contentWindow.showModeSelection;
+                        
+                        if (canvas && showModeSelection) {
+                            result.textContent = '✅ Pac-Man is working! All essential elements found.';
+                            status.className = 'status working';
+                        } else {
+                            result.textContent = '❌ Pac-Man has issues: Missing elements or functions.';
+                            status.className = 'status broken';
+                        }
+                    } catch (e) {
+                        result.textContent = '❌ Pac-Man error: ' + e.message;
+                        status.className = 'status broken';
+                    }
+                    
+                    document.body.removeChild(iframe);
+                };
+            } catch (e) {
+                result.textContent = '❌ Failed to test Pac-Man: ' + e.message;
+                status.className = 'status broken';
+            }
+        }
+        
+        function testStories() {
+            const result = document.getElementById('stories-result');
+            const status = document.getElementById('stories-status');
+            
+            try {
+                const iframe = document.createElement('iframe');
+                iframe.src = 'bedtime-stories.html';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                iframe.onload = function() {
+                    try {
+                        const generateBtn = iframe.contentDocument.querySelector('.btn-magic-create');
+                        const storyGenerator = iframe.contentWindow.storyGenerator;
+                        
+                        if (generateBtn && storyGenerator) {
+                            result.textContent = '✅ Bedtime Stories is working! Generator and buttons found.';
+                            status.className = 'status working';
+                        } else {
+                            result.textContent = '❌ Stories has issues: Missing generator or buttons.';
+                            status.className = 'status broken';
+                        }
+                    } catch (e) {
+                        result.textContent = '❌ Stories error: ' + e.message;
+                        status.className = 'status broken';
+                    }
+                    
+                    document.body.removeChild(iframe);
+                };
+            } catch (e) {
+                result.textContent = '❌ Failed to test Stories: ' + e.message;
+                status.className = 'status broken';
+            }
+        }
+        
+        function fixPacman() {
+            alert('Opening Pac-Man for manual testing...');
+            window.open('pacman.html', '_blank');
+        }
+        
+        function fixStories() {
+            alert('Opening Bedtime Stories for manual testing...');
+            window.open('bedtime-stories.html', '_blank');
+        }
+        
+        // Auto-test on load
+        window.onload = function() {
+            setTimeout(testPacman, 1000);
+            setTimeout(testStories, 2000);
+        };
+    </script>
+</body>
+</html>
