@@ -370,8 +370,8 @@
             </div>
         </div>
 
-        <!-- Enhanced Loading Experience -->
-        <div class="loading-universe" id="loadingOverlay" style="display: none;">
+        <!-- Enhanced Loading Experience - DISABLED FOR TESTING -->
+        <div class="loading-universe" id="loadingOverlay" style="display: none !important; visibility: hidden !important; opacity: 0 !important;">
             <div class="loading-stars"></div>
             <div class="loading-content">
                 <div class="magic-cauldron">
@@ -392,11 +392,205 @@
                         <div class="progress-fill"></div>
                     </div>
                 </div>
+                
+                <!-- Emergency Force Display Button -->
+                <button id="forceDisplayBtn" onclick="forceDisplayStory()" style="
+                    position: absolute;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #ff4444;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    z-index: 10000;
+                ">🚨 FORCE DISPLAY STORY</button>
             </div>
         </div>
     </div>
 
     <script src="bedtime-stories.js"></script>
+    
+    <!-- TESTING: Force disable loading overlays -->
+    <style>
+        #loadingOverlay, .loading-universe, .loading-overlay {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            z-index: -9999 !important;
+            pointer-events: none !important;
+        }
+        #storyOutput {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    </style>
+    
+    <!-- Debug Script -->
+    <script>
+        console.log('🚀 Debug script loaded');
+        
+        // Add debug button after page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                console.log('🔍 Checking story generator status...');
+                console.log('storyGenerator exists:', !!storyGenerator);
+                console.log('window.storyGenerator exists:', !!window.storyGenerator);
+                console.log('generateStory function:', typeof generateStory);
+                
+                // Add a test button
+                const testBtn = document.createElement('button');
+                testBtn.innerHTML = '🧪 TEST STORY GENERATION';
+                testBtn.style.cssText = `
+                    position: fixed; 
+                    top: 10px; 
+                    right: 10px; 
+                    z-index: 9999; 
+                    background: red; 
+                    color: white; 
+                    padding: 10px; 
+                    border: none; 
+                    border-radius: 5px;
+                    cursor: pointer;
+                `;
+                testBtn.onclick = () => {
+                    console.log('🧪 Test button clicked');
+                    
+                    // Test immediate story creation and display
+                    const testStory = {
+                        title: "🌟 Luna the brave princess's Great Adventure",
+                        content: `Once upon a time, in a land far beyond the rainbow, there lived Luna the brave princess and Sparkle the magical unicorn.
+
+They made their home in an enchanted forest, where magic sparkled in every corner and every day brought new wonders.
+
+Luna was known for being brave and kind, and together with Sparkle, they spent their days exploring and helping all the creatures of the forest.
+
+One beautiful morning, Luna discovered a mysterious map that led to an ancient treasure. A sense of wonder filled their heart as they realized this was the beginning of something truly special.
+
+They climbed the highest mountain and discovered a view more beautiful than any picture. Along the way, they helped a family of lost rabbits find their way home and shared their lunch with a hungry squirrel.
+
+In the end, Luna and her friends learned that the greatest treasure was the friendship they made along the way.
+
+As the stars began to twinkle in the evening sky, Luna felt grateful for the wonderful adventure and the precious friends who shared it. With hearts full of joy and minds full of beautiful memories, they settled down for a peaceful night's sleep, knowing that tomorrow would bring new possibilities for kindness, friendship, and magical moments.`,
+                        readingTime: "5-7 minutes",
+                        theme: "adventure",
+                        characters: ["Luna the brave princess", "Sparkle the magical unicorn"]
+                    };
+                    
+                    // Force display the story immediately
+                    const storyBuilder = document.getElementById('storyBuilder');
+                    const storyOutput = document.getElementById('storyOutput');
+                    const titleElement = document.getElementById('storyTitle');
+                    const textElement = document.getElementById('storyText');
+                    const readingTimeElement = document.getElementById('readingTime');
+                    
+                    if (storyBuilder) storyBuilder.style.display = 'none';
+                    
+                    if (titleElement) titleElement.textContent = testStory.title;
+                    if (readingTimeElement) readingTimeElement.textContent = `📖 ${testStory.readingTime}`;
+                    if (textElement) {
+                        const formattedContent = testStory.content.split('\n\n').map(paragraph => 
+                            `<p class="story-paragraph">${paragraph}</p>`
+                        ).join('');
+                        textElement.innerHTML = formattedContent;
+                    }
+                    
+                    if (storyOutput) {
+                        storyOutput.style.display = 'block';
+                        storyOutput.style.visibility = 'visible';
+                        storyOutput.style.opacity = '1';
+                        storyOutput.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    
+                    // Hide all loading overlays
+                    const loadingElements = document.querySelectorAll('#loadingOverlay, .loading-universe, .loading-overlay');
+                    loadingElements.forEach(el => {
+                        el.style.display = 'none';
+                        el.style.visibility = 'hidden';
+                        el.style.opacity = '0';
+                    });
+                    
+                    console.log('✅ Test story displayed successfully!');
+                };
+                document.body.appendChild(testBtn);
+                
+                // Add emergency bypass button
+                const bypassBtn = document.createElement('button');
+                bypassBtn.innerHTML = '🚨 FORCE SHOW STORY';
+                bypassBtn.style.cssText = `
+                    position: fixed; 
+                    top: 60px; 
+                    right: 10px; 
+                    z-index: 9999; 
+                    background: orange; 
+                    color: white; 
+                    padding: 10px; 
+                    border: none; 
+                    border-radius: 5px;
+                    cursor: pointer;
+                `;
+                bypassBtn.onclick = () => {
+                    console.log('🚨 Emergency bypass clicked');
+                    
+                    // Hide loading overlay
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'none';
+                        console.log('Loading hidden');
+                    }
+                    
+                    // Show story output
+                    const outputElement = document.getElementById('storyOutput');
+                    const builderElement = document.getElementById('storyBuilder');
+                    
+                    if (builderElement) {
+                        builderElement.style.display = 'none';
+                        console.log('Builder hidden');
+                    }
+                    
+                    if (outputElement) {
+                        outputElement.style.display = 'block';
+                        outputElement.scrollIntoView({ behavior: 'smooth' });
+                        console.log('Story output forced to show');
+                    }
+                    
+                    // If no story exists, create one
+                    if (storyGenerator && !storyGenerator.currentStory) {
+                        const story = storyGenerator.createPersonalizedStory(
+                            'Luna the brave princess, Sparkle the unicorn', 
+                            'adventure', 
+                            'medium', 
+                            'peaceful', 
+                            'magical forest'
+                        );
+                        if (story) {
+                            storyGenerator.displayStory(story);
+                            console.log('Emergency story created and displayed');
+                        }
+                    }
+                };
+                document.body.appendChild(bypassBtn);
+                
+                // Override the original generateStory to add logging
+                const originalGenerateStory = window.generateStory;
+                window.generateStory = function() {
+                    console.log('🎯 generateStory() called');
+                    console.log('storyGenerator available:', !!storyGenerator);
+                    if (originalGenerateStory) {
+                        console.log('📞 Calling original generateStory...');
+                        originalGenerateStory();
+                    } else {
+                        console.error('❌ Original generateStory not found');
+                    }
+                };
+                
+            }, 1000);
+        });
+    </script>
     
     <!-- Feedback Widget -->
     <!-- Feedback widget CSS removed -->
