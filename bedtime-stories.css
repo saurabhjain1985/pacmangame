@@ -612,6 +612,7 @@ body {
     backdrop-filter: blur(10px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
     border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #2d3748;
 }
 
 .library-header {
@@ -1230,7 +1231,7 @@ body {
 }
 
 .character-chip {
-    background: #f8f9ff;
+    background: rgba(255, 255, 255, 0.95);
     border: 3px solid #e0e7ff;
     border-radius: 20px;
     padding: 15px 20px;
@@ -1239,6 +1240,7 @@ body {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 600;
     font-size: 1rem;
+    color: #2d3748;
     position: relative;
     overflow: hidden;
 }
@@ -1284,8 +1286,14 @@ body {
     border-radius: 20px;
     font-size: 1.1rem;
     font-family: inherit;
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
+    color: #2d3748;
     transition: all 0.3s ease;
+}
+
+.character-input-container input::placeholder {
+    color: #718096;
+    opacity: 1;
 }
 
 .character-input-container input:focus {
@@ -2022,4 +2030,49 @@ body {
     .voice-settings {
         grid-template-columns: 1fr;
     }
+}
+
+/* Additional Contrast Improvements */
+.story-container {
+    color: #2d3748;
+}
+
+.story-builder {
+    color: #2d3748;
+}
+
+.story-builder * {
+    color: inherit;
+}
+
+.story-builder h2, .story-builder h3, .story-builder h4 {
+    color: #4c1d95 !important;
+}
+
+.story-builder p {
+    color: #4a5568 !important;
+}
+
+/* Ensure all interactive elements have proper contrast */
+.story-builder input, .story-builder select, .story-builder textarea {
+    color: #2d3748 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.story-builder button {
+    color: white !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Fix any remaining light text issues */
+.story-builder .character-builder,
+.story-builder .theme-grid,
+.story-builder .settings-grid {
+    color: #2d3748;
+}
+
+.story-builder .character-builder h3,
+.story-builder .theme-grid h3,
+.story-builder .settings-grid h3 {
+    color: #4c1d95 !important;
 }

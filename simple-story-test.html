@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Story Test</title>
+    <link rel="stylesheet" href="bedtime-stories.css">
+    <style>
+        .test-area {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            margin: 20px;
+            border-radius: 15px;
+            color: #333;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #debug-output {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            min-height: 100px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="story-universe">
+        <div class="test-area">
+            <h1>🧪 Simple Story Generation Test</h1>
+            
+            <!-- Minimal form elements that the script expects -->
+            <input type="text" id="characters" value="Luna the brave princess, Sparkle the unicorn" placeholder="Characters">
+            
+            <!-- Test buttons -->
+            <button onclick="testDirectGeneration()">🧪 Test Direct Generation</button>
+            <button onclick="manualInit()">🔧 Manual Init</button>
+            <button onclick="generateStory()" class="btn-magic-create">
+                📚 Create My Story (Real Button)
+            </button>
+            <button onclick="clearDebug()">🧹 Clear</button>
+            
+            <div id="debug-output"></div>
+        </div>
+        
+        <!-- Required HTML elements for the story display -->
+        <div class="story-builder" id="storyBuilder">
+            <p>Story Builder Area (should be hidden when story displays)</p>
+        </div>
+        
+        <div class="story-experience" id="storyOutput" style="display: none;">
+            <div class="story-book">
+                <div class="story-header">
+                    <h2 class="story-title" id="storyTitle">Your Magical Story</h2>
+                    <div class="story-meta-badges">
+                        <span class="story-badge" id="readingTime">📖 5-7 minutes</span>
+                        <span class="story-badge" id="storyTheme">🎭 Adventure</span>
+                    </div>
+                </div>
+                <div class="story-content">
+                    <div class="story-text" id="storyText">
+                        Story content will appear here...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading overlay -->
+        <div class="loading-universe" id="loadingOverlay" style="display: none;">
+            <div class="loading-content">
+                <h2>✨ Creating Your Magical Story ✨</h2>
+                <div class="loading-spinner"></div>
+                <p id="loadingTips">Gathering magical characters...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="bedtime-stories.js"></script>
+    <script>
+        let debugOutput = document.getElementById('debug-output');
+        
+        function debugLog(message) {
+            console.log(message);
+            debugOutput.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+        }
+        
+        function clearDebug() {
+            debugOutput.textContent = '';
+        }
+        
+        function manualInit() {
+            debugLog('🔧 Attempting manual initialization...');
+            try {
+                if (typeof BedtimeStoryGenerator !== 'undefined') {
+                    storyGenerator = new BedtimeStoryGenerator();
+                    window.storyGenerator = storyGenerator;
+                    debugLog('✅ Manual initialization successful');
+                } else {
+                    debugLog('❌ BedtimeStoryGenerator class not found');
+                }
+            } catch (error) {
+                debugLog('❌ Manual initialization failed: ' + error.message);
+            }
+        }
+        
+        function testDirectGeneration() {
+            debugLog('🧪 Testing direct story generation...');
+            
+            if (!storyGenerator) {
+                debugLog('❌ storyGenerator not found');
+                return;
+            }
+            
+            try {
+                const story = storyGenerator.createPersonalizedStory(
+                    'Luna the brave princess, Sparkle the unicorn', 
+                    'adventure', 
+                    'medium', 
+                    'peaceful', 
+                    'magical forest'
+                );
+                
+                if (story) {
+                    debugLog('✅ Story created successfully!');
+                    debugLog(`📖 Title: ${story.title}`);
+                    debugLog(`📝 Content length: ${story.content.length} chars`);
+                    
+                    // Test display function
+                    debugLog('🖥️ Testing display...');
+                    storyGenerator.displayStory(story);
+                    debugLog('✅ Display function called');
+                } else {
+                    debugLog('❌ Story creation returned null');
+                }
+            } catch (error) {
+                debugLog('❌ Error: ' + error.message);
+            }
+        }
+        
+        // Override the generateStory function to add debugging
+        const originalGenerateStory = window.generateStory;
+        window.generateStory = function() {
+            debugLog('🚀 generateStory() called');
+            if (originalGenerateStory) {
+                originalGenerateStory();
+            } else {
+                debugLog('❌ Original generateStory function not found');
+            }
+        };
+        
+        // Log when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            debugLog('📄 Page loaded');
+            
+            // Check immediately
+            debugLog(`🎯 storyGenerator exists (immediate): ${!!storyGenerator}`);
+            debugLog(`🎯 window.storyGenerator exists (immediate): ${!!window.storyGenerator}`);
+            
+            // Check after delays to see when it gets initialized
+            setTimeout(() => {
+                debugLog(`🎯 storyGenerator exists (after 500ms): ${!!storyGenerator}`);
+                debugLog(`🎯 window.storyGenerator exists (after 500ms): ${!!window.storyGenerator}`);
+            }, 500);
+            
+            setTimeout(() => {
+                debugLog(`🎯 storyGenerator exists (after 1s): ${!!storyGenerator}`);
+                debugLog(`🎯 window.storyGenerator exists (after 1s): ${!!window.storyGenerator}`);
+                if (storyGenerator) {
+                    debugLog('✅ Story generator is ready');
+                } else if (window.storyGenerator) {
+                    debugLog('✅ Story generator found on window object');
+                    storyGenerator = window.storyGenerator;
+                } else {
+                    debugLog('❌ Story generator still not found');
+                }
+            }, 1000);
+            
+            setTimeout(() => {
+                debugLog(`🎯 Final check - storyGenerator exists (after 2s): ${!!storyGenerator}`);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

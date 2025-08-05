@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Generation Full Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .test-container {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        #log { 
+            background: #f9f9f9; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            max-height: 300px; 
+            overflow-y: auto; 
+            margin: 15px 0;
+            font-size: 12px;
+        }
+        #story-result { 
+            background: #e8f5e8; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin: 15px 0; 
+            min-height: 100px;
+        }
+        .step { margin: 15px 0; padding: 10px; background: #f0f8ff; border-radius: 5px; }
+        input { width: 100%; padding: 8px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Complete Story Generation Test</h1>
+        
+        <div class="step">
+            <h3>Test Input</h3>
+            <input type="text" id="test-characters" value="Luna the brave princess, Sparkle the unicorn" placeholder="Characters">
+        </div>
+        
+        <div class="step">
+            <h3>Test Controls</h3>
+            <button onclick="checkEnvironment()">1️⃣ Check Environment</button>
+            <button onclick="testClassCreation()">2️⃣ Test Class Creation</button>
+            <button onclick="testStoryCreation()">3️⃣ Test Story Creation</button>
+            <button onclick="testFullFlow()">4️⃣ Test Full Flow</button>
+            <button onclick="clearLog()">🧹 Clear</button>
+        </div>
+        
+        <div class="step">
+            <h3>Debug Log</h3>
+            <div id="log"></div>
+        </div>
+        
+        <div class="step">
+            <h3>Story Result</h3>
+            <div id="story-result">No story generated yet...</div>
+        </div>
+    </div>
+
+    <!-- Include the actual bedtime stories script -->
+    <script src="bedtime-stories.js"></script>
+    
+    <script>
+        let log = document.getElementById('log');
+        let storyResult = document.getElementById('story-result');
+        
+        function logMessage(msg) {
+            console.log(msg);
+            log.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        function clearLog() {
+            log.textContent = '';
+            storyResult.innerHTML = 'No story generated yet...';
+        }
+        
+        function checkEnvironment() {
+            logMessage('🔍 CHECKING ENVIRONMENT...');
+            
+            // Check if class is defined
+            logMessage(`- BedtimeStoryGenerator class exists: ${typeof BedtimeStoryGenerator !== 'undefined'}`);
+            
+            // Check global variables
+            logMessage(`- window.storyGenerator exists: ${!!window.storyGenerator}`);
+            logMessage(`- global storyGenerator exists: ${typeof storyGenerator !== 'undefined' && !!storyGenerator}`);
+            
+            // Check global functions
+            logMessage(`- generateStory function exists: ${typeof generateStory === 'function'}`);
+            logMessage(`- generateSurpriseStory function exists: ${typeof generateSurpriseStory === 'function'}`);
+            
+            logMessage('✅ Environment check complete\n');
+        }
+        
+        function testClassCreation() {
+            logMessage('🏭 TESTING CLASS CREATION...');
+            
+            try {
+                if (typeof BedtimeStoryGenerator === 'undefined') {
+                    logMessage('❌ BedtimeStoryGenerator class not found');
+                    return;
+                }
+                
+                logMessage('- Creating new instance...');
+                let testGenerator = new BedtimeStoryGenerator();
+                logMessage('✅ Instance created successfully');
+                
+                logMessage(`- Instance has generateStory method: ${typeof testGenerator.generateStory === 'function'}`);
+                logMessage(`- Instance has createPersonalizedStory method: ${typeof testGenerator.createPersonalizedStory === 'function'}`);
+                logMessage(`- Instance has displayStory method: ${typeof testGenerator.displayStory === 'function'}`);
+                
+                // Set as global for other tests
+                window.testStoryGenerator = testGenerator;
+                logMessage('✅ Class creation test complete\n');
+                
+            } catch (error) {
+                logMessage(`❌ Class creation failed: ${error.message}`);
+                logMessage(`❌ Stack: ${error.stack}`);
+            }
+        }
+        
+        function testStoryCreation() {
+            logMessage('📖 TESTING STORY CREATION...');
+            
+            let generator = window.testStoryGenerator || window.storyGenerator || storyGenerator;
+            
+            if (!generator) {
+                logMessage('❌ No generator available for testing');
+                return;
+            }
+            
+            try {
+                let characters = document.getElementById('test-characters').value;
+                logMessage(`- Characters: "${characters}"`);
+                logMessage('- Theme: adventure');
+                logMessage('- Length: medium');
+                logMessage('- Mood: peaceful');
+                
+                logMessage('- Calling createPersonalizedStory...');
+                let story = generator.createPersonalizedStory(characters, 'adventure', 'medium', 'peaceful', 'magical forest');
+                
+                if (story) {
+                    logMessage('✅ Story created successfully!');
+                    logMessage(`- Title: "${story.title}"`);
+                    logMessage(`- Characters: [${story.characters.join(', ')}]`);
+                    logMessage(`- Theme: ${story.theme}`);
+                    logMessage(`- Content length: ${story.content.length} characters`);
+                    logMessage(`- Reading time: ${story.readingTime}`);
+                    
+                    // Display the story
+                    storyResult.innerHTML = `
+                        <h3>${story.title}</h3>
+                        <p><strong>Characters:</strong> ${story.characters.join(', ')}</p>
+                        <p><strong>Theme:</strong> ${story.theme} | <strong>Reading Time:</strong> ${story.readingTime}</p>
+                        <hr>
+                        <div style="line-height: 1.6; white-space: pre-line;">${story.content}</div>
+                    `;
+                    
+                    logMessage('✅ Story creation test complete\n');
+                } else {
+                    logMessage('❌ createPersonalizedStory returned null/undefined');
+                }
+                
+            } catch (error) {
+                logMessage(`❌ Story creation failed: ${error.message}`);
+                logMessage(`❌ Stack: ${error.stack}`);
+            }
+        }
+        
+        function testFullFlow() {
+            logMessage('🚀 TESTING FULL FLOW...');
+            
+            let generator = window.storyGenerator || storyGenerator;
+            
+            if (!generator) {
+                logMessage('❌ Main story generator not available');
+                return;
+            }
+            
+            try {
+                logMessage('- Calling generator.generateStory()...');
+                generator.generateStory();
+                logMessage('✅ generateStory() called without error');
+                
+                // Check if loading is shown
+                setTimeout(() => {
+                    logMessage('- Checking for loading state...');
+                    let loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        logMessage(`- Loading overlay display: ${loadingOverlay.style.display}`);
+                    } else {
+                        logMessage('- No loading overlay found');
+                    }
+                }, 100);
+                
+                // Check after story should be complete
+                setTimeout(() => {
+                    logMessage('- Checking story completion...');
+                    let storyOutput = document.getElementById('storyOutput');
+                    let storyTitle = document.getElementById('storyTitle');
+                    let storyText = document.getElementById('storyText');
+                    
+                    if (storyOutput) {
+                        logMessage(`- Story output display: ${storyOutput.style.display}`);
+                    }
+                    if (storyTitle) {
+                        logMessage(`- Story title: "${storyTitle.textContent}"`);
+                    }
+                    if (storyText) {
+                        logMessage(`- Story text length: ${storyText.innerHTML.length} characters`);
+                    }
+                    
+                    logMessage('✅ Full flow test complete\n');
+                }, 3000);
+                
+            } catch (error) {
+                logMessage(`❌ Full flow failed: ${error.message}`);
+                logMessage(`❌ Stack: ${error.stack}`);
+            }
+        }
+        
+        // Auto-run basic checks when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                logMessage('🚀 Page loaded, running initial checks...\n');
+                checkEnvironment();
+            }, 500);
+        });
+    </script>
+    
+    <!-- Minimal HTML elements for testing -->
+    <div id="characters" style="display: none;">Luna the brave princess, Sparkle the unicorn</div>
+    <div id="storyBuilder" style="display: none;">Builder</div>
+    <div id="storyOutput" style="display: none;">
+        <h2 id="storyTitle">Test Title</h2>
+        <div id="readingTime">Test Time</div>
+        <div id="storyTheme">Test Theme</div>
+        <div id="storyText">Test Content</div>
+    </div>
+    <div id="loadingOverlay" style="display: none;">Loading...</div>
+    <div id="savedStoriesList" style="display: none;"></div>
+</body>
+</html>
