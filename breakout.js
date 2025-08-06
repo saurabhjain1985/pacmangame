@@ -144,9 +144,23 @@ class BreakoutGame {
         });
         
         // Mouse controls
+        let mouseActive = false;
+        
         this.canvas.addEventListener('mousemove', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.mouseX = e.clientX - rect.left;
+            if (this.gameState === 'playing' && this.paddle.direction === 0) {
+                const rect = this.canvas.getBoundingClientRect();
+                this.mouseX = e.clientX - rect.left;
+                mouseActive = true;
+                // Reset mouse activity after a short delay
+                setTimeout(() => { 
+                    if (this.paddle.direction === 0) mouseActive = false; 
+                }, 100);
+            }
+        });
+        
+        this.canvas.addEventListener('mouseleave', () => {
+            mouseActive = false;
+            this.mouseX = 0;
         });
         
         this.canvas.addEventListener('click', (e) => {
@@ -156,10 +170,15 @@ class BreakoutGame {
         });
         
         // Touch controls
+        let touchActive = false;
+        
         this.canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            const rect = this.canvas.getBoundingClientRect();
-            this.touchX = e.touches[0].clientX - rect.left;
+            if (this.gameState === 'playing' && this.paddle.direction === 0) {
+                const rect = this.canvas.getBoundingClientRect();
+                this.touchX = e.touches[0].clientX - rect.left;
+                touchActive = true;
+            }
         });
         
         this.canvas.addEventListener('touchstart', (e) => {
@@ -169,18 +188,66 @@ class BreakoutGame {
             }
         });
         
-        // Mobile control buttons
-        document.getElementById('left-btn').addEventListener('click', () => {
-            this.paddle.direction = -1;
-            setTimeout(() => { this.paddle.direction = 0; }, 200);
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            touchActive = false;
+            this.touchX = 0;
         });
         
-        document.getElementById('right-btn').addEventListener('click', () => {
+        // Mobile control buttons
+        let leftPressed = false;
+        let rightPressed = false;
+        
+        document.getElementById('left-btn').addEventListener('mousedown', () => {
+            leftPressed = true;
+            this.paddle.direction = -1;
+        });
+        
+        document.getElementById('left-btn').addEventListener('mouseup', () => {
+            leftPressed = false;
+            if (!rightPressed) this.paddle.direction = 0;
+        });
+        
+        document.getElementById('left-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            leftPressed = true;
+            this.paddle.direction = -1;
+        });
+        
+        document.getElementById('left-btn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            leftPressed = false;
+            if (!rightPressed) this.paddle.direction = 0;
+        });
+        
+        document.getElementById('right-btn').addEventListener('mousedown', () => {
+            rightPressed = true;
             this.paddle.direction = 1;
-            setTimeout(() => { this.paddle.direction = 0; }, 200);
+        });
+        
+        document.getElementById('right-btn').addEventListener('mouseup', () => {
+            rightPressed = false;
+            if (!leftPressed) this.paddle.direction = 0;
+        });
+        
+        document.getElementById('right-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            rightPressed = true;
+            this.paddle.direction = 1;
+        });
+        
+        document.getElementById('right-btn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            rightPressed = false;
+            if (!leftPressed) this.paddle.direction = 0;
         });
         
         document.getElementById('launch-btn').addEventListener('click', () => {
+            this.launchBall();
+        });
+        
+        document.getElementById('launch-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
             this.launchBall();
         });
     }
@@ -296,13 +363,12 @@ class BreakoutGame {
     }
     
     update() {
-        // Update paddle position
+        // Update paddle position with keyboard (highest priority)
         if (this.paddle.direction !== 0) {
             this.paddle.x += this.paddle.direction * this.paddle.speed;
         }
-        
-        // Mouse/touch paddle control
-        if (this.mouseX > 0) {
+        // Mouse/touch paddle control (only if no keyboard input)
+        else if (this.mouseX > 0) {
             this.paddle.x = this.mouseX - this.paddle.width / 2;
         } else if (this.touchX > 0) {
             this.paddle.x = this.touchX - this.paddle.width / 2;
