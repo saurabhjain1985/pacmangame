@@ -39,15 +39,6 @@ class MultiplicationMaster {
             volume: 1.0
         };
         
-        // Speed control settings
-        this.speedSettings = {
-            slow: { rate: 0.6, delay: 2500 },
-            normal: { rate: 0.8, delay: 1500 },
-            fast: { rate: 1.0, delay: 1000 },
-            veryFast: { rate: 1.3, delay: 700 }
-        };
-        this.currentSpeed = 'normal';
-        
         this.initializeSpeech();
         this.generateLearnEquations();
     }
@@ -96,7 +87,7 @@ class MultiplicationMaster {
         this.speechSynth.cancel();
         
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = this.speedSettings[this.currentSpeed].rate;
+        utterance.rate = this.voiceSettings.rate;
         utterance.pitch = this.voiceSettings.pitch;
         utterance.volume = this.voiceSettings.volume;
         
@@ -162,10 +153,10 @@ class MultiplicationMaster {
             equation.spoken = true;
             this.currentLearningStep++;
             
-            // Wait based on current speed setting
+            // Wait a bit before next equation
             setTimeout(() => {
                 this.speakNextEquation();
-            }, this.speedSettings[this.currentSpeed].delay);
+            }, 1500);
         });
     }
     
@@ -294,29 +285,7 @@ class MultiplicationMaster {
         const container = document.getElementById('learnContent');
         if (!container) return;
         
-        let html = '<div class="speed-controls">';
-        html += '<h4>🎚️ Speed Control:</h4>';
-        html += '<div class="speed-buttons">';
-        
-        Object.keys(this.speedSettings).forEach(speed => {
-            const isActive = speed === this.currentSpeed;
-            const speedLabels = {
-                slow: '🐌 Slow',
-                normal: '🚶 Normal', 
-                fast: '🏃 Fast',
-                veryFast: '⚡ Very Fast'
-            };
-            
-            html += `<button class="speed-btn ${isActive ? 'active' : ''}" onclick="changeSpeed('${speed}')">
-                ${speedLabels[speed]}
-            </button>`;
-        });
-        
-        html += '</div>';
-        html += `<p class="speed-info">Current: ${this.currentSpeed} (Rate: ${this.speedSettings[this.currentSpeed].rate}x)</p>`;
-        html += '</div>';
-        
-        html += '<div class="learn-equations">';
+        let html = '<div class="learn-equations">';
         
         this.learnEquations.forEach((eq, index) => {
             const isActive = index === this.currentLearningStep;
@@ -340,13 +309,6 @@ class MultiplicationMaster {
         
         html += '</div>';
         container.innerHTML = html;
-    }
-    
-    // Speed control method
-    changeSpeed(newSpeed) {
-        this.currentSpeed = newSpeed;
-        this.updateLearnDisplay();
-        this.showMessage(`🎚️ Speed changed to ${newSpeed} (${this.speedSettings[newSpeed].rate}x rate)`, 'info');
     }
     
     highlightCurrentEquation() {
@@ -438,305 +400,15 @@ class MultiplicationMaster {
         }
     }
     
-    // Practice Mode Implementation
+    // Placeholder methods for other modes
     startPracticeMode() {
-        this.hideAllScreens();
-        document.getElementById('practiceScreen').style.display = 'flex';
-        
-        this.generatePracticeQuestions();
-        this.currentQuestion = 0;
-        this.practiceAnswered = false;
-        this.showPracticeQuestion();
+        alert('Practice mode coming soon!');
+        this.goToModeSelection();
     }
     
-    generatePracticeQuestions() {
-        this.practiceQuestions = [];
-        
-        // Generate 10 random questions from the selected table
-        for (let i = 0; i < 10; i++) {
-            const multiplier = Math.floor(Math.random() * 10) + 1;
-            this.practiceQuestions.push({
-                multiplicand: this.currentTable,
-                multiplier: multiplier,
-                result: this.currentTable * multiplier,
-                answered: false,
-                correct: false,
-                userAnswer: null
-            });
-        }
-    }
-    
-    showPracticeQuestion() {
-        const question = this.practiceQuestions[this.currentQuestion];
-        const questionText = `What is ${question.multiplicand} × ${question.multiplier}?`;
-        
-        // Update question display
-        const questionEl = document.getElementById('practiceQuestion');
-        if (questionEl) questionEl.textContent = questionText;
-        
-        const questionNumEl = document.getElementById('questionNumber');
-        if (questionNumEl) questionNumEl.textContent = this.currentQuestion + 1;
-        
-        const totalQuestionsEl = document.getElementById('totalQuestions');
-        if (totalQuestionsEl) totalQuestionsEl.textContent = this.practiceQuestions.length;
-        
-        // Clear previous inputs and feedback
-        const answerInput = document.getElementById('practiceAnswerInput');
-        if (answerInput) answerInput.value = '';
-        
-        const feedbackEl = document.getElementById('practiceFeedback');
-        if (feedbackEl) feedbackEl.innerHTML = '';
-        
-        this.practiceAnswered = false;
-        this.updatePracticeButtons();
-    }
-    
-    submitPracticeAnswer() {
-        if (this.practiceAnswered) return;
-        
-        const answerInput = document.getElementById('practiceAnswerInput');
-        const userAnswer = parseInt(answerInput.value);
-        const question = this.practiceQuestions[this.currentQuestion];
-        
-        if (isNaN(userAnswer)) {
-            this.showPracticeFeedback('Please enter a number', 'warning');
-            return;
-        }
-        
-        this.practiceAnswered = true;
-        question.answered = true;
-        question.userAnswer = userAnswer;
-        
-        if (userAnswer === question.result) {
-            question.correct = true;
-            this.correctAnswers++;
-            this.currentStreak++;
-            this.totalScore += 10 + (this.currentStreak * 2);
-            this.showPracticeFeedback(`✅ Correct! ${question.multiplicand} × ${question.multiplier} = ${question.result}`, 'success');
-        } else {
-            question.correct = false;
-            this.wrongAnswers++;
-            this.currentStreak = 0;
-            this.showPracticeFeedback(`❌ Not quite. The correct answer is ${question.result}`, 'error');
-        }
-        
-        this.updateStats();
-        this.updatePracticeButtons();
-        
-        // Auto-advance after 3 seconds
-        setTimeout(() => {
-            this.nextPracticeQuestion();
-        }, 3000);
-    }
-    
-    nextPracticeQuestion() {
-        if (this.currentQuestion < this.practiceQuestions.length - 1) {
-            this.currentQuestion++;
-            this.showPracticeQuestion();
-        } else {
-            this.completePracticeSession();
-        }
-    }
-    
-    completePracticeSession() {
-        const accuracy = Math.round((this.correctAnswers / this.practiceQuestions.length) * 100) || 0;
-        const message = `🎉 Practice Complete!\n\nScore: ${this.totalScore}\nCorrect: ${this.correctAnswers}/${this.practiceQuestions.length}\nAccuracy: ${accuracy}%`;
-        
-        setTimeout(() => {
-            if (confirm(message + '\n\nWould you like to practice another table?')) {
-                this.hideAllScreens();
-                document.getElementById('tableScreen').style.display = 'flex';
-            } else {
-                this.goToModeSelection();
-            }
-        }, 1000);
-    }
-    
-    showPracticeFeedback(message, type) {
-        const feedbackEl = document.getElementById('practiceFeedback');
-        if (feedbackEl) {
-            feedbackEl.textContent = message;
-            feedbackEl.className = `practice-feedback ${type}`;
-        }
-    }
-    
-    updatePracticeButtons() {
-        const submitBtn = document.getElementById('submitPracticeBtn');
-        const nextBtn = document.getElementById('nextPracticeBtn');
-        
-        if (submitBtn) submitBtn.disabled = this.practiceAnswered;
-        if (nextBtn) nextBtn.style.display = this.practiceAnswered ? 'inline-block' : 'none';
-    }
-    
-    // Challenge Mode Implementation  
     startChallengeMode() {
-        this.hideAllScreens();
-        document.getElementById('challengeScreen').style.display = 'flex';
-        
-        this.challengeLevel = 1;
-        this.timeLeft = 60; // 60 seconds
-        this.livesLeft = 3;
-        this.comboCount = 0;
-        this.challengeScore = 0;
-        
-        this.updateChallengeDisplay();
-        this.generateChallengeQuestion();
-        this.startChallengeTimer();
-    }
-    
-    generateChallengeQuestion() {
-        // Mix different tables based on level
-        const tables = this.challengeLevel === 1 ? [2, 3, 4, 5] :
-                      this.challengeLevel === 2 ? [2, 3, 4, 5, 6, 7] :
-                      this.challengeLevel === 3 ? [6, 7, 8, 9] :
-                      [2, 3, 4, 5, 6, 7, 8, 9, 12];
-        
-        const table = tables[Math.floor(Math.random() * tables.length)];
-        const multiplier = Math.floor(Math.random() * 10) + 1;
-        const correctAnswer = table * multiplier;
-        
-        // Generate wrong answers
-        const wrongAnswers = [];
-        while (wrongAnswers.length < 3) {
-            const wrong = correctAnswer + Math.floor(Math.random() * 20) - 10;
-            if (wrong > 0 && wrong !== correctAnswer && !wrongAnswers.includes(wrong)) {
-                wrongAnswers.push(wrong);
-            }
-        }
-        
-        // Mix all options
-        const allOptions = [correctAnswer, ...wrongAnswers].sort(() => Math.random() - 0.5);
-        
-        // Update question display
-        const questionEl = document.getElementById('challengeQuestion');
-        if (questionEl) questionEl.textContent = `${table} × ${multiplier} = ?`;
-        
-        // Update answer options
-        const optionsContainer = document.getElementById('challengeOptions');
-        if (optionsContainer) {
-            optionsContainer.innerHTML = '';
-            
-            allOptions.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.className = 'challenge-option-btn';
-                button.textContent = option;
-                button.onclick = () => this.selectChallengeOption(button, option, correctAnswer);
-                optionsContainer.appendChild(button);
-            });
-        }
-        
-        this.currentCorrectAnswer = correctAnswer;
-    }
-    
-    selectChallengeOption(button, selectedAnswer, correctAnswer) {
-        // Disable all buttons
-        document.querySelectorAll('.challenge-option-btn').forEach(btn => {
-            btn.disabled = true;
-        });
-        
-        if (selectedAnswer === correctAnswer) {
-            button.classList.add('correct');
-            this.handleChallengeCorrect();
-        } else {
-            button.classList.add('wrong');
-            // Show correct answer
-            document.querySelectorAll('.challenge-option-btn').forEach(btn => {
-                if (parseInt(btn.textContent) === correctAnswer) {
-                    btn.classList.add('correct');
-                }
-            });
-            this.handleChallengeWrong();
-        }
-        
-        setTimeout(() => {
-            if (this.livesLeft > 0 && this.timeLeft > 0) {
-                this.generateChallengeQuestion();
-            }
-        }, 1500);
-    }
-    
-    handleChallengeCorrect() {
-        this.comboCount++;
-        this.challengeScore += 20 + (this.comboCount * 5);
-        this.correctAnswers++;
-        
-        // Level up every 5 correct in a row
-        if (this.comboCount >= 5) {
-            this.challengeLevel++;
-            this.comboCount = 0;
-            this.timeLeft += 15; // Bonus time
-            this.showChallengeMessage(`🎉 Level Up! Bonus time added!`, 'success');
-        }
-        
-        this.updateChallengeDisplay();
-    }
-    
-    handleChallengeWrong() {
-        this.livesLeft--;
-        this.comboCount = 0;
-        this.wrongAnswers++;
-        
-        this.updateChallengeDisplay();
-        
-        if (this.livesLeft === 0) {
-            this.endChallenge();
-        }
-    }
-    
-    startChallengeTimer() {
-        this.challengeTimer = setInterval(() => {
-            this.timeLeft--;
-            this.updateChallengeDisplay();
-            
-            if (this.timeLeft === 0) {
-                this.endChallenge();
-            }
-        }, 1000);
-    }
-    
-    updateChallengeDisplay() {
-        const timeEl = document.getElementById('challengeTime');
-        const livesEl = document.getElementById('challengeLives');
-        const levelEl = document.getElementById('challengeLevel');
-        const scoreEl = document.getElementById('challengeScore');
-        const comboEl = document.getElementById('challengeCombo');
-        
-        if (timeEl) timeEl.textContent = this.timeLeft;
-        if (livesEl) livesEl.textContent = '❤️'.repeat(this.livesLeft);
-        if (levelEl) levelEl.textContent = this.challengeLevel;
-        if (scoreEl) scoreEl.textContent = this.challengeScore;
-        if (comboEl) comboEl.textContent = this.comboCount;
-    }
-    
-    showChallengeMessage(message, type) {
-        const messageEl = document.getElementById('challengeMessage');
-        if (messageEl) {
-            messageEl.textContent = message;
-            messageEl.className = `challenge-message ${type}`;
-            setTimeout(() => {
-                if (messageEl.textContent === message) {
-                    messageEl.textContent = '';
-                    messageEl.className = 'challenge-message';
-                }
-            }, 3000);
-        }
-    }
-    
-    endChallenge() {
-        if (this.challengeTimer) {
-            clearInterval(this.challengeTimer);
-        }
-        
-        const reason = this.livesLeft === 0 ? 'out of lives' : 'time up';
-        const message = `🎮 Challenge Over! (${reason})\n\nFinal Score: ${this.challengeScore}\nLevel Reached: ${this.challengeLevel}\nCorrect: ${this.correctAnswers}\nWrong: ${this.wrongAnswers}`;
-        
-        setTimeout(() => {
-            if (confirm(message + '\n\nTry again?')) {
-                this.startChallengeMode();
-            } else {
-                this.goToModeSelection();
-            }
-        }, 1000);
+        alert('Challenge mode coming soon!');
+        this.goToModeSelection();
     }
     
     // Utility methods
@@ -799,16 +471,4 @@ function goToModeSelection() {
 
 function goToTableSelection() {
     if (game) game.goToTableSelection();
-}
-
-function changeSpeed(speed) {
-    if (game) game.changeSpeed(speed);
-}
-
-function submitPracticeAnswer() {
-    if (game) game.submitPracticeAnswer();
-}
-
-function nextPracticeQuestion() {
-    if (game) game.nextPracticeQuestion();
 }

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multiplication Master - Learn Times Tables</title>
-    <link rel="stylesheet" href="multiplication-master.css">`n    <link rel="stylesheet" href="main-menu.css">
-    <script src="universal-back-button.js"></script>`n</head>
+    
+    <link rel="stylesheet" href="multiplication-master.css"></head>
 <body>
     <div class="game-container">
         <!-- Header -->
@@ -37,6 +37,11 @@
         <!-- Game Modes Screen -->
         <div class="screen" id="modeScreen">
             <div class="mode-container">
+                <!-- Page confirmation -->
+                <div style="background: #10b981; color: white; padding: 1rem; border-radius: 10px; margin-bottom: 2rem; font-weight: bold;">
+                    ✅ MULTIPLICATION MASTER - NO STORIES HERE! 🧮
+                </div>
+                
                 <h2>🎯 Choose Your Learning Mode</h2>
                 <div class="mode-grid">
                     <div class="mode-card" onclick="startMode('learn')">
@@ -127,58 +132,34 @@
                     </div>
                 </div>
                 <div class="table-actions">
-                    <button class="btn-secondary" onclick="showModeScreen()">← Back to Modes</button>
+                    <button class="btn-secondary" onclick="goToModeSelection()">← Back to Modes</button>
                     <button class="btn-primary" onclick="startLearning()" id="startBtn" disabled>Start Learning</button>
                 </div>
             </div>
         </div>
 
-        <!-- Learn Mode Screen -->
+        <!-- Enhanced Learn Mode Screen -->
         <div class="screen" id="learnScreen" style="display: none;">
             <div class="learn-container">
                 <div class="learn-header">
-                    <h2>📚 Learning Times Table <span id="learnTableNumber">2</span></h2>
-                    <p>Listen carefully and repeat after me!</p>
-                </div>
-                
-                <div class="learn-equation">
-                    <div class="equation-display">
-                        <span id="learnEquation">2 × 1 = 2</span>
-                    </div>
-                    <div class="equation-audio">
-                        <button class="btn-audio" id="playEquationBtn" onclick="playEquation()">
-                            🔊 Play
-                        </button>
-                        <button class="btn-audio" id="recordBtn" onclick="startRecording()">
-                            🎤 Repeat
-                        </button>
+                    <h2>🎧 Learn & Repeat Mode</h2>
+                    <div class="mode-indicator">
+                        <span class="phase-badge" id="phaseBadge">Learning Phase</span>
+                        <span class="table-info">Table: <span id="learnTableNum">2</span></span>
                     </div>
                 </div>
 
-                <div class="learn-progress">
-                    <div class="progress-text">
-                        <span id="learnProgress">1 of 10</span>
-                    </div>
-                    <div class="progress-dots">
-                        <div class="dot active"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                    </div>
+                <div class="learn-message" id="learnMessage">
+                    Get ready to learn! First, I'll recite the entire table for you.
                 </div>
 
-                <div class="learn-actions">
-                    <button class="btn-secondary" onclick="previousEquation()">← Previous</button>
-                    <button class="btn-primary" onclick="nextEquation()">Next →</button>
-                    <button class="btn-success" onclick="startPractice()" style="display: none;" id="practiceBtn">
-                        Ready for Practice! 🎯
-                    </button>
+                <div class="learn-content" id="learnContent">
+                    <!-- Equations will be populated by JavaScript -->
+                </div>
+
+                <div class="learn-controls">
+                    <button class="btn-secondary" onclick="goToTableSelection()">← Change Table</button>
+                    <button class="btn-secondary" onclick="goToModeSelection()">🏠 Main Menu</button>
                 </div>
             </div>
         </div>
@@ -197,37 +178,22 @@
                     <div class="question-text">
                         <span id="practiceQuestion">What is 2 × 3?</span>
                     </div>
-                    <button class="btn-audio" onclick="playQuestion()">🔊 Listen</button>
                 </div>
 
-                <div class="answer-methods">
-                    <div class="method-tabs">
-                        <button class="tab-btn active" onclick="switchMethod('voice')">🎤 Voice</button>
-                        <button class="tab-btn" onclick="switchMethod('type')">⌨️ Type</button>
-                    </div>
-
-                    <div class="answer-input" id="voiceInput">
-                        <button class="btn-voice" id="voiceBtn" onclick="startVoiceAnswer()">
-                            🎤 Speak Your Answer
-                        </button>
-                        <div class="voice-feedback" id="voiceFeedback"></div>
-                    </div>
-
-                    <div class="answer-input" id="typeInput" style="display: none;">
-                        <input type="number" id="answerInput" placeholder="Enter your answer">
-                        <button class="btn-primary" onclick="submitAnswer()">Submit</button>
-                    </div>
+                <div class="practice-input">
+                    <input type="number" id="practiceAnswerInput" placeholder="Enter your answer" class="practice-answer-input">
+                    <button class="btn-primary" id="submitPracticeBtn" onclick="submitPracticeAnswer()">Submit Answer</button>
+                    <button class="btn-success" id="nextPracticeBtn" onclick="nextPracticeQuestion()" style="display: none;">
+                        Next Question →
+                    </button>
                 </div>
 
-                <div class="feedback-area" id="feedbackArea">
-                    <!-- Feedback will be shown here -->
+                <div class="practice-feedback-area">
+                    <div id="practiceFeedback" class="practice-feedback"></div>
                 </div>
 
                 <div class="practice-actions">
-                    <button class="btn-secondary" onclick="skipQuestion()">Skip</button>
-                    <button class="btn-primary" onclick="nextQuestion()" id="nextBtn" style="display: none;">
-                        Next Question →
-                    </button>
+                    <button class="btn-secondary" onclick="goToModeSelection()">← Back to Menu</button>
                 </div>
             </div>
         </div>
@@ -240,38 +206,40 @@
                     <div class="challenge-stats">
                         <div class="stat">
                             <span class="stat-label">Time</span>
-                            <span class="stat-value" id="timeLeft">30</span>
+                            <span class="stat-value" id="challengeTime">60</span>
                         </div>
                         <div class="stat">
                             <span class="stat-label">Lives</span>
-                            <span class="stat-value" id="livesLeft">❤️❤️❤️</span>
+                            <span class="stat-value" id="challengeLives">❤️❤️❤️</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Level</span>
+                            <span class="stat-value" id="challengeLevel">1</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Score</span>
+                            <span class="stat-value" id="challengeScore">0</span>
                         </div>
                         <div class="stat">
                             <span class="stat-label">Combo</span>
-                            <span class="stat-value" id="comboCount">0</span>
+                            <span class="stat-value" id="challengeCombo">0</span>
                         </div>
                     </div>
                 </div>
+
+                <div id="challengeMessage" class="challenge-message"></div>
 
                 <div class="challenge-question">
                     <div class="question-text large">
                         <span id="challengeQuestion">7 × 8 = ?</span>
                     </div>
-                    <div class="answer-options" id="answerOptions">
-                        <button class="option-btn" onclick="selectOption(this, 54)">54</button>
-                        <button class="option-btn" onclick="selectOption(this, 56)">56</button>
-                        <button class="option-btn" onclick="selectOption(this, 58)">58</button>
-                        <button class="option-btn" onclick="selectOption(this, 52)">52</button>
+                    <div class="answer-options" id="challengeOptions">
+                        <!-- Options will be generated dynamically -->
                     </div>
                 </div>
 
-                <div class="challenge-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="challengeProgress"></div>
-                    </div>
-                    <div class="level-indicator">
-                        Level <span id="challengeLevel">1</span>
-                    </div>
+                <div class="challenge-actions">
+                    <button class="btn-secondary" onclick="goToModeSelection()">← Back to Menu</button>
                 </div>
             </div>
         </div>
@@ -315,7 +283,7 @@
                 </div>
 
                 <div class="results-actions">
-                    <button class="btn-secondary" onclick="showModeScreen()">← Main Menu</button>
+                    <button class="btn-secondary" onclick="goToModeSelection()">← Main Menu</button>
                     <button class="btn-primary" onclick="playAgain()">Play Again</button>
                     <button class="btn-success" onclick="nextLevel()">Next Level 🚀</button>
                 </div>
@@ -331,6 +299,7 @@
         <source src="data:audio/wav;base64,UklGRkIFAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YR4FAAAAdZkGAAC/EAFAH/BdAL6Dqzu+hbEzvYq2O7yCsj2+iLY8vIGvQb2IuT27fq9DvYi5Pb15rkG+iLo/vXmqQr6Ju0C9d6pCvoi7QL13qEO+iLxBvXWlRL6JvUK9caJFvom+Q71vo0W+ib9EvW2iRr6JwEW9bJ5HvonBRr1qnke+icJHvWiZSL6Jw0i9ZpRJvonESb1kkEq+icVKvWOKS76JxUy9YYNNvonGTb1ffE6+icdPvV52UL6Jx1G9W25Svop3U71Cykq+FvBdRLxHvYfCR71mnUi+hcNJvWSRSr6HxEu9Y4RMvofFTb1hdE6+h8ZPvV9yUL6Hx1G9XXRSvoh2U71bdlS+iHVVvVx0Vr6Ic1e9XnFYvotxWb1fcVq+i25bvWJwXL6KbV29ZGxevoluX71mZ2C+iGNhvWhjYr6JYmO9aWFkvoluZb1qX2a+iVxnvWxaaL6KV2m9blVqvopTa71xUGy+ik1tvXNKbr6KSG+9dUZwvopDcb13QHK+ij1zvXk7dL6KOHa9ezZ2voo0d713N3i+ijJ5vXo0er6KL3u8fC98voouer19KX2+ii5+vX8mf76KJoC8gSWBvoojgr2EIoO+iSKEvYQfhb6KH4a9hiCHvoofh72IHoi+ih+Jvooaib6JG4q9ixmLvooXjL2MFo29ixWOvYwUj76LFo+9jhaQvosUkb2OG5C9jxeSvooVk72QGpO9jhWVvY0Vlr2OFJa9kBSXvY4Tl72RE5i+jhKZvZESmr6OEpq9kRKbvo4Sm72RFJy+jhKdvZETnr6OE569khSfvo4Tn72SFZ+9jhWgvZMVoL6NFqG9kxahvo0Wor2UFqO+jRWjvZQXpL6NFqS9lRaqvY0Wq72VFqu+jRasvZYXrL6NFq29lhitvYwWrr2XGK++jBavvZcYsL6MFrC9mBixvowWsb2YGrK9jBayvZkbs72LFrO9mRu0vYsWtL2aHLW9ixa1vZoct76LFre9mx24vYsWuL2bHrm9ixa5vZseu76LFru9nB+8vYsWvL2cIL29ixW9vZ0hvr2LFb69nSLAvY0Vvr2eI8G9jRS/vZ4jwr2OFL+9nyTCvY4Uv72fJcO9jhPAvZ8mxL2NE8C9oCbFvY0TwL2gJ8a9jhPAvZ8nx72OE7+9oSjJvY4Tv72hKcq9jhO/vaEqy72OE7+9oSvMvY4Tv72hLM29jhO/vaAsz72OE7+9oC3QvY4Tv72gLtG9jhO/vaAu0r2OE7+9oC/TvY4Tv72gL9S9jhO/vaAw1b2OE7+9oTDWvY4Tv72hMde9jhO/vaIw2L2OE7+9ozDZvY0Tv72kMNq9jRO/vaMx3L2OE7+9pDHbvY4Tv72kMt29jhO/vaUx3r2OE7+9pTLevY4Tv72lMuC9jhO/vaUy4b2OEr+9pTLivY4Tv72mMuK9jhK/vaYz472OEr+9pjPkvY4Sv72mM+W9jhK/vaYz5r2OEr+9pjTnvY4Sv72nNOi9jhK/vacz6b2OEr" type="audio/wav">
     </audio>
 
+    <script src="universal-back-button.js"></script>
     <script src="multiplication-master.js"></script>
 </body>
 </html>

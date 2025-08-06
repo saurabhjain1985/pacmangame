@@ -12,6 +12,12 @@ function createUniversalBackButton() {
         return;
     }
     
+    // Ensure document.body exists
+    if (!document.body) {
+        console.log('Document body not ready, waiting...');
+        return;
+    }
+    
     // Create the back button
     const backButton = document.createElement('a');
     backButton.className = 'universal-back-button';

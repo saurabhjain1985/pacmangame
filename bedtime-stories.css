@@ -1203,8 +1203,8 @@ body {
 
 .step-header p {
     font-size: 1.2rem;
-    color: #6b46c1;
-    opacity: 0.9;
+    color: #4c1d95;
+    font-weight: 600;
 }
 
 /* 👫 Character Builder */
@@ -1238,11 +1238,12 @@ body {
     text-align: left;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 600;
-    font-size: 1rem;
-    color: #2d3748;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #1a202c;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .character-chip::before {
@@ -1287,13 +1288,16 @@ body {
     font-size: 1.1rem;
     font-family: inherit;
     background: rgba(255, 255, 255, 0.95);
-    color: #2d3748;
+    color: #1a202c;
+    font-weight: 600;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .character-input-container input::placeholder {
-    color: #718096;
+    color: #4a5568;
     opacity: 1;
+    font-weight: 600;
 }
 
 .character-input-container input:focus {
@@ -1338,6 +1342,8 @@ body {
     position: relative;
     overflow: hidden;
     text-align: center;
+    color: #1a202c;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .theme-card::before {
@@ -1384,13 +1390,15 @@ body {
     font-size: 1.6rem;
     margin-bottom: 15px;
     font-weight: 700;
+    color: #1a202c;
 }
 
 .theme-card p {
     font-size: 1rem;
     line-height: 1.5;
     margin-bottom: 20px;
-    opacity: 0.9;
+    color: #2d3748;
+    font-weight: 600;
 }
 
 .theme-preview {
@@ -1413,6 +1421,8 @@ body {
     border-radius: 25px;
     padding: 30px;
     transition: all 0.3s ease;
+    color: #1a202c;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .setting-card:hover {
@@ -1446,6 +1456,9 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
+    color: #1a202c;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .length-option:hover,
@@ -1485,11 +1498,14 @@ body {
 .length-info strong {
     font-size: 1.1rem;
     margin-bottom: 5px;
+    color: #1a202c;
+    font-weight: 700;
 }
 
 .length-info span {
     font-size: 0.9rem;
-    opacity: 0.8;
+    color: #4a5568;
+    font-weight: 600;
 }
 
 .mood-emoji {
@@ -1520,6 +1536,15 @@ body {
     background: white;
     transition: all 0.3s ease;
     margin-bottom: 10px;
+    color: #1a202c;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.custom-setting input::placeholder {
+    color: #4a5568;
+    font-weight: 600;
+    opacity: 1;
 }
 
 .custom-setting input:focus {
